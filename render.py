@@ -54,44 +54,52 @@ def add_weather_overlay(im,w,theme):
     d=ImageDraw.Draw(im,"RGBA")
 
     # Branded headline: large, centered, balanced like the approved poster.
-    d.text((W//2,72),"🐾",font=font(48),anchor="ma",fill="white")
-    d.text((W//2,132),"TAIPEI",font=font(82),anchor="ma",fill="white")
-    d.text((W//2,222),"MEOWCAST",font=font(86),anchor="ma",fill=accent)
-    d.line((300,318,780,318),fill=accent,width=5)
-    d.text((W//2,338),"Exploring Taipei with you,",font=font(30),anchor="ma",fill="white")
-    d.text((W//2,380),"one little adventure at a time. ♡",font=font(30),anchor="ma",fill="white")
+    d.text((W//2,88),"TAIPEI",font=font(72),anchor="ma",fill="white")
+    d.text((W//2,168),"MEOWCAST",font=font(82),anchor="ma",fill=accent)
+    d.line((320,265,760,265),fill=accent,width=5)
+    d.text((W//2,286),"Exploring Taipei with you,",font=font(28),anchor="ma",fill="white")
+    d.text((W//2,324),"one little adventure at a time.",font=font(28),anchor="ma",fill="white")
 
     date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y / %m / %d (%a)").upper()
-    d.text((W//2,458),date_label,font=font(43),anchor="ma",fill="white")
+    d.text((W//2,390),date_label,font=font(40),anchor="ma",fill="white")
 
     # Main weather information.
-    icon={"sunny":"☀","rainy":"☂","cloudy":"☁","hot":"☀","cold":"❄"}[theme]
-    d.text((205,585),icon,font=font(100),anchor="mm",fill=accent)
-    d.text((500,580),f"{w['high']}°C",font=font(128),anchor="mm",fill="white")
-    d.line((690,515,690,645),fill=(255,255,255,220),width=3)
-    d.text((730,530),"LOW",font=font(35),fill=(245,248,252,255))
-    d.text((730,575),f"{w['low']}°C",font=font(55),fill="white")
+    # Use simple drawn weather symbols; emoji fonts render as tofu boxes on GitHub runners.
+    if theme in ("sunny","hot"):
+        d.ellipse((145,500,215,570),fill=accent)
+        for dx,dy in [(0,-55),(0,55),(-55,0),(55,0),(-40,-40),(40,-40),(-40,40),(40,40)]:
+            d.line((180+dx*.65,535+dy*.65,180+dx,535+dy),fill=accent,width=6)
+    elif theme in ("rainy","cloudy"):
+        d.ellipse((130,515,190,565),fill=accent); d.ellipse((165,495,230,565),fill=accent); d.rectangle((130,535,230,565),fill=accent)
+        if theme=="rainy":
+            for x in (145,180,215): d.line((x,580,x-10,605),fill=accent,width=5)
+    else:
+        d.text((180,535),"*",font=font(90),anchor="mm",fill=accent)
+    d.text((500,535),f"{w['high']}°C",font=font(124),anchor="mm",fill="white")
+    d.line((690,475,690,595),fill=(255,255,255,220),width=3)
+    d.text((730,490),"LOW",font=font(35),fill=(245,248,252,255))
+    d.text((730,535),f"{w['low']}°C",font=font(55),fill="white")
 
     # Accent label ensures Sunny/Rainy remains readable on every photograph.
-    label_box=(315,690,765,785)
+    label_box=(315,635,765,725)
     d.rounded_rectangle(label_box,radius=45,fill=accent)
     text_fill=(30,30,35,255) if theme in ("sunny","hot","cloudy") else (255,255,255,255)
-    d.text((W//2,716),condition,font=font(58),anchor="ma",fill=text_fill)
-    d.text((W//2,812),f"Rain chance {w['rain']}%",font=font(35),anchor="ma",fill="white")
-    d.line((410,862,670,862),fill=accent,width=5)
+    d.text((W//2,657),condition,font=font(54),anchor="ma",fill=text_fill)
+    d.text((W//2,760),f"Rain chance {w['rain']}%",font=font(34),anchor="ma",fill="white")
+    d.line((410,810,670,810),fill=accent,width=5)
 
     # Daily line gets its own dark translucent card: no low-contrast white-on-sky.
-    d.rounded_rectangle((105,900,975,1025),radius=30,fill=(8,16,24,145))
-    d.text((W//2,928),tips[theme],font=font(31),anchor="ma",fill="white")
+    d.rounded_rectangle((105,845,975,960),radius=30,fill=(8,16,24,165))
+    d.text((W//2,880),tips[theme],font=font(29),anchor="ma",fill="white")
 
     # Footer uses a strong dark band so labels remain readable over any base image.
     footer_y=1645
     d.rounded_rectangle((35,footer_y,1045,1880),radius=34,fill=(7,13,18,175))
-    items=[("☕","Warm drink"),("⌂","A cozy day"),("♪","Good mood"),("♥","You got this")]
+    items=["Warm drink","A cozy day","Good mood","You got this"]
     xs=[155,410,670,925]
-    for x,(ico,label) in zip(xs,items):
-        d.text((x,1700),ico,font=font(48),anchor="mm",fill="white")
-        d.text((x,1760),label,font=font(26),anchor="mm",fill="white")
+    for x,label in zip(xs,items):
+        d.ellipse((x-8,1692,x+8,1708),fill=accent)
+        d.text((x,1750),label,font=font(25),anchor="mm",fill="white")
     d.line((90,1810,990,1810),fill=(255,255,255,190),width=2)
     d.text((W//2,1842),"GOOD WEATHER  ·  GOOD DAYS  ·  A HAPPIER YOU",font=font(23),anchor="mm",fill="white")
 
