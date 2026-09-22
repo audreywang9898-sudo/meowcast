@@ -1,0 +1,6 @@
+{
+  "isAI": false,
+  "aiModel": "gpt-5.6-luna",
+  "bilingual": true,
+  "timezone": "Asia/Taipei"
+}
