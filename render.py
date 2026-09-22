@@ -59,3 +59,6 @@ def main():
     os.makedirs("output",exist_ok=True); im.save("output/card.jpg",quality=94)
     make_music("output/bgm.wav")
     subprocess.run(["ffmpeg","-y","-loop","1","-i","output/card.jpg","-i","output/bgm.wav","-vf","scale=1200:2134,zoompan=z='min(zoom+0.0005,1.08)':d=200:s=1080x1920:fps=25","-t","8","-c:v","libx264","-c:a","aac","-b:a","128k","-shortest","-pix_fmt","yuv420p","-movflags","+faststart","output/meowcast.mp4"],check=True)
+    open("output/caption.txt","w",encoding="utf-8").write(cap)
+
+if __name__=="__main__": main()
