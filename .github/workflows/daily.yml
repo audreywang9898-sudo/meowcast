@@ -24,6 +24,14 @@ jobs:
       - name: Generate today's Reel
         run: python render.py
 
+      - name: Verify generated files
+        run: |
+          test -s output/card.jpg
+          test -s output/bgm.wav
+          test -s output/meowcast.mp4
+          test -s output/caption.txt
+          ffprobe -v error -show_entries stream=codec_type,codec_name -of compact output/meowcast.mp4
+
       - name: Upload private artifact
         uses: actions/upload-artifact@v4
         with:
