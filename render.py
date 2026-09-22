@@ -22,11 +22,11 @@ def fallback(theme):
 
 def asset_for(theme):
     candidates={
-        "sunny":["assetssunny.png","assets/sunny.png","assets/sunny.jpg"],
-        "rainy":["assetsrainy.png","assets/rainy.png","assets/rainy.jpg"],
-        "cloudy":["assetscloudy.png","assets/cloudy.png","assets/cloudy.jpg"],
-        "hot":["assetshot.png","assets/hot.png","assets/hot.jpg"],
-        "cold":["assetscold.png","assets/cold.png","assets/cold.jpg"],
+        "sunny":["asset/sunny.png","asset/sunny.jpg"],
+        "rainy":["asset/rainy.png","asset/rainy.jpg"],
+        "cloudy":["asset/cloudy.png","asset/cloudy.jpg"],
+        "hot":["asset/hot.png","asset/hot.jpg"],
+        "cold":["asset/cold.png","asset/cold.jpg"],
     }
     for p in candidates[theme]:
         if os.path.exists(p): return p
