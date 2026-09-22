@@ -2,7 +2,8 @@ import os, subprocess
 from datetime import datetime
 from PIL import Image,ImageDraw,ImageFont
 from weather import get_weather
-from caption import make_caption\nfrom music import make_music
+from caption import make_caption
+from music import make_music
 
 W,H=1080,1920
 
