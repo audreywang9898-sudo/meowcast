@@ -25,9 +25,25 @@ def publish_reel(video_url,caption):
         if data.get("status_code") in ("ERROR","EXPIRED"): raise RuntimeError(json.dumps(data,ensure_ascii=False))
         time.sleep(10)
     else: raise RuntimeError("Timed out waiting for Meta to process the Reel")
-    r=requests.post(base+"/media_publish",data={"creation_id":cid,"access_token":token},timeout=60)
-    fail(r,"Publish Reel")
-    print("Published:",r.json())
+    # Meta occasionally returns transient HTTP 5xx / code 2 even after the container is FINISHED.
+    # Retry publishing the SAME container with exponential backoff instead of creating a duplicate Reel.
+    for attempt in range(1,6):
+        r=requests.post(base+"/media_publish",data={"creation_id":cid,"access_token":token},timeout=60)
+        if r.ok:
+            print("Published:",r.json())
+            return
+        try:
+            detail=r.json()
+        except Exception:
+            detail={"raw":r.text}
+        err=detail.get("error",{}) if isinstance(detail,dict) else {}
+        transient=(r.status_code >= 500 or err.get("is_transient") is True or err.get("code")==2)
+        if transient and attempt < 5:
+            wait=10*(2**(attempt-1))
+            print(f"Transient Meta publish error; retry {attempt}/5 in {wait}s:",json.dumps(detail,ensure_ascii=False))
+            time.sleep(wait)
+            continue
+        fail(r,"Publish Reel")
 
 if __name__=="__main__":
     url=os.environ.get("REEL_PUBLIC_URL")
