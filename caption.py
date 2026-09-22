@@ -1,85 +1,132 @@
+import json
+import os
+import requests
+
+CONFIG_PATH = "config.json"
+
+
+def load_config():
+    defaults = {
+        "isAI": False,
+        "aiModel": "gpt-5.6-luna",
+        "bilingual": True,
+        "timezone": "Asia/Taipei",
+    }
+    try:
+        with open(CONFIG_PATH, encoding="utf-8") as f:
+            defaults.update(json.load(f))
+    except (FileNotFoundError, json.JSONDecodeError) as exc:
+        print(f"Config fallback: {exc}")
+    return defaults
+
+
 def theme(w):
-    if w["rain"] >= 50 or w["code"] >= 51: return "rainy"
-    if w["high"] >= 32: return "hot"
-    if w["high"] <= 18: return "cold"
-    if w["code"] in (0,1): return "sunny"
+    if w["rain"] >= 50 or w["code"] >= 51:
+        return "rainy"
+    if w["high"] >= 32:
+        return "hot"
+    if w["high"] <= 18:
+        return "cold"
+    if w["code"] in (0, 1):
+        return "sunny"
     return "cloudy"
 
-LINES={
-"sunny":("hot and sunny","Sunshine is on duty. ☀️","Early walks, blue skies and a little iced coffee."),
-"rainy":("rainy with showers around","Rainy paws on duty. 🌧️","Umbrella nearby, slower steps and cozy café time."),
-"cloudy":("cloudy and comfortable","Cloudy, but cozy. ☁️","A softer Taipei day for wandering and taking it easy."),
-"hot":("hot with sunny intervals","Stay cool out there. ☀️🥤","Shade, water and iced drinks are Taipei Cat's survival kit."),
-"cold":("cool and chilly","Cold day, warm heart. 🧣","Layers on, warm drink ready, paws staying cozy.")}
 
-def make_caption(w):
-    t=theme(w)
-    condition,opening,activity=LINES[t]
-    rain=w["rain"]
-    date=w["date"].replace("-","/")
+LINES = {
+    "sunny": ("sunny", "晴朗"),
+    "rainy": ("rainy with showers", "有雨，可能有陣雨"),
+    "cloudy": ("cloudy", "多雲"),
+    "hot": ("hot with sunny intervals", "炎熱，間有陽光"),
+    "cold": ("cool and chilly", "涼冷"),
+}
 
-    if rain >= 60:
-        umbrella="☂️ Keep an umbrella nearby!"
-    elif rain >= 30:
-        umbrella="🌦️ A passing shower is possible, so a small umbrella may help."
-    else:
-        umbrella="🐾 Rain chance is low — enjoy the city."
 
-    if t=="hot":
-        reminder="Taipei is bringing the heat today. Drink some water, find a little shade, and don't rush."
-        reflection="Even on the hottest days, a small patch of shade can make everything feel gentler."
-    elif t=="rainy":
-        reminder="Rain changes the rhythm of Taipei. Walk a little slower and let the city sparkle."
-        reflection="You don't need every day to be perfectly sunny to have a beautiful life."
-    elif t=="cold":
-        reminder="A cooler Taipei day calls for warm layers, warm drinks and warm thoughts."
-        reflection="Some days are made for moving slowly and keeping the good things close."
-    elif t=="cloudy":
-        reminder="Not every beautiful day needs a blue sky. Taipei Cat approves of cozy clouds too."
-        reflection="Soft skies can still hold a very good day."
-    else:
-        reminder="Good weather, good mood — Taipei Cat is officially on sunshine duty."
-        reflection="Sunshine doesn't have to make life perfect. Sometimes it just reminds us to enjoy the view."
+def make_simple_caption(w):
+    t = theme(w)
+    en_condition, zh_condition = LINES[t]
+    date = w["date"].replace("-", "/")
+    rain = w["rain"]
 
-    return t, f"""Hi, I’m Taipei Cat! 🐱
+    caption = f"""Hi, I’m Taipei Cat! 🐱
 Exploring Taipei with you, one little adventure and one weather forecast at a time.
 
 {date} Taipei Weather 📍 Taipei Meowcast
-
-{opening}
-
-Today is {condition}, around {w['high']}°C in the daytime. Taipei Cat is checking the sky, enjoying the city and deciding where the next snack should happen. 😹
 
 🌤️ Today’s Weather
 📍 Taipei, Taiwan
 🌡️ {w['high']}°C / {w['low']}°C
 🌧️ Rain chance: {rain}%
-{umbrella}
+Today is {en_condition}. 🐾
 
-😸 Today’s Happiness Index 😸😸😸😸☆
+🌤️ 今日台北天氣
+📍 台北，台灣
+🌡️ 最高 {w['high']}°C / 最低 {w['low']}°C
+🌧️ 降雨機率：{rain}%
+今天{zh_condition}。🐱
 
-Perfect for:
-🐾 {activity}
-📸 A little Taipei photography
-☕ Taking a break when you need one
-🌇 Enjoying the city at your own pace
+Have a lovely day in Taipei. 💛
+祝你在台北度過美好的一天。
 
-🐟 Daily Tuna Index 🐟🐟🐟🐟🐟
+#TaipeiCat #TaipeiMeowcast #TaipeiWeather #Taipei #Taiwan #台北天氣 #台北生活"""
+    return t, caption
 
-Taipei Cat: looking majestic. 😼
-Also Taipei Cat: wondering where lunch is. 😹
 
-🐾 Taipei Cat’s Little Reminder
+def _extract_response_text(data):
+    # Responses API normally returns text inside output -> content -> output_text.
+    parts = []
+    for item in data.get("output", []):
+        for content in item.get("content", []):
+            if content.get("type") == "output_text" and content.get("text"):
+                parts.append(content["text"])
+    return "\n".join(parts).strip()
 
-{reminder}
 
-{reflection}
+def make_ai_caption(w, simple_caption, config):
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENAI_API_KEY is not configured")
 
-Take care of yourself, keep going gently, and enjoy the view along the way. 🐱🐾
+    prompt = f"""You write captions for Taipei Meowcast, a gentle cat-weather account.
+Rewrite the factual caption below into a warm, playful bilingual English + Traditional Chinese caption.
+Keep every weather number exactly unchanged. Do not invent weather facts.
+Keep it concise enough for Instagram/Facebook. Keep the Taipei Cat voice cute but not childish.
+End with relevant hashtags.
 
-If you love cute cats + weather vibes + cozy Taipei content, please like & follow ❤️
-Taipei Cat Weather Forecast is here! 🐾
+FACTUAL CAPTION:
+{simple_caption}"""
 
-Every ❤️ is another can of tuna keeping this weather cat on duty. 🐟
+    response = requests.post(
+        "https://api.openai.com/v1/responses",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "model": config.get("aiModel", "gpt-5.6-luna"),
+            "input": prompt,
+        },
+        timeout=60,
+    )
+    response.raise_for_status()
+    text = _extract_response_text(response.json())
+    if not text:
+        raise RuntimeError("AI returned an empty caption")
+    return text
 
-#TaipeiCat #TaipeiMeowcast #TaipeiWeather #WeatherCat #Taipei101 #Taipei #Taiwan"""
+
+def make_caption(w):
+    config = load_config()
+    t, simple_caption = make_simple_caption(w)
+
+    if not config.get("isAI", False):
+        print("Caption mode: SIMPLE (isAI=false)")
+        return t, simple_caption
+
+    try:
+        ai_caption = make_ai_caption(w, simple_caption, config)
+        print("Caption mode: AI")
+        return t, ai_caption
+    except Exception as exc:
+        # AI is optional: publishing must continue even if the API/key/network fails.
+        print(f"AI caption failed; using SIMPLE fallback: {exc}")
+        return t, simple_caption
