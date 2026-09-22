@@ -78,15 +78,35 @@ HOLIDAY_TRACKS={
     # Original procedural themes: festive in style, not copies of existing songs.
     (1,1):("New Year Cat",118,[60,64,67,72,76,72,69,67]),
     (2,14):("Valentine Love Cat",72,[60,64,67,71,69,67,64,60]),
+    (4,4):("Children's Day Cat",116,[60,64,67,72,74,72,69,67]),
     (10,31):("Halloween Cat",96,[57,60,63,66,63,60,58,57]),
     (12,24):("Christmas Eve Cat",92,[67,71,74,79,74,71,69,67]),
     (12,25):("Christmas Cat",96,[60,64,67,72,76,72,67,69]),
     (12,31):("New Year's Eve Cat",120,[62,66,69,74,78,74,71,69]),
 }
 
+# Taiwan lunar-calendar holidays need year-specific Gregorian dates.
+# Keep this table explicit so scheduled posts are deterministic.
+LUNAR_HOLIDAYS={
+    2026:{
+        (2,17):("Lunar New Year Cat",104,[60,64,67,72,76,72,69,67]),
+        (3,3):("Lantern Festival Cat",96,[64,67,72,76,72,69,67,64]),
+        (6,19):("Dragon Boat Cat",112,[62,67,69,74,71,69,67,62]),
+        (8,19):("Qixi Love Cat",74,[60,64,69,72,69,67,64,60]),
+        (9,25):("Mid-Autumn Moon Cat",82,[57,60,64,69,67,64,60,57]),
+    },
+    2027:{
+        (2,6):("Lunar New Year Cat",104,[60,64,67,72,76,72,69,67]),
+        (2,20):("Lantern Festival Cat",96,[64,67,72,76,72,69,67,64]),
+        (6,9):("Dragon Boat Cat",112,[62,67,69,74,71,69,67,62]),
+        (8,8):("Qixi Love Cat",74,[60,64,69,72,69,67,64,60]),
+        (9,15):("Mid-Autumn Moon Cat",82,[57,60,64,69,67,64,60,57]),
+    },
+}
+
 def holiday_for_date(dt=None):
     dt=dt or datetime.now(ZoneInfo("Asia/Taipei"))
-    return HOLIDAY_TRACKS.get((dt.month,dt.day))
+    return HOLIDAY_TRACKS.get((dt.month,dt.day)) or LUNAR_HOLIDAYS.get(dt.year,{}).get((dt.month,dt.day))
 
 def make_music(path="output/bgm.wav",solar_term=None,dt=None):
     # Priority: holiday > solar term > everyday track.
