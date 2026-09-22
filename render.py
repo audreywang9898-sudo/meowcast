@@ -34,21 +34,55 @@ def asset_for(theme):
 
 def add_weather_overlay(im,w,theme):
     d=ImageDraw.Draw(im,"RGBA")
-    # Dynamic data panel: all values come from today's weather API response.
-    panel=(54,54,1026,500)
-    d.rounded_rectangle(panel,radius=42,fill=(10,18,28,150),outline=(255,255,255,80),width=2)
+    condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy","hot":"Hot","cold":"Cold"}[theme]
+    icons={"sunny":"☀","rainy":"☂","cloudy":"☁","hot":"☀","cold":"❄"}
+    tips={
+        "sunny":"Sunshine is on duty. Enjoy the view!",
+        "rainy":"Rain or shine, tomorrow is a brighter day!",
+        "cloudy":"Soft skies can still hold a very good day.",
+        "hot":"Stay cool, drink water, and find a little shade.",
+        "cold":"Warm layers, warm drinks, warm thoughts.",
+    }
 
-    date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y/%m/%d (%a)").upper()
-    condition={"sunny":"SUNNY","rainy":"RAINY","cloudy":"CLOUDY","hot":"HOT","cold":"COLD"}[theme]
+    # Soft top gradient preserves the artwork while making the editorial text readable.
+    shade=Image.new("RGBA",(W,820),(0,0,0,0))
+    sd=ImageDraw.Draw(shade,"RGBA")
+    for y in range(820):
+        alpha=max(0,int(145*(1-y/820)))
+        sd.rectangle((0,y,W,y+1),fill=(8,18,28,alpha))
+    im.paste(shade,(0,0),shade)
+    d=ImageDraw.Draw(im,"RGBA")
 
-    d.text((92,82),"TAIPEI MEOWCAST",font=font(58),fill=(255,255,255,255))
-    d.text((92,160),date_label,font=font(48),fill=(255,255,255,245))
-    d.text((92,245),f"{w['high']}°C",font=font(112),fill=(255,255,255,255))
-    d.text((430,274),f"LOW  {w['low']}°C",font=font(45),fill=(255,255,255,245))
-    d.text((92,382),condition,font=font(52),fill=(255,255,255,255))
-    rain_text=f"RAIN  {w['rain']}%"
-    rb=d.textbbox((0,0),rain_text,font=font(46))
-    d.text((986-(rb[2]-rb[0]),388),rain_text,font=font(46),fill=(255,255,255,245))
+    # Brand / editorial header.
+    title="TAIPEI\nMEOWCAST"
+    d.multiline_text((W//2,70),title,font=font(72),anchor="ma",align="center",spacing=-8,fill="white")
+    d.text((W//2,238),"Exploring Taipei with you, one little adventure at a time.",font=font(27),anchor="ma",fill=(255,255,255,235))
+
+    # Dynamic date.
+    date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y / %m / %d (%a)").upper()
+    d.text((W//2,315),date_label,font=font(42),anchor="ma",fill="white")
+
+    # Dynamic weather block, visually matching the designed poster.
+    d.text((220,405),icons[theme],font=font(92),anchor="mm",fill=(220,235,255,255))
+    d.text((525,410),f"{w['high']}°C",font=font(118),anchor="mm",fill="white")
+    d.line((700,355,700,465),fill=(255,255,255,190),width=3)
+    d.text((735,372),"LOW",font=font(35),fill=(235,240,248,245))
+    d.text((735,415),f"{w['low']}°C",font=font(52),fill="white")
+    d.text((W//2,515),condition,font=font(66),anchor="ma",fill="white")
+    d.line((400,590,680,590),fill=(180,220,255,230),width=6)
+    d.text((W//2,625),f"Rain chance {w['rain']}%  •  {tips[theme]}",font=font(29),anchor="ma",fill=(255,255,255,240))
+
+    # Bottom editorial footer, kept dynamic-data-free so it never conflicts with weather facts.
+    footer=Image.new("RGBA",(W,220),(8,15,22,115))
+    im.paste(footer,(0,H-220),footer)
+    d=ImageDraw.Draw(im,"RGBA")
+    items=[("☕","Warm drink"),("⌂","A cozy day"),("♪","Good mood"),("♥","You got this")]
+    xs=[150,410,675,930]
+    for x,(ico,label) in zip(xs,items):
+        d.text((x,H-165),ico,font=font(45),anchor="mm",fill="white")
+        d.text((x,H-105),label,font=font(25),anchor="mm",fill="white")
+    d.line((60,H-58,W-60,H-58),fill=(255,255,255,180),width=2)
+    d.text((W//2,H-32),"GOOD WEATHER  ·  GOOD DAYS  ·  A HAPPIER YOU",font=font(23),anchor="mm",fill=(255,255,255,240))
 
 def main():
     w=get_weather(); t,cap=make_caption(w); src=asset_for(t)
