@@ -35,7 +35,8 @@ def asset_for(theme):
 def add_weather_overlay(im,w,theme):
     d=ImageDraw.Draw(im,"RGBA")
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy","hot":"Hot","cold":"Cold"}[theme]
-    accent={"sunny":(255,210,105,245),"rainy":(145,205,255,245),"cloudy":(205,215,225,245),"hot":(255,175,95,245),"cold":(180,220,255,245)}[theme]
+    accent={"sunny":(255,205,88,255),"rainy":(125,195,245,255),"cloudy":(205,215,225,255),"hot":(255,160,78,255),"cold":(170,215,250,255)}[theme]
+    dark=(30,30,35,255)
     tips={
         "sunny":"Sunshine is on duty. Enjoy the view!",
         "rainy":"Rain or shine, tomorrow is a brighter day!",
@@ -44,64 +45,68 @@ def add_weather_overlay(im,w,theme):
         "cold":"Warm layers, warm drinks, warm thoughts.",
     }
 
-    # Strong localized contrast instead of washing out the whole photo.
-    top=Image.new("RGBA",(W,900),(0,0,0,0))
-    td=ImageDraw.Draw(top,"RGBA")
-    for y in range(900):
-        alpha=int(150*(1-y/900))
-        td.rectangle((0,y,W,y+1),fill=(7,18,28,max(0,alpha)))
-    im.paste(top,(0,0),top)
-    d=ImageDraw.Draw(im,"RGBA")
+    # Subtle shadow helper: poster-like lettering without UI boxes.
+    def txt(pos,text,fnt,fill="white",anchor="ma",shadow=True):
+        x,y=pos
+        if shadow:
+            d.text((x+3,y+4),text,font=fnt,anchor=anchor,fill=(0,0,0,105))
+        d.text((x,y),text,font=fnt,anchor=anchor,fill=fill)
 
-    # Branded headline: large, centered, balanced like the approved poster.
-    d.text((W//2,88),"TAIPEI",font=font(72),anchor="ma",fill="white")
-    d.text((W//2,168),"MEOWCAST",font=font(82),anchor="ma",fill=accent)
-    d.line((320,265,760,265),fill=accent,width=5)
-    d.text((W//2,286),"Exploring Taipei with you,",font=font(28),anchor="ma",fill="white")
-    d.text((W//2,324),"one little adventure at a time.",font=font(28),anchor="ma",fill="white")
+    # Local top vignette only; preserve the bright photograph and the cat.
+    grad=Image.new("RGBA",(W,930),(0,0,0,0)); gd=ImageDraw.Draw(grad,"RGBA")
+    for y in range(930):
+        alpha=int(90*max(0,1-y/930))
+        gd.rectangle((0,y,W,y+1),fill=(5,15,25,alpha))
+    im.paste(grad,(0,0),grad); d=ImageDraw.Draw(im,"RGBA")
+
+    # Match the approved poster hierarchy.
+    txt((W//2,76),"TAIPEI",font(78),"white")
+    txt((W//2,162),"MEOWCAST",font(88),accent)
+    d.line((305,263,775,263),fill=accent,width=6)
+    txt((W//2,288),"Exploring Taipei with you,",font(29),"white")
+    txt((W//2,328),"one little adventure at a time.",font(29),"white")
 
     date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y / %m / %d (%a)").upper()
-    d.text((W//2,390),date_label,font=font(40),anchor="ma",fill="white")
+    txt((W//2,405),date_label,font(42),"white")
 
-    # Main weather information.
-    # Use simple drawn weather symbols; emoji fonts render as tofu boxes on GitHub runners.
+    # Main temperature block.
     if theme in ("sunny","hot"):
-        d.ellipse((145,500,215,570),fill=accent)
+        d.ellipse((150,505,220,575),fill=accent)
         for dx,dy in [(0,-55),(0,55),(-55,0),(55,0),(-40,-40),(40,-40),(-40,40),(40,40)]:
-            d.line((180+dx*.65,535+dy*.65,180+dx,535+dy),fill=accent,width=6)
+            d.line((185+dx*.65,540+dy*.65,185+dx,540+dy),fill=accent,width=6)
     elif theme in ("rainy","cloudy"):
-        d.ellipse((130,515,190,565),fill=accent); d.ellipse((165,495,230,565),fill=accent); d.rectangle((130,535,230,565),fill=accent)
+        d.ellipse((135,520,195,570),fill=accent); d.ellipse((170,500,235,570),fill=accent); d.rectangle((135,540,235,570),fill=accent)
         if theme=="rainy":
-            for x in (145,180,215): d.line((x,580,x-10,605),fill=accent,width=5)
+            for x in (150,185,220): d.line((x,585,x-10,610),fill=accent,width=5)
     else:
-        d.text((180,535),"*",font=font(90),anchor="mm",fill=accent)
-    d.text((500,535),f"{w['high']}°C",font=font(124),anchor="mm",fill="white")
-    d.line((690,475,690,595),fill=(255,255,255,220),width=3)
-    d.text((730,490),"LOW",font=font(35),fill=(245,248,252,255))
-    d.text((730,535),f"{w['low']}°C",font=font(55),fill="white")
+        d.line((145,540,225,540),fill=accent,width=7); d.line((185,500,185,580),fill=accent,width=7)
+        d.line((155,510,215,570),fill=accent,width=7); d.line((215,510,155,570),fill=accent,width=7)
 
-    # Accent label ensures Sunny/Rainy remains readable on every photograph.
-    label_box=(315,635,765,725)
-    d.rounded_rectangle(label_box,radius=45,fill=accent)
-    text_fill=(30,30,35,255) if theme in ("sunny","hot","cloudy") else (255,255,255,255)
-    d.text((W//2,657),condition,font=font(54),anchor="ma",fill=text_fill)
-    d.text((W//2,760),f"Rain chance {w['rain']}%",font=font(34),anchor="ma",fill="white")
-    d.line((410,810,670,810),fill=accent,width=5)
+    txt((505,535),f"{w['high']}°C",font(126),"white",anchor="mm")
+    d.line((700,480,700,600),fill=(255,255,255,220),width=3)
+    txt((740,495),"LOW",font(34),(245,248,252,255),anchor="la")
+    txt((740,540),f"{w['low']}°C",font(54),"white",anchor="la")
 
-    # Daily line gets its own dark translucent card: no low-contrast white-on-sky.
-    d.rounded_rectangle((105,845,975,960),radius=30,fill=(8,16,24,165))
-    d.text((W//2,880),tips[theme],font=font(29),anchor="ma",fill="white")
+    # Painted weather label like the design reference, not a UI button.
+    d.rounded_rectangle((335,650,745,738),radius=40,fill=accent)
+    label_fill=dark if theme in ("sunny","hot","cloudy") else (255,255,255,255)
+    txt((W//2,671),condition,font(54),label_fill,shadow=False)
+    txt((W//2,765),f"Rain chance {w['rain']}%",font(34),"white")
+    d.line((430,817,650,817),fill=accent,width=5)
 
-    # Footer uses a strong dark band so labels remain readable over any base image.
-    footer_y=1645
-    d.rounded_rectangle((35,footer_y,1045,1880),radius=34,fill=(7,13,18,175))
-    items=["Warm drink","A cozy day","Good mood","You got this"]
+    # Handwritten-note feel: no black rectangle.
+    txt((125,855),tips[theme],font(29),"white",anchor="la")
+
+    # Minimal footer inspired by the poster; placed above Reel UI safe area.
+    footer_y=1660
+    d.line((90,footer_y,990,footer_y),fill=(255,255,255,190),width=2)
+    labels=["Warm drink","A cozy day","Good mood","You got this"]
     xs=[155,410,670,925]
-    for x,label in zip(xs,items):
-        d.ellipse((x-8,1692,x+8,1708),fill=accent)
-        d.text((x,1750),label,font=font(25),anchor="mm",fill="white")
-    d.line((90,1810,990,1810),fill=(255,255,255,190),width=2)
-    d.text((W//2,1842),"GOOD WEATHER  ·  GOOD DAYS  ·  A HAPPIER YOU",font=font(23),anchor="mm",fill="white")
+    for x,label in zip(xs,labels):
+        d.ellipse((x-7,footer_y+45,x+7,footer_y+59),fill=accent)
+        txt((x,footer_y+78),label,font(24),"white",anchor="ma")
+    d.line((90,footer_y+125,990,footer_y+125),fill=(255,255,255,150),width=2)
+    txt((W//2,footer_y+148),"GOOD WEATHER  ·  GOOD DAYS  ·  A HAPPIER YOU",font(22),"white")
 
 def main():
     w=get_weather(); t,cap=make_caption(w); src=asset_for(t)
