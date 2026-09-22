@@ -74,11 +74,31 @@ def _render(path,bpm,notes,title,duration=DUR):
     print("BGM:",title)
     return path
 
-def make_music(path="output/bgm.wav",solar_term=None):
+HOLIDAY_TRACKS={
+    # Original procedural themes: festive in style, not copies of existing songs.
+    (1,1):("New Year Cat",118,[60,64,67,72,76,72,69,67]),
+    (2,14):("Valentine Love Cat",72,[60,64,67,71,69,67,64,60]),
+    (10,31):("Halloween Cat",96,[57,60,63,66,63,60,58,57]),
+    (12,24):("Christmas Eve Cat",92,[67,71,74,79,74,71,69,67]),
+    (12,25):("Christmas Cat",96,[60,64,67,72,76,72,67,69]),
+    (12,31):("New Year's Eve Cat",120,[62,66,69,74,78,74,71,69]),
+}
+
+def holiday_for_date(dt=None):
+    dt=dt or datetime.now(ZoneInfo("Asia/Taipei"))
+    return HOLIDAY_TRACKS.get((dt.month,dt.day))
+
+def make_music(path="output/bgm.wav",solar_term=None,dt=None):
+    # Priority: holiday > solar term > everyday track.
+    holiday=holiday_for_date(dt)
+    if holiday:
+        title,bpm,notes=holiday
+        return _render(path,bpm,notes,title)
     if solar_term and solar_term in SOLAR_TERMS:
         zh,en,bpm,notes=SOLAR_TERMS[solar_term]
         return _render(path,bpm,notes,f"{zh} / {en}")
-    bpm,notes,title=TRACKS[datetime.now(ZoneInfo("Asia/Taipei")).weekday()]
+    now=dt or datetime.now(ZoneInfo("Asia/Taipei"))
+    bpm,notes,title=TRACKS[now.weekday()]
     return _render(path,bpm,notes,title)
 
 def generate_solar_term_library(directory="output/solar_terms"):
