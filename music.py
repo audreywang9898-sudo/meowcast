@@ -58,18 +58,18 @@ def _render(path,bpm,notes,title,duration=DUR):
         f=hz(notes[k%len(notes)])
         for i in range(int(st*SR),min(n,int((st+.5)*SR))):
             t=i/SR-st
-            env=(1-math.exp(-30*t))*math.exp(-5*t)
-            # Bell-like melody, generated mathematically; no sampled/copyrighted audio.
-            audio[i]+=.18*env*(math.sin(2*math.pi*f*t)+.25*math.sin(4*math.pi*f*t))
+            env=(1-math.exp(-12*t))*math.exp(-4.2*t)
+            # Soft rounded tone: gentle attack, restrained harmonic content.
+            audio[i]+=.13*env*(math.sin(2*math.pi*f*t)+.10*math.sin(4*math.pi*f*t))
     root=hz(notes[0]-12)
     for i in range(n):
         t=i/SR
-        audio[i]+=.03*math.sin(2*math.pi*root*t)
+        audio[i]+=.018*math.sin(2*math.pi*root*t)
     peak=max(map(abs,audio)) or 1
     with wave.open(path,"w") as w:
         w.setparams((1,2,SR,n,"NONE","not compressed"))
         w.writeframes(b"".join(
-            struct.pack("<h",int(max(-1,min(1,x/peak*.8))*32767)) for x in audio
+            struct.pack("<h",int(max(-1,min(1,x/peak*.62))*32767)) for x in audio
         ))
     print("BGM:",title)
     return path
