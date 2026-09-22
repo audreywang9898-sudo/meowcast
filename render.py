@@ -32,16 +32,23 @@ def asset_for(theme):
         if os.path.exists(p): return p
     return None
 
-def add_date(im,date_text):
-    d=ImageDraw.Draw(im)
-    label=datetime.strptime(date_text,"%Y-%m-%d").strftime("%Y/%m/%d")
-    f=font(44)
-    box=d.textbbox((0,0),label,font=f)
-    tw=box[2]-box[0]
-    x=(W-tw)//2
-    # English/numeric only; translucent pill keeps date readable over any artwork.
-    d.rounded_rectangle((x-28,28,x+tw+28,94),radius=26,fill=(255,255,255,215))
-    d.text((x,36),label,font=f,fill=(35,35,35))
+def add_weather_overlay(im,w,theme):
+    d=ImageDraw.Draw(im,"RGBA")
+    # Dynamic data panel: all values come from today's weather API response.
+    panel=(54,54,1026,500)
+    d.rounded_rectangle(panel,radius=42,fill=(10,18,28,150),outline=(255,255,255,80),width=2)
+
+    date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y/%m/%d (%a)").upper()
+    condition={"sunny":"SUNNY","rainy":"RAINY","cloudy":"CLOUDY","hot":"HOT","cold":"COLD"}[theme]
+
+    d.text((92,82),"TAIPEI MEOWCAST",font=font(58),fill=(255,255,255,255))
+    d.text((92,160),date_label,font=font(48),fill=(255,255,255,245))
+    d.text((92,245),f"{w['high']}°C",font=font(112),fill=(255,255,255,255))
+    d.text((430,274),f"LOW  {w['low']}°C",font=font(45),fill=(255,255,255,245))
+    d.text((92,382),condition,font=font(52),fill=(255,255,255,255))
+    rain_text=f"RAIN  {w['rain']}%"
+    rb=d.textbbox((0,0),rain_text,font=font(46))
+    d.text((986-(rb[2]-rb[0]),388),rain_text,font=font(46),fill=(255,255,255,245))
 
 def main():
     w=get_weather(); t,cap=make_caption(w); src=asset_for(t)
@@ -55,7 +62,7 @@ def main():
         d.text((70,125),"TAIPEI MEOWCAST",font=font(66),fill="white")
         d.text((70,220),f"{w['low']}–{w['high']}°C",font=font(48),fill="white")
         d.text((70,295),f"Rain {w['rain']}%",font=font(42),fill="white")
-    add_date(im,w["date"])
+    add_weather_overlay(im,w,t)
     os.makedirs("output",exist_ok=True); im.save("output/card.jpg",quality=94)
     make_music("output/bgm.wav")
     subprocess.run(["ffmpeg","-y","-loop","1","-i","output/card.jpg","-i","output/bgm.wav","-vf","scale=1200:2134,zoompan=z='min(zoom+0.0005,1.08)':d=200:s=1080x1920:fps=25","-t","8","-c:v","libx264","-c:a","aac","-b:a","128k","-shortest","-pix_fmt","yuv420p","-movflags","+faststart","output/meowcast.mp4"],check=True)
