@@ -1,5 +1,7 @@
 import os,time,requests,json
 
+API="https://graph.instagram.com/v24.0"
+
 def fail(r,label):
     if r.ok: return
     try: detail=r.json()
@@ -11,13 +13,12 @@ def publish_reel(video_url,caption):
     if not ig or not token:
         print("IG publishing skipped: missing GitHub secrets.")
         return
-    base=f"https://graph.facebook.com/v24.0/{ig}"
+    base=f"{API}/{ig}"
     r=requests.post(base+"/media",data={"media_type":"REELS","video_url":video_url,"caption":caption,"share_to_feed":"true","access_token":token},timeout=60)
     fail(r,"Create Reel container")
-    cid=r.json()["id"]
-    print("Container created:",cid)
+    cid=r.json()["id"]; print("Container created:",cid)
     for _ in range(30):
-        s=requests.get(f"https://graph.facebook.com/v24.0/{cid}",params={"fields":"status_code,status","access_token":token},timeout=30)
+        s=requests.get(f"{API}/{cid}",params={"fields":"status_code,status","access_token":token},timeout=30)
         fail(s,"Check Reel status")
         data=s.json(); print("Meta status:",data.get("status_code"))
         if data.get("status_code")=="FINISHED": break
