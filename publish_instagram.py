@@ -1,18 +1,32 @@
-import os,time,requests
+import os,time,requests,json
+
+def fail(r,label):
+    if r.ok: return
+    try: detail=r.json()
+    except Exception: detail=r.text
+    raise RuntimeError(f"{label} failed (HTTP {r.status_code}): {json.dumps(detail,ensure_ascii=False)}")
 
 def publish_reel(video_url,caption):
     ig=os.environ.get("IG_USER_ID"); token=os.environ.get("IG_ACCESS_TOKEN")
     if not ig or not token:
-        print("IG publishing skipped: add IG_USER_ID and IG_ACCESS_TOKEN as GitHub Actions secrets.")
+        print("IG publishing skipped: missing GitHub secrets.")
         return
     base=f"https://graph.facebook.com/v24.0/{ig}"
-    r=requests.post(base+"/media",data={"media_type":"REELS","video_url":video_url,"caption":caption,"share_to_feed":"true","access_token":token},timeout=60); r.raise_for_status(); cid=r.json()["id"]
+    r=requests.post(base+"/media",data={"media_type":"REELS","video_url":video_url,"caption":caption,"share_to_feed":"true","access_token":token},timeout=60)
+    fail(r,"Create Reel container")
+    cid=r.json()["id"]
+    print("Container created:",cid)
     for _ in range(30):
-        s=requests.get(f"https://graph.facebook.com/v24.0/{cid}",params={"fields":"status_code","access_token":token},timeout=30).json()
-        if s.get("status_code")=="FINISHED": break
-        if s.get("status_code")=="ERROR": raise RuntimeError(s)
+        s=requests.get(f"https://graph.facebook.com/v24.0/{cid}",params={"fields":"status_code,status","access_token":token},timeout=30)
+        fail(s,"Check Reel status")
+        data=s.json(); print("Meta status:",data.get("status_code"))
+        if data.get("status_code")=="FINISHED": break
+        if data.get("status_code") in ("ERROR","EXPIRED"): raise RuntimeError(json.dumps(data,ensure_ascii=False))
         time.sleep(10)
-    r=requests.post(base+"/media_publish",data={"creation_id":cid,"access_token":token},timeout=60); r.raise_for_status(); print(r.json())
+    else: raise RuntimeError("Timed out waiting for Meta to process the Reel")
+    r=requests.post(base+"/media_publish",data={"creation_id":cid,"access_token":token},timeout=60)
+    fail(r,"Publish Reel")
+    print("Published:",r.json())
 
 if __name__=="__main__":
     url=os.environ.get("REEL_PUBLIC_URL")
