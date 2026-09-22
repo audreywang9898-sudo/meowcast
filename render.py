@@ -19,7 +19,7 @@ def fallback(theme):
     return im
 
 def main():
-    w=get_weather(); t,cap=make_caption(w); src=f"assets/{t}.jpg"
+    w=get_weather(); t,cap=make_caption(w); src = "assetssunny.png" if t == "sunny" and os.path.exists("assetssunny.png") else f"assets/{t}.jpg"
     if os.path.exists(src):
         im=Image.open(src).convert("RGB"); scale=max(W/im.width,H/im.height); im=im.resize((int(im.width*scale),int(im.height*scale)))
         x=(im.width-W)//2; y=(im.height-H)//2; im=im.crop((x,y,x+W,y+H))
