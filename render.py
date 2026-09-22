@@ -35,7 +35,7 @@ def asset_for(theme):
 def add_weather_overlay(im,w,theme):
     d=ImageDraw.Draw(im,"RGBA")
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy","hot":"Hot","cold":"Cold"}[theme]
-    icons={"sunny":"☀","rainy":"☂","cloudy":"☁","hot":"☀","cold":"❄"}
+    accent={"sunny":(255,210,105,245),"rainy":(145,205,255,245),"cloudy":(205,215,225,245),"hot":(255,175,95,245),"cold":(180,220,255,245)}[theme]
     tips={
         "sunny":"Sunshine is on duty. Enjoy the view!",
         "rainy":"Rain or shine, tomorrow is a brighter day!",
@@ -44,45 +44,56 @@ def add_weather_overlay(im,w,theme):
         "cold":"Warm layers, warm drinks, warm thoughts.",
     }
 
-    # Soft top gradient preserves the artwork while making the editorial text readable.
-    shade=Image.new("RGBA",(W,820),(0,0,0,0))
-    sd=ImageDraw.Draw(shade,"RGBA")
-    for y in range(820):
-        alpha=max(0,int(145*(1-y/820)))
-        sd.rectangle((0,y,W,y+1),fill=(8,18,28,alpha))
-    im.paste(shade,(0,0),shade)
+    # Strong localized contrast instead of washing out the whole photo.
+    top=Image.new("RGBA",(W,900),(0,0,0,0))
+    td=ImageDraw.Draw(top,"RGBA")
+    for y in range(900):
+        alpha=int(150*(1-y/900))
+        td.rectangle((0,y,W,y+1),fill=(7,18,28,max(0,alpha)))
+    im.paste(top,(0,0),top)
     d=ImageDraw.Draw(im,"RGBA")
 
-    # Brand / editorial header.
-    title="TAIPEI\nMEOWCAST"
-    d.multiline_text((W//2,70),title,font=font(72),anchor="ma",align="center",spacing=-8,fill="white")
-    d.text((W//2,238),"Exploring Taipei with you, one little adventure at a time.",font=font(27),anchor="ma",fill=(255,255,255,235))
+    # Branded headline: large, centered, balanced like the approved poster.
+    d.text((W//2,72),"🐾",font=font(48),anchor="ma",fill="white")
+    d.text((W//2,132),"TAIPEI",font=font(82),anchor="ma",fill="white")
+    d.text((W//2,222),"MEOWCAST",font=font(86),anchor="ma",fill=accent)
+    d.line((300,318,780,318),fill=accent,width=5)
+    d.text((W//2,338),"Exploring Taipei with you,",font=font(30),anchor="ma",fill="white")
+    d.text((W//2,380),"one little adventure at a time. ♡",font=font(30),anchor="ma",fill="white")
 
-    # Dynamic date.
     date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y / %m / %d (%a)").upper()
-    d.text((W//2,315),date_label,font=font(42),anchor="ma",fill="white")
+    d.text((W//2,458),date_label,font=font(43),anchor="ma",fill="white")
 
-    # Dynamic weather block, visually matching the designed poster.
-    d.text((220,405),icons[theme],font=font(92),anchor="mm",fill=(220,235,255,255))
-    d.text((525,410),f"{w['high']}°C",font=font(118),anchor="mm",fill="white")
-    d.line((700,355,700,465),fill=(255,255,255,190),width=3)
-    d.text((735,372),"LOW",font=font(35),fill=(235,240,248,245))
-    d.text((735,415),f"{w['low']}°C",font=font(52),fill="white")
-    d.text((W//2,515),condition,font=font(66),anchor="ma",fill="white")
-    d.line((400,590,680,590),fill=(180,220,255,230),width=6)
-    d.text((W//2,625),f"Rain chance {w['rain']}%  •  {tips[theme]}",font=font(29),anchor="ma",fill=(255,255,255,240))
+    # Main weather information.
+    icon={"sunny":"☀","rainy":"☂","cloudy":"☁","hot":"☀","cold":"❄"}[theme]
+    d.text((205,585),icon,font=font(100),anchor="mm",fill=accent)
+    d.text((500,580),f"{w['high']}°C",font=font(128),anchor="mm",fill="white")
+    d.line((690,515,690,645),fill=(255,255,255,220),width=3)
+    d.text((730,530),"LOW",font=font(35),fill=(245,248,252,255))
+    d.text((730,575),f"{w['low']}°C",font=font(55),fill="white")
 
-    # Bottom editorial footer, kept dynamic-data-free so it never conflicts with weather facts.
-    footer=Image.new("RGBA",(W,220),(8,15,22,115))
-    im.paste(footer,(0,H-220),footer)
-    d=ImageDraw.Draw(im,"RGBA")
+    # Accent label ensures Sunny/Rainy remains readable on every photograph.
+    label_box=(315,690,765,785)
+    d.rounded_rectangle(label_box,radius=45,fill=accent)
+    text_fill=(30,30,35,255) if theme in ("sunny","hot","cloudy") else (255,255,255,255)
+    d.text((W//2,716),condition,font=font(58),anchor="ma",fill=text_fill)
+    d.text((W//2,812),f"Rain chance {w['rain']}%",font=font(35),anchor="ma",fill="white")
+    d.line((410,862,670,862),fill=accent,width=5)
+
+    # Daily line gets its own dark translucent card: no low-contrast white-on-sky.
+    d.rounded_rectangle((105,900,975,1025),radius=30,fill=(8,16,24,145))
+    d.text((W//2,928),tips[theme],font=font(31),anchor="ma",fill="white")
+
+    # Footer uses a strong dark band so labels remain readable over any base image.
+    footer_y=1645
+    d.rounded_rectangle((35,footer_y,1045,1880),radius=34,fill=(7,13,18,175))
     items=[("☕","Warm drink"),("⌂","A cozy day"),("♪","Good mood"),("♥","You got this")]
-    xs=[150,410,675,930]
+    xs=[155,410,670,925]
     for x,(ico,label) in zip(xs,items):
-        d.text((x,H-165),ico,font=font(45),anchor="mm",fill="white")
-        d.text((x,H-105),label,font=font(25),anchor="mm",fill="white")
-    d.line((60,H-58,W-60,H-58),fill=(255,255,255,180),width=2)
-    d.text((W//2,H-32),"GOOD WEATHER  ·  GOOD DAYS  ·  A HAPPIER YOU",font=font(23),anchor="mm",fill=(255,255,255,240))
+        d.text((x,1700),ico,font=font(48),anchor="mm",fill="white")
+        d.text((x,1760),label,font=font(26),anchor="mm",fill="white")
+    d.line((90,1810,990,1810),fill=(255,255,255,190),width=2)
+    d.text((W//2,1842),"GOOD WEATHER  ·  GOOD DAYS  ·  A HAPPIER YOU",font=font(23),anchor="mm",fill="white")
 
 def main():
     w=get_weather(); t,cap=make_caption(w); src=asset_for(t)
@@ -91,11 +102,6 @@ def main():
         x=(im.width-W)//2; y=(im.height-H)//2; im=im.crop((x,y,x+W,y+H))
     else:
         im=fallback(t)
-        d=ImageDraw.Draw(im)
-        overlay=Image.new("RGBA",(W,430),(0,0,0,125)); im.paste(overlay,(0,0),overlay)
-        d.text((70,125),"TAIPEI MEOWCAST",font=font(66),fill="white")
-        d.text((70,220),f"{w['low']}–{w['high']}°C",font=font(48),fill="white")
-        d.text((70,295),f"Rain {w['rain']}%",font=font(42),fill="white")
     add_weather_overlay(im,w,t)
     os.makedirs("output",exist_ok=True); im.save("output/card.jpg",quality=94)
     make_music("output/bgm.wav")
