@@ -2,7 +2,7 @@ import os, subprocess
 from datetime import datetime
 from PIL import Image,ImageDraw,ImageFont
 from weather import get_weather
-from caption import make_caption
+from caption import make_caption\nfrom music import make_music
 
 W,H=1080,1920
 
@@ -56,7 +56,5 @@ def main():
         d.text((70,295),f"Rain {w['rain']}%",font=font(42),fill="white")
     add_date(im,w["date"])
     os.makedirs("output",exist_ok=True); im.save("output/card.jpg",quality=94)
-    subprocess.run(["ffmpeg","-y","-loop","1","-i","output/card.jpg","-vf","scale=1200:2134,zoompan=z='min(zoom+0.0005,1.08)':d=200:s=1080x1920:fps=25","-t","8","-c:v","libx264","-pix_fmt","yuv420p","-movflags","+faststart","output/meowcast.mp4"],check=True)
-    open("output/caption.txt","w",encoding="utf-8").write(cap)
-
-if __name__=="__main__": main()
+    make_music("output/bgm.wav")
+    subprocess.run(["ffmpeg","-y","-loop","1","-i","output/card.jpg","-i","output/bgm.wav","-vf","scale=1200:2134,zoompan=z='min(zoom+0.0005,1.08)':d=200:s=1080x1920:fps=25","-t","8","-c:v","libx264","-c:a","aac","-b:a","128k","-shortest","-pix_fmt","yuv420p","-movflags","+faststart","output/meowcast.mp4"],check=True)
