@@ -1,0 +1,78 @@
+TAIPEI MEOWCAST — MUSIC & CALENDAR MAP
+=======================================
+Purpose: Reference list for automatic Taipei Meowcast BGM selection.
+Priority: Special Holiday > Solar Term > Everyday Music
+
+A. SPECIAL HOLIDAYS
+-------------------
+01/01  New Year's Day       -> New Year Cat
+02/14  Valentine's Day      -> Valentine Love Cat
+10/31  Halloween            -> Halloween Cat
+12/24  Christmas Eve        -> Christmas Eve Cat
+12/25  Christmas Day        -> Christmas Cat
+12/31  New Year's Eve       -> New Year's Eve Cat
+
+Notes:
+- Holiday tracks are original procedural Meowcast themes.
+- Christmas tracks use an original festive/Christmas mood; they do not copy an existing song.
+- Valentine's Day uses a slower, warm and romantic mood.
+
+B. 24 SOLAR TERMS
+-----------------
+Dates vary slightly by year. The solar-term engine should identify the actual date
+for the current year rather than permanently assuming one calendar date.
+
+01. 立春  Lichun       / Beginning of Spring -> lichun.wav
+02. 雨水  Yushui       / Rain Water          -> yushui.wav
+03. 驚蟄  Jingzhe      / Awakening of Insects-> jingzhe.wav
+04. 春分  Chunfen      / Spring Equinox      -> chunfen.wav
+05. 清明  Qingming     / Pure Brightness     -> qingming.wav
+06. 穀雨  Guyu         / Grain Rain          -> guyu.wav
+07. 立夏  Lixia        / Beginning of Summer -> lixia.wav
+08. 小滿  Xiaoman      / Grain Buds          -> xiaoman.wav
+09. 芒種  Mangzhong    / Grain in Ear        -> mangzhong.wav
+10. 夏至  Xiazhi       / Summer Solstice     -> xiazhi.wav
+11. 小暑  Xiaoshu      / Minor Heat          -> xiaoshu.wav
+12. 大暑  Dashu        / Major Heat          -> dashu.wav
+13. 立秋  Liqiu        / Beginning of Autumn -> liqiu.wav
+14. 處暑  Chushu       / End of Heat         -> chushu.wav
+15. 白露  Bailu        / White Dew           -> bailu.wav
+16. 秋分  Qiufen       / Autumn Equinox      -> qiufen.wav
+17. 寒露  Hanlu        / Cold Dew            -> hanlu.wav
+18. 霜降  Shuangjiang  / Frost's Descent     -> shuangjiang.wav
+19. 立冬  Lidong       / Beginning of Winter -> lidong.wav
+20. 小雪  Xiaoxue      / Minor Snow          -> xiaoxue.wav
+21. 大雪  Daxue        / Major Snow          -> daxue.wav
+22. 冬至  Dongzhi      / Winter Solstice     -> dongzhi.wav
+23. 小寒  Xiaohan      / Minor Cold          -> xiaohan.wav
+24. 大寒  Dahan        / Major Cold          -> dahan.wav
+
+C. EVERYDAY MUSIC
+-----------------
+If today is neither a special holiday nor a solar term, Meowcast uses the
+weekday-based everyday BGM library:
+
+Monday    -> Fresh Start
+Tuesday   -> Sunny Steps
+Wednesday -> Cozy City
+Thursday  -> Little Adventure
+Friday    -> Happy Paws
+Saturday  -> Slow Morning
+Sunday    -> Soft Sunshine
+
+D. CURRENT SELECTION RULE
+-------------------------
+1. Check whether today is a configured special holiday.
+2. If yes, use that holiday's BGM.
+3. Otherwise, check whether today is one of the 24 solar terms.
+4. If yes, use that solar-term BGM.
+5. Otherwise, use the normal weekday BGM.
+
+Future candidates:
+- Lunar New Year / 春節
+- Lantern Festival / 元宵節
+- Dragon Boat Festival / 端午節
+- Mid-Autumn Festival / 中秋節
+- Other Taipei/Taiwan-specific commemorative or seasonal days
+
+Last updated: 2026-09-22
