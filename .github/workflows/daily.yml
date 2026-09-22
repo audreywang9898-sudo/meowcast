@@ -3,6 +3,10 @@ on:
   schedule:
     - cron: '30 23 * * *'
   workflow_dispatch:
+
+permissions:
+  contents: write
+
 jobs:
   reel:
     runs-on: ubuntu-latest
@@ -14,7 +18,38 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements.txt
       - run: python render.py
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload private artifact
+        uses: actions/upload-artifact@v4
         with:
           name: daily-meowcast
           path: output/
+
+      - name: Publish video to public media branch
+        run: |
+          mkdir /tmp/media
+          cp output/meowcast.mp4 /tmp/media/meowcast.mp4
+          cd /tmp/media
+          git init
+          git checkout -b media
+          git config user.name "meowcast-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add meowcast.mp4
+          git commit -m "Update daily Reel"
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin media
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Reel to Instagram
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          REEL_PUBLIC_URL: https://raw.githubusercontent.com/${{ github.repository }}/media/meowcast.mp4
+        run: |
+          if [ -n "$IG_USER_ID" ] && [ -n "$IG_ACCESS_TOKEN" ]; then
+            sleep 15
+            python publish_instagram.py
+          else
+            echo "Instagram secrets are not configured; Reel generation succeeded and publishing was skipped."
+          fi
