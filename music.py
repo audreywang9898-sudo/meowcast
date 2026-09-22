@@ -78,7 +78,12 @@ HOLIDAY_TRACKS={
     # Original procedural themes: festive in style, not copies of existing songs.
     (1,1):("New Year Cat",118,[60,64,67,72,76,72,69,67]),
     (2,14):("Valentine Love Cat",72,[60,64,67,71,69,67,64,60]),
+    (2,28):("Peaceful Paws",68,[60,64,67,69,67,64,62,60]),
     (4,4):("Children's Day Cat",116,[60,64,67,72,74,72,69,67]),
+    (5,1):("May Day Cat",104,[60,64,67,69,72,69,67,64]),
+    (9,28):("Teacher Appreciation Cat",88,[60,64,67,71,69,67,64,62]),
+    (10,10):("Taiwan Celebration Cat",112,[60,67,72,76,72,69,67,64]),
+    (10,25):("Autumn Taiwan Cat",90,[57,60,64,67,69,67,64,60]),
     (10,31):("Halloween Cat",96,[57,60,63,66,63,60,58,57]),
     (12,24):("Christmas Eve Cat",92,[67,71,74,79,74,71,69,67]),
     (12,25):("Christmas Cat",96,[60,64,67,72,76,72,67,69]),
