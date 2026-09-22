@@ -7,7 +7,12 @@ A. SPECIAL HOLIDAYS
 -------------------
 01/01  New Year's Day       -> New Year Cat
 02/14  Valentine's Day      -> Valentine Love Cat
+02/28  Peace Memorial Day   -> Peaceful Paws
 04/04  Children's Day       -> Children's Day Cat
+05/01  Labor Day            -> May Day Cat
+09/28  Teachers' Day        -> Teacher Appreciation Cat
+10/10  National Day         -> Taiwan Celebration Cat
+10/25  Taiwan Retrocession & Kinmen Guningtou Victory Memorial Day -> Autumn Taiwan Cat
 Lunar   Lunar New Year      -> Lunar New Year Cat
 Lunar   Lantern Festival    -> Lantern Festival Cat
 Lunar   Dragon Boat Festival-> Dragon Boat Cat
@@ -15,7 +20,7 @@ Lunar   Qixi Festival       -> Qixi Love Cat
 Lunar   Mid-Autumn Festival -> Mid-Autumn Moon Cat
 10/31  Halloween            -> Halloween Cat
 12/24  Christmas Eve        -> Christmas Eve Cat
-12/25  Christmas Day        -> Christmas Cat
+12/25  Christmas Day / Constitution Day -> Christmas Cat
 12/31  New Year's Eve       -> New Year's Eve Cat
 
 Notes:
