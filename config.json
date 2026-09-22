@@ -1,5 +1,5 @@
 {
-  "isAI": false,
+  "isAI": true,
   "aiModel": "gpt-5.6-luna",
   "bilingual": true,
   "timezone": "Asia/Taipei"
