@@ -6,12 +6,80 @@ def theme(w):
     return "cloudy"
 
 LINES={
-"sunny":("Sunshine is on duty.","陽光值班中，出門走走吧！"),
-"rainy":("Rainy day. Paws stay dry.","今天記得帶傘，貓也不想淋濕。"),
-"cloudy":("Cloudy skies. Cozy vibes.","有點陰天，但心情依然柔軟。"),
-"hot":("Stay cool. More treats!","天氣好熱，記得多喝水！"),
-"cold":("Cold days. Warm hearts.","天氣有點冷，記得保暖喔！")}
+"sunny":("hot and sunny","Sunshine is on duty. ☀️","Early walks, blue skies and a little iced coffee."),
+"rainy":("rainy with showers around","Rainy paws on duty. 🌧️","Umbrella nearby, slower steps and cozy café time."),
+"cloudy":("cloudy and comfortable","Cloudy, but cozy. ☁️","A softer Taipei day for wandering and taking it easy."),
+"hot":("hot with sunny intervals","Stay cool out there. ☀️🥤","Shade, water and iced drinks are Taipei Cat's survival kit."),
+"cold":("cool and chilly","Cold day, warm heart. 🧣","Layers on, warm drink ready, paws staying cozy.")}
 
 def make_caption(w):
-    t=theme(w); en,zh=LINES[t]
-    return t, f"Taipei Meowcast 🐾\n{w['date']} · {w['low']}–{w['high']}°C · Rain {w['rain']}%\n\n{en}\n{zh}\n\n#TaipeiMeowcast #TaipeiWeather #台北天氣 #CatReels"
+    t=theme(w)
+    condition,opening,activity=LINES[t]
+    rain=w["rain"]
+    date=w["date"].replace("-","/")
+
+    if rain >= 60:
+        umbrella="☂️ Keep an umbrella nearby!"
+    elif rain >= 30:
+        umbrella="🌦️ A passing shower is possible, so a small umbrella may help."
+    else:
+        umbrella="🐾 Rain chance is low — enjoy the city."
+
+    if t=="hot":
+        reminder="Taipei is bringing the heat today. Drink some water, find a little shade, and don't rush."
+        reflection="Even on the hottest days, a small patch of shade can make everything feel gentler."
+    elif t=="rainy":
+        reminder="Rain changes the rhythm of Taipei. Walk a little slower and let the city sparkle."
+        reflection="You don't need every day to be perfectly sunny to have a beautiful life."
+    elif t=="cold":
+        reminder="A cooler Taipei day calls for warm layers, warm drinks and warm thoughts."
+        reflection="Some days are made for moving slowly and keeping the good things close."
+    elif t=="cloudy":
+        reminder="Not every beautiful day needs a blue sky. Taipei Cat approves of cozy clouds too."
+        reflection="Soft skies can still hold a very good day."
+    else:
+        reminder="Good weather, good mood — Taipei Cat is officially on sunshine duty."
+        reflection="Sunshine doesn't have to make life perfect. Sometimes it just reminds us to enjoy the view."
+
+    return t, f"""Hi, I’m Taipei Cat! 🐱
+Exploring Taipei with you, one little adventure and one weather forecast at a time.
+
+{date} Taipei Weather 📍 Taipei Meowcast
+
+{opening}
+
+Today is {condition}, around {w['high']}°C in the daytime. Taipei Cat is checking the sky, enjoying the city and deciding where the next snack should happen. 😹
+
+🌤️ Today’s Weather
+📍 Taipei, Taiwan
+🌡️ {w['high']}°C / {w['low']}°C
+🌧️ Rain chance: {rain}%
+{umbrella}
+
+😸 Today’s Happiness Index 😸😸😸😸☆
+
+Perfect for:
+🐾 {activity}
+📸 A little Taipei photography
+☕ Taking a break when you need one
+🌇 Enjoying the city at your own pace
+
+🐟 Daily Tuna Index 🐟🐟🐟🐟🐟
+
+Taipei Cat: looking majestic. 😼
+Also Taipei Cat: wondering where lunch is. 😹
+
+🐾 Taipei Cat’s Little Reminder
+
+{reminder}
+
+{reflection}
+
+Take care of yourself, keep going gently, and enjoy the view along the way. 🐱🐾
+
+If you love cute cats + weather vibes + cozy Taipei content, please like & follow ❤️
+Taipei Cat Weather Forecast is here! 🐾
+
+Every ❤️ is another can of tuna keeping this weather cat on duty. 🐟
+
+#TaipeiCat #TaipeiMeowcast #TaipeiWeather #WeatherCat #Taipei101 #Taipei #Taiwan"""
