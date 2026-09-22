@@ -1,7 +1,7 @@
 name: Daily Meowcast
 on:
   schedule:
-    - cron: '30 22 * * *'
+    - cron: '1 23 * * *'
   workflow_dispatch:
 
 permissions:
