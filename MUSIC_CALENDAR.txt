@@ -7,6 +7,12 @@ A. SPECIAL HOLIDAYS
 -------------------
 01/01  New Year's Day       -> New Year Cat
 02/14  Valentine's Day      -> Valentine Love Cat
+04/04  Children's Day       -> Children's Day Cat
+Lunar   Lunar New Year      -> Lunar New Year Cat
+Lunar   Lantern Festival    -> Lantern Festival Cat
+Lunar   Dragon Boat Festival-> Dragon Boat Cat
+Lunar   Qixi Festival       -> Qixi Love Cat
+Lunar   Mid-Autumn Festival -> Mid-Autumn Moon Cat
 10/31  Halloween            -> Halloween Cat
 12/24  Christmas Eve        -> Christmas Eve Cat
 12/25  Christmas Day        -> Christmas Cat
@@ -68,11 +74,18 @@ D. CURRENT SELECTION RULE
 4. If yes, use that solar-term BGM.
 5. Otherwise, use the normal weekday BGM.
 
+Taiwan lunar-holiday dates are mapped to their Gregorian dates by year in music.py.
+Current year-specific mappings cover 2026 and 2027.
+
+Included Taiwan holidays:
+- 春節 / Lunar New Year
+- 元宵節 / Lantern Festival
+- 兒童節 / Children's Day
+- 端午節 / Dragon Boat Festival
+- 七夕 / Qixi Festival
+- 中秋節 / Mid-Autumn Festival
+
 Future candidates:
-- Lunar New Year / 春節
-- Lantern Festival / 元宵節
-- Dragon Boat Festival / 端午節
-- Mid-Autumn Festival / 中秋節
 - Other Taipei/Taiwan-specific commemorative or seasonal days
 
 Last updated: 2026-09-22
