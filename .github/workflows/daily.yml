@@ -1,0 +1,20 @@
+name: Daily Meowcast
+on:
+  schedule:
+    - cron: '30 23 * * *'
+  workflow_dispatch:
+jobs:
+  reel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python render.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: daily-meowcast
+          path: output/
