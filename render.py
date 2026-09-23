@@ -26,7 +26,11 @@ def fallback(theme):
     d.text((330,1120),"MEOW",font=font(100),fill="white")
     return im
 
-def asset_for(theme):
+def asset_for(theme,event=None):
+    # Special-day artwork wins over normal weather artwork when provided.
+    if event:
+        for p in [f"asset/{event}.png", f"asset/{event}.jpg"]:
+            if os.path.exists(p): return p
     candidates={
         "sunny":["asset/sunny.png","asset/sunny.jpg"],
         "rainy":["asset/rainy.png","asset/rainy.jpg"],
@@ -116,7 +120,7 @@ def add_weather_overlay(im,w,theme,event=None):
     text(W//2,1815,"GOOD WEATHER  ·  GOOD DAYS  ·  A HAPPIER YOU",23,stroke=2)
 
 def main():
-    w=get_weather(); t,cap=make_caption(w); event=seasonal_event(w["date"]); src=asset_for(t)
+    w=get_weather(); t,cap=make_caption(w); event=seasonal_event(w["date"]); src=asset_for(t,event)
     if src:
         im=Image.open(src).convert("RGB"); scale=max(W/im.width,H/im.height); im=im.resize((int(im.width*scale),int(im.height*scale)))
         x=(im.width-W)//2; y=(im.height-H)//2; im=im.crop((x,y,x+W,y+H))
