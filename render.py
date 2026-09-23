@@ -99,7 +99,9 @@ def add_weather_overlay(im,w,theme,event=None):
 
     # Hand-painted condition swash.
     d.rounded_rectangle((335,700,745,795),radius=46,fill=accent)
-    text(W//2,723,condition,58,ink if theme in ("sunny","hot","cloudy") else (255,255,255,255),stroke=0)
+    # Center the weather condition both horizontally and vertically in the pill.
+    # Slightly larger type improves Reel readability.
+    text(W//2,748,condition,68,ink if theme in ("sunny","hot","cloudy") else (255,255,255,255),anchor="mm",stroke=0)
     text(W//2,825,f"Rain chance {w['rain']}%",35)
     d.line((430,880,650,880),fill=accent,width=5)
 
