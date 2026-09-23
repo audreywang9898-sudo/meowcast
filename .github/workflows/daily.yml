@@ -91,6 +91,8 @@ jobs:
           fi
 
       - name: Generate today's Reel
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
         run: python render.py
 
