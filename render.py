@@ -12,6 +12,12 @@ def font(size):
         if os.path.exists(p): return ImageFont.truetype(p,size)
     return ImageFont.load_default()
 
+def seasonal_event(date_text):
+    # Taipei Meowcast special-day art direction.
+    # Autumnal Equinox falls around Sep 22-23; explicit 2026 date is Sep 23.
+    special={"2026-09-23":"autumn_equinox"}
+    return special.get(date_text)
+
 def fallback(theme):
     tones={"sunny":(235,196,104),"rainy":(91,119,145),"cloudy":(164,174,181),"hot":(221,145,98),"cold":(136,163,186)}
     im=Image.new("RGB",(W,H),tones[theme]); d=ImageDraw.Draw(im)
@@ -32,9 +38,10 @@ def asset_for(theme):
         if os.path.exists(p): return p
     return None
 
-def add_weather_overlay(im,w,theme):
+def add_weather_overlay(im,w,theme,event=None):
     d=ImageDraw.Draw(im,"RGBA")
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy","hot":"Hot","cold":"Cold"}[theme]
+    is_equinox=(event=="autumn_equinox")
     accent={"sunny":(255,205,88,255),"rainy":(155,205,245,255),"cloudy":(215,220,225,255),"hot":(255,165,80,255),"cold":(185,220,250,255)}[theme]
     ink=(28,30,34,255)
     tips={"sunny":"Sunshine is on duty.\nEnjoy the view!",
@@ -68,6 +75,11 @@ def add_weather_overlay(im,w,theme):
 
     date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y / %m / %d (%a)").upper()
     text(W//2,452,date_label,43)
+    if is_equinox:
+        # Seasonal badge: weather remains live; only the art direction/message changes.
+        d.rounded_rectangle((92,705,300,785),radius=34,fill=(245,181,74,235))
+        text(196,722,"AUTUMNAL",25,ink,stroke=0)
+        text(196,752,"EQUINOX",25,ink,stroke=0)
 
     # Weather icon + temperature + low, same proportions as the approved reference.
     cx,cy=210,590
@@ -96,20 +108,21 @@ def add_weather_overlay(im,w,theme):
     d.line((430,880,650,880),fill=accent,width=5)
 
     # Small handwritten-style note at left, no dark UI card.
-    d.multiline_text((125,920),tips[theme],font=font(31),fill=(255,255,255,255),
+    note = "Day and night in balance.\nA gentler season begins." if is_equinox else tips[theme]
+    d.multiline_text((125,920),note,font=font(31),fill=(255,255,255,255),
                      spacing=7,stroke_width=2,stroke_fill=(0,0,0,95))
 
     # No bottom toolbar: preserve the cat and scenery. One subtle brand line only.
     text(W//2,1815,"GOOD WEATHER  ·  GOOD DAYS  ·  A HAPPIER YOU",23,stroke=2)
 
 def main():
-    w=get_weather(); t,cap=make_caption(w); src=asset_for(t)
+    w=get_weather(); t,cap=make_caption(w); event=seasonal_event(w["date"]); src=asset_for(t)
     if src:
         im=Image.open(src).convert("RGB"); scale=max(W/im.width,H/im.height); im=im.resize((int(im.width*scale),int(im.height*scale)))
         x=(im.width-W)//2; y=(im.height-H)//2; im=im.crop((x,y,x+W,y+H))
     else:
         im=fallback(t)
-    add_weather_overlay(im,w,t)
+    add_weather_overlay(im,w,t,event)
     os.makedirs("output",exist_ok=True); im.save("output/card.jpg",quality=94)
     make_music("output/bgm.wav")
     subprocess.run(["ffmpeg","-y","-loop","1","-i","output/card.jpg","-i","output/bgm.wav","-vf","scale=1200:2134,zoompan=z='min(zoom+0.0005,1.08)':d=200:s=1080x1920:fps=25","-t","8","-c:v","libx264","-c:a","aac","-b:a","128k","-shortest","-pix_fmt","yuv420p","-movflags","+faststart","output/meowcast.mp4"],check=True)
