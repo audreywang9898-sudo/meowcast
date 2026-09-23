@@ -1,23 +1,28 @@
 import os
-import shutil
 
-DEFAULT_TRACK = "music/the_window_seat_reel.mp3"
+DEFAULT_TRACK = "music/daily_gentle.mp3"
 
+def music_for_event(event=None):
+    """Choose an approved real audio file from music/. Never synthesize BGM."""
+    candidates = []
+    if event:
+        key = event.get("music")
+        if key:
+            candidates.extend([
+                f"music/{key}.mp3",
+                f"music/{key}.wav",
+                f"music/{key}.m4a",
+            ])
+    candidates.append(DEFAULT_TRACK)
 
-def make_music(path="output/bgm.mp3", event=None, date_text=None, dt=None):
-    """Use the approved Taipei Meowcast background track.
+    for path in candidates:
+        if os.path.isfile(path) and os.path.getsize(path) > 0:
+            print("BGM:", path)
+            return path
 
-    Calendar/event arguments are kept for API compatibility so different
-    approved tracks can be mapped later without changing render.py.
-    """
-    if not os.path.exists(DEFAULT_TRACK):
-        raise FileNotFoundError(f"Approved BGM not found: {DEFAULT_TRACK}")
-
-    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-    shutil.copyfile(DEFAULT_TRACK, path)
-    print("BGM: The Window Seat (approved Reel edit)")
-    return path
-
+    raise FileNotFoundError(
+        f"No approved real BGM found. Expected {DEFAULT_TRACK} or an event-specific file in music/."
+    )
 
 if __name__ == "__main__":
-    make_music()
+    print(music_for_event())
