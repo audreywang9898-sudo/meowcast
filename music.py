@@ -62,6 +62,15 @@ MUSIC_RECIPES={
     "dongzhi":(66,[60,64,67,72,67,64,59,60],"Winter Solstice"),
     "xiaohan":(70,[62,65,69,65,62,60,57,60],"Minor Cold"),
     "dahan":(64,[55,60,63,67,63,60,58,55],"Major Cold"),
+    "white_day":(74,[64,67,71,76,74,71,67,64],"White Day Cat"),
+    "easter":(108,[60,64,67,72,76,72,69,67],"Easter Paws"),
+    "fathers_day":(84,[55,59,62,67,64,62,59,55],"Father's Day Cat"),
+    "qixi":(74,[60,64,69,72,69,67,64,60],"Qixi Love Cat"),
+    "ghost_festival":(70,[57,60,63,67,63,60,57,55],"Ghost Festival Night"),
+    "double_ninth":(78,[60,64,67,71,67,64,62,60],"Double Ninth Cat"),
+    "thanksgiving":(86,[60,64,67,72,69,67,64,60],"Thanksgiving Cat"),
+    "christmas_eve":(90,[67,71,74,79,74,71,69,67],"Christmas Eve Cat"),
+    "new_years_eve":(120,[62,66,69,74,78,74,71,69],"New Year's Eve Cat"),
 }
 
 def hz(n):
