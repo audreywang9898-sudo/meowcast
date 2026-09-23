@@ -46,30 +46,54 @@ def make_simple_caption(w):
     en_condition, zh_condition = LINES[t]
     date = w["date"].replace("-", "/")
     rain = w["rain"]
+    is_equinox = w["date"] == "2026-09-23"
+
+    seasonal_en = ""
+    seasonal_zh = ""
+    seasonal_tags = ""
+    if is_equinox:
+        seasonal_en = """🍂 Autumnal Equinox in Taipei
+Today marks the seasonal turning point: daylight and darkness come into near balance, and Taipei begins easing into autumn.
+A good day to notice the softer light, slower evenings, and the first hint of a new season. 🐾
+
+"""
+        seasonal_zh = """🍁 台北・秋分
+今天是秋分。白晝與黑夜走向接近平衡，也像是在提醒我們：炎熱的夏天正慢慢把位置讓給秋天。
+不一定要趕著去哪裡，抬頭看看天空、感受風和光線的變化，就是今天的小小季節儀式。🐱
+
+"""
+        seasonal_tags = " #AutumnalEquinox #秋分 #二十四節氣"
 
     caption = f"""Hi, I’m Taipei Cat! 🐱
 Exploring Taipei with you, one little adventure and one weather forecast at a time.
 
-{date} Taipei Weather 📍 Taipei Meowcast
+{seasonal_en}{date} Taipei Weather 📍 Taipei Meowcast
 
 🌤️ Today’s Weather
 📍 Taipei, Taiwan
-🌡️ {w['high']}°C / {w['low']}°C
+🌡️ High {w['high']}°C / Low {w['low']}°C
 🌧️ Rain chance: {rain}%
-Today is {en_condition}. 🐾
+Today is {en_condition}.
 
-🌤️ 今日台北天氣
+🐾 Taipei Cat’s little note
+Weather changes the city in tiny ways — the light, the breeze, the pace of a walk, even where a cat chooses to sit.
+Whatever the sky looks like today, I hope you find one small corner of Taipei that feels good to you. 💛
+
+{seasonal_zh}🌤️ 今日台北天氣
 📍 台北，台灣
 🌡️ 最高 {w['high']}°C / 最低 {w['low']}°C
 🌧️ 降雨機率：{rain}%
-今天{zh_condition}。🐱
+今天{zh_condition}。
+
+🐱 台北貓的小提醒
+天氣不只是溫度和降雨機率，也悄悄改變一座城市的光線、風、散步的速度。
+不管今天是晴是雨，都希望你在台北找到一個讓自己舒服的小角落。
 
 Have a lovely day in Taipei. 💛
 祝你在台北度過美好的一天。
 
-#TaipeiCat #TaipeiMeowcast #TaipeiWeather #Taipei #Taiwan #台北天氣 #台北生活"""
+#TaipeiCat #TaipeiMeowcast #TaipeiWeather #WeatherCat #Taipei101 #Taipei #Taiwan #台北天氣 #台北生活{seasonal_tags}"""
     return t, caption
-
 
 def _extract_response_text(data):
     # Responses API normally returns text inside output -> content -> output_text.
