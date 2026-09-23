@@ -71,7 +71,7 @@ def add_weather_overlay(im,w,theme,event=None):
     # Do not draw TAIPEI / MEOWCAST / tagline dynamically.
 
     date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y / %m / %d (%a)").upper()
-    text(W//2,452,date_label,43)
+    text(W//2,500,date_label,43)
     if is_equinox:
         # Seasonal badge: weather remains live; only the art direction/message changes.
         d.rounded_rectangle((92,705,300,785),radius=34,fill=(245,181,74,235))
@@ -96,9 +96,9 @@ def add_weather_overlay(im,w,theme,event=None):
     # IMPORTANT: these coordinates are the blank fields in the 1080x1920 master artwork.
     # Draw values only; never redraw °C, LOW, Rain chance or %.
     # The master artwork uses underscores as placeholders. Overlay values at those exact fields.
-    text(515,575,f"{w['high']}",132,anchor="mm")
+    text(515,635,f"{w['high']}",132,anchor="mm")
     # Right-side blank: number sits immediately before the artwork's printed °C.
-    text(775,675,f"{w['low']}",56,anchor="mm")
+    text(775,720,f"{w['low']}",56,anchor="mm")
 
     # Condition is centered inside the white rounded label, not above it.
     text(W//2,790,condition,62,ink,anchor="mm",stroke=0)
