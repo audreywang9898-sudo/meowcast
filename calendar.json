@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "timezone": "Asia/Taipei",
+  "description": "Taipei Meowcast calendar. Program reads this file before rendering; special-day assets/messages can override normal weather presentation.",
+  "events": {
+    "2026-09-23": {
+      "type": "solar_term",
+      "key": "autumn_equinox",
+      "name_en": "Autumnal Equinox",
+      "name_zh": "秋分",
+      "asset": "autumn_equinox.png",
+      "note_en": "Day and night in balance. A gentler season begins."
+    }
+  }
+}
