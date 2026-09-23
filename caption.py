@@ -46,23 +46,29 @@ def make_simple_caption(w, event=None):
     en_condition, zh_condition = LINES[t]
     date = w["date"].replace("-", "/")
     rain = w["rain"]
-    is_equinox = bool(event and event.get("key") == "autumn_equinox")
-
     seasonal_en = ""
     seasonal_zh = ""
     seasonal_tags = ""
-    if is_equinox:
-        seasonal_en = """🍂 Autumnal Equinox in Taipei
-Today marks the seasonal turning point: daylight and darkness come into near balance, and Taipei begins easing into autumn.
-A good day to notice the softer light, slower evenings, and the first hint of a new season. 🐾
-
-"""
-        seasonal_zh = """🍁 台北・秋分
-今天是秋分。白晝與黑夜走向接近平衡，也像是在提醒我們：炎熱的夏天正慢慢把位置讓給秋天。
-不一定要趕著去哪裡，抬頭看看天空、感受風和光線的變化，就是今天的小小季節儀式。🐱
-
-"""
-        seasonal_tags = " #AutumnalEquinox #秋分 #二十四節氣"
+    if event:
+        name_en = event.get("name_en", "")
+        name_zh = event.get("name_zh", "")
+        note_en = event.get("note_en", "")
+        event_type = event.get("type", "")
+        if name_en:
+            seasonal_en = f"🐾 {name_en} in Taipei\n"
+            if note_en:
+                seasonal_en += f"{note_en}\n"
+            seasonal_en += "\n"
+        if name_zh:
+            seasonal_zh = f"🐱 台北・{name_zh}\n今天是{name_zh}，讓台北貓陪你一起感受今天的小小節日／季節氣氛。\n\n"
+        tag_en = name_en.replace(" ", "").replace("'", "").replace("/", "") if name_en else ""
+        tag_zh = name_zh.replace("／", "") if name_zh else ""
+        if tag_en:
+            seasonal_tags += f" #{tag_en}"
+        if tag_zh:
+            seasonal_tags += f" #{tag_zh}"
+        if event_type == "solar_term":
+            seasonal_tags += " #二十四節氣"
 
     caption = f"""Hi, I’m Taipei Cat! 🐱
 Exploring Taipei with you, one little adventure and one weather forecast at a time.
