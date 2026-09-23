@@ -10,6 +10,9 @@ permissions:
 jobs:
   reel:
     runs-on: ubuntu-latest
+    concurrency:
+      group: meowcast-publisher
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
 
@@ -26,20 +29,21 @@ jobs:
         run: |
           python - <<'PY'
           import json, os
-          from datetime import datetime, timedelta
+          from datetime import datetime
           from zoneinfo import ZoneInfo
 
           cfg=json.load(open("schedule.json",encoding="utf-8"))
           event=os.environ.get("GITHUB_EVENT_NAME","")
+          tz=ZoneInfo(cfg.get("timezone","Asia/Taipei"))
+          now=datetime.now(tz)
           run=True
+          slot="manual"
           reason="manual run"
 
           if event=="schedule":
               if not cfg.get("enabled", True):
                   run=False; reason="schedule disabled"
               else:
-                  tz=ZoneInfo(cfg.get("timezone","Asia/Taipei"))
-                  now=datetime.now(tz)
                   window=int(cfg.get("window_minutes",30))
                   run=False
                   for value in cfg.get("publish_times",["07:00"]):
@@ -47,31 +51,42 @@ jobs:
                       target=now.replace(hour=hh,minute=mm,second=0,microsecond=0)
                       delta=(now-target).total_seconds()/60
                       if 0 <= delta < window:
-                          run=True; reason=f"inside {value} + {window}min window"
+                          run=True
+                          slot=value.replace(":","")
+                          reason=f"inside {value} + {window}min window"
                           break
-                  if not run: reason=f"outside configured publish window at {now:%H:%M}"
+                  if not run:
+                      reason=f"outside configured publish window at {now:%H:%M}"
+
+          date=now.strftime("%Y-%m-%d")
           print(reason)
+          print(f"date={date} slot={slot}")
           with open(os.environ["GITHUB_OUTPUT"],"a") as out:
               out.write(f"run={'true' if run else 'false'}\n")
+              out.write(f"date={date}\n")
+              out.write(f"slot={slot}\n")
           PY
 
-
-      - name: Skip if today's Reel is already published
+      - name: Skip if this scheduled slot is already published
         if: steps.schedule.outputs.run == 'true'
         id: dedupe
+        env:
+          SLOT: ${{ steps.schedule.outputs.slot }}
+          PUBLISH_DATE: ${{ steps.schedule.outputs.date }}
         run: |
-          # Manual runs are intentional previews/re-publishes, so never dedupe them.
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            echo "Manual run: bypassing daily dedupe."
+            echo "Manual run: bypassing scheduled-slot dedupe."
             echo "skip=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          TODAY=$(TZ=Asia/Taipei date +%F)
-          PUBLISHED=$(curl -fsSL "https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-date.txt?ts=$(date +%s)" || true)
-          if [ "$PUBLISHED" = "$TODAY" ]; then
-            echo "Today's Reel was already published: $TODAY"
+          MARKER="${PUBLISH_DATE}-${SLOT}"
+          URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-slot.txt?ts=${GITHUB_RUN_ID}"
+          PUBLISHED=$(curl -fsSL "$URL" || true)
+          if [ "$PUBLISHED" = "$MARKER" ]; then
+            echo "Scheduled slot already published: $MARKER"
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
+            echo "Publishing slot: $MARKER"
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -92,43 +107,51 @@ jobs:
         if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: daily-meowcast
+          name: daily-meowcast-${{ github.run_id }}
           path: output/
 
-      - name: Upload Reel to public media repository
+      - name: Upload Reel to unique public URL
         if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
+        id: media
         env:
           MEDIA_REPO_TOKEN: ${{ secrets.MEDIA_REPO_TOKEN }}
+          PUBLISH_DATE: ${{ steps.schedule.outputs.date }}
+          SLOT: ${{ steps.schedule.outputs.slot }}
         run: |
           test -n "$MEDIA_REPO_TOKEN" || (echo "MEDIA_REPO_TOKEN missing" && exit 1)
+          SAFE_SLOT="$SLOT"
+          [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && SAFE_SLOT="manual"
+          MEDIA_PATH="reels/${PUBLISH_DATE}/meowcast-${SAFE_SLOT}-${GITHUB_RUN_ID}.mp4"
           git clone "https://x-access-token:${MEDIA_REPO_TOKEN}@github.com/audreywang9898-sudo/meowcast-media.git" /tmp/meowcast-media
-          mkdir -p /tmp/meowcast-media/latest
-          cp output/meowcast.mp4 /tmp/meowcast-media/latest/meowcast.mp4
+          mkdir -p "/tmp/meowcast-media/$(dirname "$MEDIA_PATH")"
+          cp output/meowcast.mp4 "/tmp/meowcast-media/$MEDIA_PATH"
           cd /tmp/meowcast-media
           git config user.name "meowcast-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add latest/meowcast.mp4
-          if git diff --cached --quiet; then
-            echo "Media file unchanged."
-          else
-            git commit -m "Update daily Meowcast Reel"
-            git push origin main
-          fi
+          git add "$MEDIA_PATH"
+          git commit -m "Add Meowcast Reel ${PUBLISH_DATE} ${SAFE_SLOT} run ${GITHUB_RUN_ID}"
+          git push origin main
+          echo "path=$MEDIA_PATH" >> "$GITHUB_OUTPUT"
+          echo "url=https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/$MEDIA_PATH" >> "$GITHUB_OUTPUT"
 
-      - name: Verify public Reel URL
+      - name: Verify exact public Reel bytes
         if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
+        env:
+          REEL_PUBLIC_URL: ${{ steps.media.outputs.url }}
         run: |
-          URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/meowcast.mp4"
-          for i in {1..12}; do
-            CODE=$(curl -L -s -o /dev/null -w "%{http_code}" "$URL")
-            if [ "$CODE" = "200" ]; then
-              echo "Public Reel is reachable."
-              exit 0
+          LOCAL_SHA=$(sha256sum output/meowcast.mp4 | awk '{print $1}')
+          for i in {1..18}; do
+            if curl -fL --retry 2 --retry-delay 2 -o /tmp/public-meowcast.mp4 "$REEL_PUBLIC_URL?run=${GITHUB_RUN_ID}"; then
+              REMOTE_SHA=$(sha256sum /tmp/public-meowcast.mp4 | awk '{print $1}')
+              if [ "$REMOTE_SHA" = "$LOCAL_SHA" ]; then
+                echo "Unique public Reel URL is reachable and bytes match."
+                exit 0
+              fi
+              echo "Public URL returned different bytes; waiting..."
             fi
-            echo "Waiting for public Reel URL (HTTP $CODE)..."
             sleep 5
           done
-          echo "Public Reel URL did not become reachable."
+          echo "Public Reel URL did not become ready with matching bytes."
           exit 1
 
       - name: Publish Reel to Instagram
@@ -136,25 +159,26 @@ jobs:
         env:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-          REEL_PUBLIC_URL: https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/meowcast.mp4
+          REEL_PUBLIC_URL: ${{ steps.media.outputs.url }}?run=${{ github.run_id }}
         run: |
           test -n "$IG_USER_ID" || (echo "IG_USER_ID missing" && exit 1)
           test -n "$IG_ACCESS_TOKEN" || (echo "IG_ACCESS_TOKEN missing" && exit 1)
-          sleep 10
           python publish_instagram.py
 
-      - name: Mark today's Reel as published
-        if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true' && success()
+      - name: Mark scheduled slot as published
+        if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true' && success() && github.event_name == 'schedule'
         env:
           MEDIA_REPO_TOKEN: ${{ secrets.MEDIA_REPO_TOKEN }}
+          PUBLISH_DATE: ${{ steps.schedule.outputs.date }}
+          SLOT: ${{ steps.schedule.outputs.slot }}
         run: |
-          TODAY=$(TZ=Asia/Taipei date +%F)
+          MARKER="${PUBLISH_DATE}-${SLOT}"
           git clone "https://x-access-token:${MEDIA_REPO_TOKEN}@github.com/audreywang9898-sudo/meowcast-media.git" /tmp/meowcast-marker
           mkdir -p /tmp/meowcast-marker/latest
-          printf "%s" "$TODAY" > /tmp/meowcast-marker/latest/published-date.txt
+          printf "%s" "$MARKER" > /tmp/meowcast-marker/latest/published-slot.txt
           cd /tmp/meowcast-marker
           git config user.name "meowcast-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add latest/published-date.txt
-          git commit -m "Mark Meowcast published $TODAY" || exit 0
+          git add latest/published-slot.txt
+          git commit -m "Mark Meowcast published $MARKER" || exit 0
           git push origin main
