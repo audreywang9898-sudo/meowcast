@@ -95,16 +95,18 @@ def add_weather_overlay(im,w,theme,event=None):
 
     # The approved base artwork already contains the static °C / LOW labels.
     # Fill only the variable numbers into the reserved blanks; do not redraw labels.
-    text(475,575,f"{w['high']}",132,anchor="mm")
-    text(775,610,f"{w['low']}",56,anchor="mm")
+    # Fit values into the artwork's actual blank fields.
+    # High value sits left of the printed °C; low value sits on the right-hand underline.
+    text(445,575,f"{w['high']}",132,anchor="mm")
+    text(805,577,f"{w['low']}",56,anchor="mm")
 
     # Hand-painted condition swash.
     d.rounded_rectangle((335,700,745,795),radius=46,fill=accent)
     # Center the weather condition both horizontally and vertically in the pill.
     # Slightly larger type improves Reel readability.
     text(W//2,748,condition,68,ink if theme in ("sunny","hot","cloudy") else (255,255,255,255),anchor="mm",stroke=0)
-    # Base artwork already says "Rain chance __%"; insert only the percentage value.
-    text(600,825,f"{w['rain']}",35,anchor="mm")
+    # Base artwork already says "Rain chance __%"; put the value on its underline.
+    text(620,873,f"{w['rain']}",35,anchor="mm")
 
     # Small handwritten-style note at left, no dark UI card.
     note = "Day and night in balance.\nA gentler season begins." if is_equinox else tips[theme]
