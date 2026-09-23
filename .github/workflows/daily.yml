@@ -98,7 +98,7 @@ jobs:
         if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
         run: |
           test -s output/card.jpg
-          test -s output/bgm.wav
+          test -s music/daily_gentle.mp3
           test -s output/meowcast.mp4
           test -s output/caption.txt
           ffprobe -v error -show_entries stream=codec_type,codec_name -of compact output/meowcast.mp4
