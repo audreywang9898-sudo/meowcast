@@ -3,7 +3,7 @@ from datetime import datetime
 from PIL import Image,ImageDraw,ImageFont
 from weather import get_weather
 from caption import make_caption
-from music import make_music
+from music import music_for_event
 from calendar_events import event_for_date
 
 W,H=1080,1920
