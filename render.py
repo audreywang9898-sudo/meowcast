@@ -66,16 +66,8 @@ def add_weather_overlay(im,w,theme,event=None):
         vd.rectangle((0,yy,W,yy+1),fill=(5,18,30,max(alpha,0)))
     im.paste(vignette,(0,0),vignette); d=ImageDraw.Draw(im,"RGBA")
 
-    # Paw mark is drawn, not emoji, so GitHub Linux renders it reliably.
-    d.ellipse((516,58,540,82),fill="white")
-    for bx,by in [(490,48),(518,35),(546,48),(570,68)]:
-        d.ellipse((bx,by,bx+20,by+24),fill="white")
-
-    text(W//2,112,"TAIPEI",82)
-    text(W//2,204,"MEOWCAST",94,accent)
-    d.line((280,310,800,310),fill=accent,width=6)
-    text(W//2,333,"Exploring Taipei with you,",30)
-    text(W//2,375,"one little adventure at a time.",30)
+    # Branding/title/subtitle are part of the base artwork.
+    # Do not draw TAIPEI / MEOWCAST / tagline dynamically.
 
     date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y / %m / %d (%a)").upper()
     text(W//2,452,date_label,43)
