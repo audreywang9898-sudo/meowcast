@@ -1,7 +1,7 @@
 name: Daily Meowcast
 on:
   schedule:
-    - cron: '50 22 * * *'\n    - cron: '10 23 * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -21,7 +21,43 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      - name: Check schedule config
+        id: schedule
+        run: |
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timedelta
+          from zoneinfo import ZoneInfo
+
+          cfg=json.load(open("schedule.json",encoding="utf-8"))
+          event=os.environ.get("GITHUB_EVENT_NAME","")
+          run=True
+          reason="manual run"
+
+          if event=="schedule":
+              if not cfg.get("enabled", True):
+                  run=False; reason="schedule disabled"
+              else:
+                  tz=ZoneInfo(cfg.get("timezone","Asia/Taipei"))
+                  now=datetime.now(tz)
+                  window=int(cfg.get("window_minutes",30))
+                  run=False
+                  for value in cfg.get("publish_times",["07:00"]):
+                      hh,mm=map(int,value.split(":"))
+                      target=now.replace(hour=hh,minute=mm,second=0,microsecond=0)
+                      delta=(now-target).total_seconds()/60
+                      if 0 <= delta < window:
+                          run=True; reason=f"inside {value} + {window}min window"
+                          break
+                  if not run: reason=f"outside configured publish window at {now:%H:%M}"
+          print(reason)
+          with open(os.environ["GITHUB_OUTPUT"],"a") as out:
+              out.write(f"run={'true' if run else 'false'}\n")
+          PY
+
+
       - name: Skip if today's Reel is already published
+        if: steps.schedule.outputs.run == 'true'
         id: dedupe
         run: |
           TODAY=$(TZ=Asia/Taipei date +%F)
@@ -34,11 +70,11 @@ jobs:
           fi
 
       - name: Generate today's Reel
-        if: steps.dedupe.outputs.skip != 'true'
+        if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
         run: python render.py
 
       - name: Verify generated files
-        if: steps.dedupe.outputs.skip != 'true'
+        if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
         run: |
           test -s output/card.jpg
           test -s output/bgm.wav
@@ -47,14 +83,14 @@ jobs:
           ffprobe -v error -show_entries stream=codec_type,codec_name -of compact output/meowcast.mp4
 
       - name: Upload private artifact
-        if: steps.dedupe.outputs.skip != 'true'
+        if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: daily-meowcast
           path: output/
 
       - name: Upload Reel to public media repository
-        if: steps.dedupe.outputs.skip != 'true'
+        if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
         env:
           MEDIA_REPO_TOKEN: ${{ secrets.MEDIA_REPO_TOKEN }}
         run: |
@@ -74,7 +110,7 @@ jobs:
           fi
 
       - name: Verify public Reel URL
-        if: steps.dedupe.outputs.skip != 'true'
+        if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
         run: |
           URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/meowcast.mp4"
           for i in {1..12}; do
@@ -90,7 +126,7 @@ jobs:
           exit 1
 
       - name: Publish Reel to Instagram
-        if: steps.dedupe.outputs.skip != 'true'
+        if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
         env:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
@@ -102,7 +138,7 @@ jobs:
           python publish_instagram.py
 
       - name: Mark today's Reel as published
-        if: steps.dedupe.outputs.skip != 'true' && success()
+        if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true' && success()
         env:
           MEDIA_REPO_TOKEN: ${{ secrets.MEDIA_REPO_TOKEN }}
         run: |
