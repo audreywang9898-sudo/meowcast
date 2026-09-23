@@ -52,7 +52,7 @@ def make_simple_caption(w, event=None):
     if event:
         name_en = event.get("name_en", "")
         name_zh = event.get("name_zh", "")
-        note_en = event.get("note_en", "")
+        note_en = event.get("caption_en") or event.get("note_en", "")\n        note_zh = event.get("caption_zh", "")
         event_type = event.get("type", "")
         if name_en:
             seasonal_en = f"🐾 {name_en} in Taipei\n"
