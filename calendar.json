@@ -1,15 +1,433 @@
 {
-  "version": 1,
+  "version": 2,
   "timezone": "Asia/Taipei",
-  "description": "Taipei Meowcast calendar. Program reads this file before rendering; special-day assets/messages can override normal weather presentation.",
+  "year": 2026,
+  "description": "Taipei Meowcast 2026 calendar: 24 solar terms, Taiwan public holidays and major Chinese/Western festivals. If multiple observances share a date, the primary event drives artwork and additional observances are stored in also.",
   "events": {
+    "2026-01-01": {
+      "type": "holiday",
+      "key": "new_year",
+      "name_en": "New Year's Day",
+      "name_zh": "元旦",
+      "asset": "new_year.png",
+      "music": "new_year"
+    },
+    "2026-01-05": {
+      "type": "solar_term",
+      "key": "xiaohan",
+      "name_en": "Minor Cold",
+      "name_zh": "小寒",
+      "asset": "xiaohan.png",
+      "music": "xiaohan"
+    },
+    "2026-01-20": {
+      "type": "solar_term",
+      "key": "dahan",
+      "name_en": "Major Cold",
+      "name_zh": "大寒",
+      "asset": "dahan.png",
+      "music": "dahan"
+    },
+    "2026-02-04": {
+      "type": "solar_term",
+      "key": "lichun",
+      "name_en": "Beginning of Spring",
+      "name_zh": "立春",
+      "asset": "lichun.png",
+      "music": "lichun"
+    },
+    "2026-02-14": {
+      "type": "festival",
+      "key": "valentines_day",
+      "name_en": "Valentine's Day",
+      "name_zh": "西洋情人節",
+      "asset": "valentines_day.png",
+      "music": "valentine"
+    },
+    "2026-02-16": {
+      "type": "lunar_festival",
+      "key": "lunar_new_year_eve",
+      "name_en": "Lunar New Year's Eve",
+      "name_zh": "除夕",
+      "asset": "lunar_new_year_eve.png",
+      "music": "lunar_new_year"
+    },
+    "2026-02-17": {
+      "type": "lunar_festival",
+      "key": "lunar_new_year",
+      "name_en": "Lunar New Year",
+      "name_zh": "春節",
+      "asset": "lunar_new_year.png",
+      "music": "lunar_new_year"
+    },
+    "2026-02-18": {
+      "type": "solar_term",
+      "key": "yushui",
+      "name_en": "Rain Water",
+      "name_zh": "雨水",
+      "asset": "yushui.png",
+      "music": "yushui"
+    },
+    "2026-02-28": {
+      "type": "holiday",
+      "key": "peace_memorial_day",
+      "name_en": "Peace Memorial Day",
+      "name_zh": "和平紀念日",
+      "asset": "peace_memorial_day.png",
+      "music": "peaceful"
+    },
+    "2026-03-03": {
+      "type": "lunar_festival",
+      "key": "lantern_festival",
+      "name_en": "Lantern Festival",
+      "name_zh": "元宵節",
+      "asset": "lantern_festival.png",
+      "music": "lantern_festival"
+    },
+    "2026-03-05": {
+      "type": "solar_term",
+      "key": "jingzhe",
+      "name_en": "Awakening of Insects",
+      "name_zh": "驚蟄",
+      "asset": "jingzhe.png",
+      "music": "jingzhe"
+    },
+    "2026-03-08": {
+      "type": "festival",
+      "key": "womens_day",
+      "name_en": "International Women's Day",
+      "name_zh": "國際婦女節",
+      "asset": "womens_day.png",
+      "music": "gentle"
+    },
+    "2026-03-14": {
+      "type": "festival",
+      "key": "white_day",
+      "name_en": "White Day",
+      "name_zh": "白色情人節",
+      "asset": "white_day.png",
+      "music": "valentine"
+    },
+    "2026-03-20": {
+      "type": "solar_term",
+      "key": "chunfen",
+      "name_en": "Spring Equinox",
+      "name_zh": "春分",
+      "asset": "chunfen.png",
+      "music": "chunfen"
+    },
+    "2026-04-01": {
+      "type": "festival",
+      "key": "april_fools",
+      "name_en": "April Fools' Day",
+      "name_zh": "愚人節",
+      "asset": "april_fools.png",
+      "music": "playful"
+    },
+    "2026-04-04": {
+      "type": "holiday",
+      "key": "childrens_day",
+      "name_en": "Children's Day",
+      "name_zh": "兒童節",
+      "asset": "childrens_day.png",
+      "music": "childrens_day"
+    },
+    "2026-04-05": {
+      "type": "solar_term",
+      "key": "qingming",
+      "name_en": "Pure Brightness / Qingming",
+      "name_zh": "清明",
+      "asset": "qingming.png",
+      "music": "qingming",
+      "also": [
+        {
+          "type": "festival",
+          "key": "easter",
+          "name_en": "Easter",
+          "name_zh": "復活節"
+        }
+      ]
+    },
+    "2026-04-20": {
+      "type": "solar_term",
+      "key": "guyu",
+      "name_en": "Grain Rain",
+      "name_zh": "穀雨",
+      "asset": "guyu.png",
+      "music": "guyu"
+    },
+    "2026-04-22": {
+      "type": "festival",
+      "key": "earth_day",
+      "name_en": "Earth Day",
+      "name_zh": "世界地球日",
+      "asset": "earth_day.png",
+      "music": "nature"
+    },
+    "2026-05-01": {
+      "type": "holiday",
+      "key": "labour_day",
+      "name_en": "Labour Day",
+      "name_zh": "勞動節",
+      "asset": "labour_day.png",
+      "music": "may_day"
+    },
+    "2026-05-05": {
+      "type": "solar_term",
+      "key": "lixia",
+      "name_en": "Beginning of Summer",
+      "name_zh": "立夏",
+      "asset": "lixia.png",
+      "music": "lixia"
+    },
+    "2026-05-10": {
+      "type": "festival",
+      "key": "mothers_day",
+      "name_en": "Mother's Day",
+      "name_zh": "母親節",
+      "asset": "mothers_day.png",
+      "music": "warm_family"
+    },
+    "2026-05-21": {
+      "type": "solar_term",
+      "key": "xiaoman",
+      "name_en": "Grain Buds",
+      "name_zh": "小滿",
+      "asset": "xiaoman.png",
+      "music": "xiaoman"
+    },
+    "2026-06-05": {
+      "type": "solar_term",
+      "key": "mangzhong",
+      "name_en": "Grain in Ear",
+      "name_zh": "芒種",
+      "asset": "mangzhong.png",
+      "music": "mangzhong"
+    },
+    "2026-06-19": {
+      "type": "lunar_festival",
+      "key": "dragon_boat",
+      "name_en": "Dragon Boat Festival",
+      "name_zh": "端午節",
+      "asset": "dragon_boat.png",
+      "music": "dragon_boat"
+    },
+    "2026-06-21": {
+      "type": "solar_term",
+      "key": "xiazhi",
+      "name_en": "Summer Solstice",
+      "name_zh": "夏至",
+      "asset": "xiazhi.png",
+      "music": "xiazhi"
+    },
+    "2026-07-07": {
+      "type": "solar_term",
+      "key": "xiaoshu",
+      "name_en": "Minor Heat",
+      "name_zh": "小暑",
+      "asset": "xiaoshu.png",
+      "music": "xiaoshu"
+    },
+    "2026-07-23": {
+      "type": "solar_term",
+      "key": "dashu",
+      "name_en": "Major Heat",
+      "name_zh": "大暑",
+      "asset": "dashu.png",
+      "music": "dashu"
+    },
+    "2026-08-07": {
+      "type": "solar_term",
+      "key": "liqiu",
+      "name_en": "Beginning of Autumn",
+      "name_zh": "立秋",
+      "asset": "liqiu.png",
+      "music": "liqiu"
+    },
+    "2026-08-08": {
+      "type": "festival",
+      "key": "fathers_day",
+      "name_en": "Father's Day",
+      "name_zh": "父親節",
+      "asset": "fathers_day.png",
+      "music": "warm_family"
+    },
+    "2026-08-19": {
+      "type": "lunar_festival",
+      "key": "qixi",
+      "name_en": "Qixi Festival",
+      "name_zh": "七夕",
+      "asset": "qixi.png",
+      "music": "valentine"
+    },
+    "2026-08-23": {
+      "type": "solar_term",
+      "key": "chushu",
+      "name_en": "End of Heat",
+      "name_zh": "處暑",
+      "asset": "chushu.png",
+      "music": "chushu"
+    },
+    "2026-08-27": {
+      "type": "lunar_festival",
+      "key": "ghost_festival",
+      "name_en": "Ghost Festival",
+      "name_zh": "中元節",
+      "asset": "ghost_festival.png",
+      "music": "calm_night"
+    },
+    "2026-09-07": {
+      "type": "solar_term",
+      "key": "bailu",
+      "name_en": "White Dew",
+      "name_zh": "白露",
+      "asset": "bailu.png",
+      "music": "bailu"
+    },
     "2026-09-23": {
       "type": "solar_term",
       "key": "autumn_equinox",
       "name_en": "Autumnal Equinox",
       "name_zh": "秋分",
       "asset": "autumn_equinox.png",
+      "music": "qiufen",
       "note_en": "Day and night in balance. A gentler season begins."
+    },
+    "2026-09-25": {
+      "type": "lunar_festival",
+      "key": "mid_autumn",
+      "name_en": "Mid-Autumn Festival",
+      "name_zh": "中秋節",
+      "asset": "mid_autumn.png",
+      "music": "mid_autumn"
+    },
+    "2026-09-28": {
+      "type": "holiday",
+      "key": "teachers_day",
+      "name_en": "Teachers' Day / Confucius' Birthday",
+      "name_zh": "教師節／孔子誕辰紀念日",
+      "asset": "teachers_day.png",
+      "music": "teacher_appreciation"
+    },
+    "2026-10-08": {
+      "type": "solar_term",
+      "key": "hanlu",
+      "name_en": "Cold Dew",
+      "name_zh": "寒露",
+      "asset": "hanlu.png",
+      "music": "hanlu"
+    },
+    "2026-10-10": {
+      "type": "holiday",
+      "key": "national_day",
+      "name_en": "National Day",
+      "name_zh": "國慶日",
+      "asset": "national_day.png",
+      "music": "celebration"
+    },
+    "2026-10-18": {
+      "type": "lunar_festival",
+      "key": "double_ninth",
+      "name_en": "Double Ninth Festival",
+      "name_zh": "重陽節",
+      "asset": "double_ninth.png",
+      "music": "warm_family"
+    },
+    "2026-10-23": {
+      "type": "solar_term",
+      "key": "shuangjiang",
+      "name_en": "Frost's Descent",
+      "name_zh": "霜降",
+      "asset": "shuangjiang.png",
+      "music": "shuangjiang"
+    },
+    "2026-10-25": {
+      "type": "holiday",
+      "key": "taiwan_retrocession_day",
+      "name_en": "Taiwan Retrocession Day",
+      "name_zh": "臺灣光復暨金門古寧頭大捷紀念日",
+      "asset": "taiwan_retrocession_day.png",
+      "music": "commemoration"
+    },
+    "2026-10-31": {
+      "type": "festival",
+      "key": "halloween",
+      "name_en": "Halloween",
+      "name_zh": "萬聖節",
+      "asset": "halloween.png",
+      "music": "halloween"
+    },
+    "2026-11-07": {
+      "type": "solar_term",
+      "key": "lidong",
+      "name_en": "Beginning of Winter",
+      "name_zh": "立冬",
+      "asset": "lidong.png",
+      "music": "lidong"
+    },
+    "2026-11-22": {
+      "type": "solar_term",
+      "key": "xiaoxue",
+      "name_en": "Minor Snow",
+      "name_zh": "小雪",
+      "asset": "xiaoxue.png",
+      "music": "xiaoxue"
+    },
+    "2026-11-26": {
+      "type": "festival",
+      "key": "thanksgiving",
+      "name_en": "Thanksgiving",
+      "name_zh": "感恩節",
+      "asset": "thanksgiving.png",
+      "music": "warm_family"
+    },
+    "2026-12-07": {
+      "type": "solar_term",
+      "key": "daxue",
+      "name_en": "Major Snow",
+      "name_zh": "大雪",
+      "asset": "daxue.png",
+      "music": "daxue"
+    },
+    "2026-12-22": {
+      "type": "solar_term",
+      "key": "dongzhi",
+      "name_en": "Winter Solstice",
+      "name_zh": "冬至",
+      "asset": "dongzhi.png",
+      "music": "dongzhi"
+    },
+    "2026-12-24": {
+      "type": "festival",
+      "key": "christmas_eve",
+      "name_en": "Christmas Eve",
+      "name_zh": "平安夜",
+      "asset": "christmas_eve.png",
+      "music": "christmas"
+    },
+    "2026-12-25": {
+      "type": "holiday",
+      "key": "christmas",
+      "name_en": "Christmas Day",
+      "name_zh": "聖誕節",
+      "asset": "christmas.png",
+      "music": "christmas",
+      "also": [
+        {
+          "type": "holiday",
+          "key": "constitution_day",
+          "name_en": "Constitution Day",
+          "name_zh": "行憲紀念日"
+        }
+      ]
+    },
+    "2026-12-31": {
+      "type": "festival",
+      "key": "new_years_eve",
+      "name_en": "New Year's Eve",
+      "name_zh": "跨年夜",
+      "asset": "new_years_eve.png",
+      "music": "new_year"
     }
   }
 }
