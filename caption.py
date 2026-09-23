@@ -41,12 +41,12 @@ LINES = {
 }
 
 
-def make_simple_caption(w):
+def make_simple_caption(w, event=None):
     t = theme(w)
     en_condition, zh_condition = LINES[t]
     date = w["date"].replace("-", "/")
     rain = w["rain"]
-    is_equinox = w["date"] == "2026-09-23"
+    is_equinox = bool(event and event.get("key") == "autumn_equinox")
 
     seasonal_en = ""
     seasonal_zh = ""
@@ -138,9 +138,9 @@ FACTUAL CAPTION:
     return text
 
 
-def make_caption(w):
+def make_caption(w, event=None):
     config = load_config()
-    t, simple_caption = make_simple_caption(w)
+    t, simple_caption = make_simple_caption(w, event=event)
 
     if not config.get("isAI", False):
         print("Caption mode: SIMPLE (isAI=false)")
