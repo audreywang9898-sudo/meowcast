@@ -10,7 +10,9 @@
       "name_en": "New Year's Day",
       "name_zh": "元旦",
       "asset": "new_year.png",
-      "music": "new_year"
+      "music": "new_year",
+      "caption_en": "A fresh year begins — may your days be bright, gentle, and full of little adventures.",
+      "caption_zh": "新的一年開始了，願日子明亮溫柔，也有好多值得期待的小冒險。"
     },
     "2026-01-05": {
       "type": "solar_term",
@@ -18,7 +20,9 @@
       "name_en": "Minor Cold",
       "name_zh": "小寒",
       "asset": "xiaohan.png",
-      "music": "xiaohan"
+      "music": "xiaohan",
+      "caption_en": "Minor Cold is here. Keep warm and save a sunny spot for yourself.",
+      "caption_zh": "小寒到了，記得穿暖一點，也替自己留一個曬得到陽光的位置。"
     },
     "2026-01-20": {
       "type": "solar_term",
@@ -26,7 +30,9 @@
       "name_en": "Major Cold",
       "name_zh": "大寒",
       "asset": "dahan.png",
-      "music": "dahan"
+      "music": "dahan",
+      "caption_en": "Major Cold marks the deepest chill of the season. Warm paws, warm drinks, warm heart.",
+      "caption_zh": "大寒是一年最冷的時節之一。暖暖手腳、喝杯熱飲，也把心照顧暖一點。"
     },
     "2026-02-04": {
       "type": "solar_term",
@@ -34,7 +40,9 @@
       "name_en": "Beginning of Spring",
       "name_zh": "立春",
       "asset": "lichun.png",
-      "music": "lichun"
+      "music": "lichun",
+      "caption_en": "Spring begins quietly today — a tiny green promise is already on its way.",
+      "caption_zh": "立春了。春天總是安安靜靜地來，一點點綠意正在路上。"
     },
     "2026-02-14": {
       "type": "festival",
@@ -42,7 +50,9 @@
       "name_en": "Valentine's Day",
       "name_zh": "西洋情人節",
       "asset": "valentines_day.png",
-      "music": "valentine"
+      "music": "valentine",
+      "caption_en": "Love can be grand or tiny — a warm drink, a kind word, a seat saved beside you.",
+      "caption_zh": "愛不一定轟轟烈烈，也可以是一杯熱飲、一句溫柔，或替你留好的位置。"
     },
     "2026-02-16": {
       "type": "lunar_festival",
@@ -50,7 +60,9 @@
       "name_en": "Lunar New Year's Eve",
       "name_zh": "除夕",
       "asset": "lunar_new_year_eve.png",
-      "music": "lunar_new_year"
+      "music": "lunar_new_year",
+      "caption_en": "Tonight is for coming home, sharing a table, and keeping the people we love close.",
+      "caption_zh": "除夕夜，回家吃頓飯，把珍惜的人好好放在身邊。"
     },
     "2026-02-17": {
       "type": "lunar_festival",
@@ -58,7 +70,9 @@
       "name_en": "Lunar New Year",
       "name_zh": "春節",
       "asset": "lunar_new_year.png",
-      "music": "lunar_new_year"
+      "music": "lunar_new_year",
+      "caption_en": "Happy Lunar New Year! May your year be cozy, lucky, and full of happy paws.",
+      "caption_zh": "新年快樂！願新的一年平安順心，好運和幸福都像貓腳印一樣一路跟著你。"
     },
     "2026-02-18": {
       "type": "solar_term",
@@ -66,7 +80,9 @@
       "name_en": "Rain Water",
       "name_zh": "雨水",
       "asset": "yushui.png",
-      "music": "yushui"
+      "music": "yushui",
+      "caption_en": "Rain Water arrives — the air softens, the earth wakes, and spring starts to feel real.",
+      "caption_zh": "雨水到了，空氣漸漸柔軟，大地甦醒，春天開始有了真正的模樣。"
     },
     "2026-02-28": {
       "type": "holiday",
@@ -74,7 +90,9 @@
       "name_en": "Peace Memorial Day",
       "name_zh": "和平紀念日",
       "asset": "peace_memorial_day.png",
-      "music": "peaceful"
+      "music": "peaceful",
+      "caption_en": "A quiet day to remember history, cherish peace, and hold space for reflection.",
+      "caption_zh": "記得歷史，也珍惜和平。今天留一點安靜的時間給記憶與思考。"
     },
     "2026-03-03": {
       "type": "lunar_festival",
@@ -82,7 +100,9 @@
       "name_en": "Lantern Festival",
       "name_zh": "元宵節",
       "asset": "lantern_festival.png",
-      "music": "lantern_festival"
+      "music": "lantern_festival",
+      "caption_en": "Lanterns glow, tangyuan are sweet, and the first full moon of the lunar year lights the night.",
+      "caption_zh": "元宵燈亮、湯圓甜甜，農曆新年的第一輪圓月也照亮了夜晚。"
     },
     "2026-03-05": {
       "type": "solar_term",
@@ -90,7 +110,9 @@
       "name_en": "Awakening of Insects",
       "name_zh": "驚蟄",
       "asset": "jingzhe.png",
-      "music": "jingzhe"
+      "music": "jingzhe",
+      "caption_en": "Spring thunder wakes the sleeping world. Time to stretch, blink, and begin again.",
+      "caption_zh": "驚蟄春雷喚醒沉睡的大地。伸個懶腰，新的季節真的醒來了。"
     },
     "2026-03-08": {
       "type": "festival",
@@ -98,7 +120,9 @@
       "name_en": "International Women's Day",
       "name_zh": "國際婦女節",
       "asset": "womens_day.png",
-      "music": "gentle"
+      "music": "gentle",
+      "caption_en": "Here’s to every woman growing, choosing, resting, creating, and living life in her own way.",
+      "caption_zh": "祝福每一位女性，都能依自己的步調成長、選擇、休息、創造與生活。"
     },
     "2026-03-14": {
       "type": "festival",
@@ -106,7 +130,9 @@
       "name_en": "White Day",
       "name_zh": "白色情人節",
       "asset": "white_day.png",
-      "music": "valentine"
+      "music": "valentine",
+      "caption_en": "A little sweetness returned is still sweetness. Save some tenderness for yourself, too.",
+      "caption_zh": "收到溫柔，也別忘了把一點甜留給自己。"
     },
     "2026-03-20": {
       "type": "solar_term",
@@ -114,7 +140,9 @@
       "name_en": "Spring Equinox",
       "name_zh": "春分",
       "asset": "chunfen.png",
-      "music": "chunfen"
+      "music": "chunfen",
+      "caption_en": "Day and night share the sky equally today. Spring has found its balance.",
+      "caption_zh": "春分，晝夜幾乎等長。春天在今天找到剛剛好的平衡。"
     },
     "2026-04-01": {
       "type": "festival",
@@ -122,7 +150,9 @@
       "name_en": "April Fools' Day",
       "name_zh": "愚人節",
       "asset": "april_fools.png",
-      "music": "playful"
+      "music": "playful",
+      "caption_en": "Today’s forecast: a 100% chance of tiny mischief. Believe the cat at your own risk.",
+      "caption_zh": "今日預報：小惡作劇機率 100%。至於貓說的話，要不要相信就看你囉。"
     },
     "2026-04-04": {
       "type": "holiday",
@@ -130,7 +160,9 @@
       "name_en": "Children's Day",
       "name_zh": "兒童節",
       "asset": "childrens_day.png",
-      "music": "childrens_day"
+      "music": "childrens_day",
+      "caption_en": "May every child have time to play, room to wonder, and grown-ups who listen.",
+      "caption_zh": "願每個孩子都有玩耍的時間、好奇的空間，也有願意好好聽他說話的大人。"
     },
     "2026-04-05": {
       "type": "solar_term",
@@ -146,7 +178,9 @@
           "name_en": "Easter",
           "name_zh": "復活節"
         }
-      ]
+      ],
+      "caption_en": "Qingming brings clear light and remembrance — a gentle day to think of those we miss.",
+      "caption_zh": "清明天光澄澈，也是思念的日子。把想念輕輕放在心裡。"
     },
     "2026-04-20": {
       "type": "solar_term",
@@ -154,7 +188,9 @@
       "name_en": "Grain Rain",
       "name_zh": "穀雨",
       "asset": "guyu.png",
-      "music": "guyu"
+      "music": "guyu",
+      "caption_en": "Grain Rain is here. Spring rain nourishes the earth before summer begins.",
+      "caption_zh": "穀雨到了。春天最後的雨水滋養大地，也悄悄替夏天鋪路。"
     },
     "2026-04-22": {
       "type": "festival",
@@ -162,7 +198,9 @@
       "name_en": "Earth Day",
       "name_zh": "世界地球日",
       "asset": "earth_day.png",
-      "music": "nature"
+      "music": "nature",
+      "caption_en": "One little planet, one shared home. Be gentle with it today and every day.",
+      "caption_zh": "只有一個地球，也是我們共同的家。今天和每一天，都對它溫柔一點。"
     },
     "2026-05-01": {
       "type": "holiday",
@@ -170,7 +208,9 @@
       "name_en": "Labour Day",
       "name_zh": "勞動節",
       "asset": "labour_day.png",
-      "music": "may_day"
+      "music": "may_day",
+      "caption_en": "For everyone whose work keeps life moving: may today include a well-earned pause.",
+      "caption_zh": "謝謝每一份讓生活繼續運轉的勞動。今天也記得替辛苦的自己留一點休息。"
     },
     "2026-05-05": {
       "type": "solar_term",
@@ -178,7 +218,9 @@
       "name_en": "Beginning of Summer",
       "name_zh": "立夏",
       "asset": "lixia.png",
-      "music": "lixia"
+      "music": "lixia",
+      "caption_en": "Summer begins. Longer light, warmer air, and a new season at the window.",
+      "caption_zh": "立夏，夏天登場。白晝變長、空氣變暖，窗邊也換上新的季節。"
     },
     "2026-05-10": {
       "type": "festival",
@@ -186,7 +228,9 @@
       "name_en": "Mother's Day",
       "name_zh": "母親節",
       "asset": "mothers_day.png",
-      "music": "warm_family"
+      "music": "warm_family",
+      "caption_en": "For every kind of mothering love: thank you for the countless small things that make a home feel safe.",
+      "caption_zh": "謝謝每一種母愛，以及那些數不清、讓家變得安心的小事。"
     },
     "2026-05-21": {
       "type": "solar_term",
@@ -194,7 +238,9 @@
       "name_en": "Grain Buds",
       "name_zh": "小滿",
       "asset": "xiaoman.png",
-      "music": "xiaoman"
+      "music": "xiaoman",
+      "caption_en": "Grain Buds reminds us: not everything has to be completely full to be enough.",
+      "caption_zh": "小滿，是將滿未滿。原來不必事事圓滿，剛剛好也可以很好。"
     },
     "2026-06-05": {
       "type": "solar_term",
@@ -202,7 +248,9 @@
       "name_en": "Grain in Ear",
       "name_zh": "芒種",
       "asset": "mangzhong.png",
-      "music": "mangzhong"
+      "music": "mangzhong",
+      "caption_en": "A season for planting and growing. Some good things begin with patient, ordinary work.",
+      "caption_zh": "芒種，是播種也是生長的時節。有些美好的事，就是從耐心又平凡的努力開始。"
     },
     "2026-06-19": {
       "type": "lunar_festival",
@@ -210,7 +258,9 @@
       "name_en": "Dragon Boat Festival",
       "name_zh": "端午節",
       "asset": "dragon_boat.png",
-      "music": "dragon_boat"
+      "music": "dragon_boat",
+      "caption_en": "Dragon boats race and zongzi are ready — summer traditions are officially here.",
+      "caption_zh": "龍舟出發、粽子上桌，熟悉的夏日節氣又回來了。"
     },
     "2026-06-21": {
       "type": "solar_term",
@@ -218,7 +268,9 @@
       "name_en": "Summer Solstice",
       "name_zh": "夏至",
       "asset": "xiazhi.png",
-      "music": "xiazhi"
+      "music": "xiazhi",
+      "caption_en": "The longest daylight of the year is here. Let a little extra sunshine into your day.",
+      "caption_zh": "夏至，一年白晝最長的時候。今天就多收下一點陽光吧。"
     },
     "2026-07-07": {
       "type": "solar_term",
@@ -226,7 +278,9 @@
       "name_en": "Minor Heat",
       "name_zh": "小暑",
       "asset": "xiaoshu.png",
-      "music": "xiaoshu"
+      "music": "xiaoshu",
+      "caption_en": "Minor Heat arrives. Summer is getting serious — shade and cool drinks are good friends.",
+      "caption_zh": "小暑到了，夏天開始認真熱起來。陰影、涼風和冰飲都是好朋友。"
     },
     "2026-07-23": {
       "type": "solar_term",
@@ -234,7 +288,9 @@
       "name_en": "Major Heat",
       "name_zh": "大暑",
       "asset": "dashu.png",
-      "music": "dashu"
+      "music": "dashu",
+      "caption_en": "Major Heat is here. Move slowly, stay hydrated, and let the afternoon take its time.",
+      "caption_zh": "大暑來了。慢一點、多喝水，最熱的午後不用急著趕路。"
     },
     "2026-08-07": {
       "type": "solar_term",
@@ -242,7 +298,9 @@
       "name_en": "Beginning of Autumn",
       "name_zh": "立秋",
       "asset": "liqiu.png",
-      "music": "liqiu"
+      "music": "liqiu",
+      "caption_en": "Autumn begins on the calendar, even if Taipei still feels like summer.",
+      "caption_zh": "立秋了。雖然台北可能還很有夏天的樣子，秋天已經先在日曆上報到。"
     },
     "2026-08-08": {
       "type": "festival",
@@ -250,7 +308,9 @@
       "name_en": "Father's Day",
       "name_zh": "父親節",
       "asset": "fathers_day.png",
-      "music": "warm_family"
+      "music": "warm_family",
+      "caption_en": "For the dads who show love in big ways and quiet ways — happy Father’s Day.",
+      "caption_zh": "祝福那些用各種方式守護家人的爸爸們，父親節快樂。"
     },
     "2026-08-19": {
       "type": "lunar_festival",
@@ -258,7 +318,9 @@
       "name_en": "Qixi Festival",
       "name_zh": "七夕",
       "asset": "qixi.png",
-      "music": "valentine"
+      "music": "valentine",
+      "caption_en": "Under the summer night sky, Qixi is a lovely excuse to tell someone: I’m glad you’re here.",
+      "caption_zh": "七夕的夏夜，剛好適合告訴重要的人：很高興有你在。"
     },
     "2026-08-23": {
       "type": "solar_term",
@@ -266,7 +328,9 @@
       "name_en": "End of Heat",
       "name_zh": "處暑",
       "asset": "chushu.png",
-      "music": "chushu"
+      "music": "chushu",
+      "caption_en": "End of Heat means summer is beginning to loosen its grip. Cooler days are slowly on their way.",
+      "caption_zh": "處暑，暑氣開始慢慢退場。再等等，舒服一點的日子正在靠近。"
     },
     "2026-08-27": {
       "type": "lunar_festival",
@@ -274,7 +338,9 @@
       "name_en": "Ghost Festival",
       "name_zh": "中元節",
       "asset": "ghost_festival.png",
-      "music": "calm_night"
+      "music": "calm_night",
+      "caption_en": "A traditional day of remembrance and respect. Keep tonight calm, warm, and gentle.",
+      "caption_zh": "中元節，是慎終追遠與表達敬意的傳統日子。今晚安安靜靜、平平安安就很好。"
     },
     "2026-09-07": {
       "type": "solar_term",
@@ -282,7 +348,9 @@
       "name_en": "White Dew",
       "name_zh": "白露",
       "asset": "bailu.png",
-      "music": "bailu"
+      "music": "bailu",
+      "caption_en": "White Dew arrives. Mornings soften, nights cool down, and autumn becomes easier to notice.",
+      "caption_zh": "白露到了。清晨更柔、夜晚漸涼，秋天開始變得看得見也感受得到。"
     },
     "2026-09-23": {
       "type": "solar_term",
@@ -291,7 +359,9 @@
       "name_zh": "秋分",
       "asset": "autumn_equinox.png",
       "music": "qiufen",
-      "note_en": "Day and night in balance. A gentler season begins."
+      "note_en": "Day and night in balance. A gentler season begins.",
+      "caption_en": "Day and night in balance. A gentler season begins.",
+      "caption_zh": "秋分，晝夜平分。天氣也開始走向更溫柔的季節。"
     },
     "2026-09-25": {
       "type": "lunar_festival",
@@ -299,7 +369,9 @@
       "name_en": "Mid-Autumn Festival",
       "name_zh": "中秋節",
       "asset": "mid_autumn.png",
-      "music": "mid_autumn"
+      "music": "mid_autumn",
+      "caption_en": "One bright moon, many different windows. May everyone you miss feel a little closer tonight.",
+      "caption_zh": "同一輪月亮，照著不同的窗。願今晚想念的人，都感覺離彼此近一點。"
     },
     "2026-09-28": {
       "type": "holiday",
@@ -307,7 +379,9 @@
       "name_en": "Teachers' Day / Confucius' Birthday",
       "name_zh": "教師節／孔子誕辰紀念日",
       "asset": "teachers_day.png",
-      "music": "teacher_appreciation"
+      "music": "teacher_appreciation",
+      "caption_en": "For every teacher who opened a door, sparked a question, or believed a little longer — thank you.",
+      "caption_zh": "謝謝每一位曾為孩子打開一扇門、點亮一個問題，或多相信他一下的老師。"
     },
     "2026-10-08": {
       "type": "solar_term",
@@ -315,7 +389,9 @@
       "name_en": "Cold Dew",
       "name_zh": "寒露",
       "asset": "hanlu.png",
-      "music": "hanlu"
+      "music": "hanlu",
+      "caption_en": "Cold Dew arrives. Autumn mornings are cooler now — perfect weather for a slower walk.",
+      "caption_zh": "寒露到了，秋晨更涼了。很適合放慢腳步，好好走一段路。"
     },
     "2026-10-10": {
       "type": "holiday",
@@ -323,7 +399,9 @@
       "name_en": "National Day",
       "name_zh": "國慶日",
       "asset": "national_day.png",
-      "music": "celebration"
+      "music": "celebration",
+      "caption_en": "A festive October day in Taiwan — Taipei is dressed for the occasion.",
+      "caption_zh": "十月的節慶日，台北也換上了應景的城市風景。"
     },
     "2026-10-18": {
       "type": "lunar_festival",
@@ -331,7 +409,9 @@
       "name_en": "Double Ninth Festival",
       "name_zh": "重陽節",
       "asset": "double_ninth.png",
-      "music": "warm_family"
+      "music": "warm_family",
+      "caption_en": "Double Ninth is a day to care for elders, climb high, and appreciate the long road behind us.",
+      "caption_zh": "重陽節，關心長輩、登高望遠，也珍惜一路走來累積的歲月。"
     },
     "2026-10-23": {
       "type": "solar_term",
@@ -339,7 +419,9 @@
       "name_en": "Frost's Descent",
       "name_zh": "霜降",
       "asset": "shuangjiang.png",
-      "music": "shuangjiang"
+      "music": "shuangjiang",
+      "caption_en": "Frost’s Descent closes out autumn. The air grows crisp and winter waits nearby.",
+      "caption_zh": "霜降，是秋天最後一個節氣。空氣漸涼，冬天已經在不遠處等著了。"
     },
     "2026-10-25": {
       "type": "holiday",
@@ -347,7 +429,9 @@
       "name_en": "Taiwan Retrocession Day",
       "name_zh": "臺灣光復暨金門古寧頭大捷紀念日",
       "asset": "taiwan_retrocession_day.png",
-      "music": "commemoration"
+      "music": "commemoration",
+      "caption_en": "A commemorative day in Taiwan’s calendar — a moment to remember history and its many layers.",
+      "caption_zh": "今天是臺灣的紀念日之一，留一點時間回望歷史，也理解其中不同的記憶與層次。"
     },
     "2026-10-31": {
       "type": "festival",
@@ -355,7 +439,9 @@
       "name_en": "Halloween",
       "name_zh": "萬聖節",
       "asset": "halloween.png",
-      "music": "halloween"
+      "music": "halloween",
+      "caption_en": "Tiny costumes, glowing pumpkins, and just enough mischief — happy Halloween!",
+      "caption_zh": "小小變裝、亮亮南瓜，再加一點剛剛好的搗蛋。萬聖節快樂！"
     },
     "2026-11-07": {
       "type": "solar_term",
@@ -363,7 +449,9 @@
       "name_en": "Beginning of Winter",
       "name_zh": "立冬",
       "asset": "lidong.png",
-      "music": "lidong"
+      "music": "lidong",
+      "caption_en": "Winter begins. Time for warmer meals, softer blankets, and earlier sunsets.",
+      "caption_zh": "立冬了。熱一點的飯、軟一點的被子，還有一天比一天早的夕陽。"
     },
     "2026-11-22": {
       "type": "solar_term",
@@ -371,7 +459,9 @@
       "name_en": "Minor Snow",
       "name_zh": "小雪",
       "asset": "xiaoxue.png",
-      "music": "xiaoxue"
+      "music": "xiaoxue",
+      "caption_en": "Minor Snow arrives on the calendar. Taipei may not see snow, but winter is settling in.",
+      "caption_zh": "小雪到了。台北也許不下雪，但冬天的氣息已經慢慢住下來了。"
     },
     "2026-11-26": {
       "type": "festival",
@@ -379,7 +469,9 @@
       "name_en": "Thanksgiving",
       "name_zh": "感恩節",
       "asset": "thanksgiving.png",
-      "music": "warm_family"
+      "music": "warm_family",
+      "caption_en": "A good day to notice what quietly makes life better — and say thank you.",
+      "caption_zh": "今天很適合看看那些默默讓生活變好的事，然後好好說一聲謝謝。"
     },
     "2026-12-07": {
       "type": "solar_term",
@@ -387,7 +479,9 @@
       "name_en": "Major Snow",
       "name_zh": "大雪",
       "asset": "daxue.png",
-      "music": "daxue"
+      "music": "daxue",
+      "caption_en": "Major Snow marks deeper winter. Even without snow in Taipei, the season asks us to slow down.",
+      "caption_zh": "大雪，冬意更深。即使台北沒有雪，這個季節也提醒我們把步調放慢一點。"
     },
     "2026-12-22": {
       "type": "solar_term",
@@ -395,7 +489,9 @@
       "name_en": "Winter Solstice",
       "name_zh": "冬至",
       "asset": "dongzhi.png",
-      "music": "dongzhi"
+      "music": "dongzhi",
+      "caption_en": "The longest night turns toward the light. Have something warm, share a tangyuan, and stay cozy.",
+      "caption_zh": "冬至，最長的夜晚也開始轉向光。吃點熱的、來顆湯圓，暖暖過一天。"
     },
     "2026-12-24": {
       "type": "festival",
@@ -403,7 +499,9 @@
       "name_en": "Christmas Eve",
       "name_zh": "平安夜",
       "asset": "christmas_eve.png",
-      "music": "christmas"
+      "music": "christmas",
+      "caption_en": "Christmas lights are glowing. May your evening be peaceful, cozy, and full of little joys.",
+      "caption_zh": "聖誕燈亮起來了。願今晚平安、溫暖，也裝滿小小的快樂。"
     },
     "2026-12-25": {
       "type": "holiday",
@@ -419,7 +517,9 @@
           "name_en": "Constitution Day",
           "name_zh": "行憲紀念日"
         }
-      ]
+      ],
+      "caption_en": "Merry Christmas from Taipei Cat! May your day be warm, bright, and wonderfully cozy.",
+      "caption_zh": "台北貓祝你聖誕快樂！願今天溫暖、明亮，還有滿滿舒服的幸福感。"
     },
     "2026-12-31": {
       "type": "festival",
@@ -427,7 +527,9 @@
       "name_en": "New Year's Eve",
       "name_zh": "跨年夜",
       "asset": "new_years_eve.png",
-      "music": "new_year"
+      "music": "new_year",
+      "caption_en": "One last Taipei night before a brand-new year. Keep the good, release the rest, and look forward.",
+      "caption_zh": "今年最後一個台北夜晚。把好的留下，其餘輕輕放下，一起期待新的一年。"
     }
   }
 }
