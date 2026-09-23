@@ -60,6 +60,12 @@ jobs:
         if: steps.schedule.outputs.run == 'true'
         id: dedupe
         run: |
+          # Manual runs are intentional previews/re-publishes, so never dedupe them.
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "Manual run: bypassing daily dedupe."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           TODAY=$(TZ=Asia/Taipei date +%F)
           PUBLISHED=$(curl -fsSL "https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-date.txt?ts=$(date +%s)" || true)
           if [ "$PUBLISHED" = "$TODAY" ]; then
