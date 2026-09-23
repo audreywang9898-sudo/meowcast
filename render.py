@@ -95,9 +95,15 @@ def add_weather_overlay(im,w,theme,event=None):
 
     # IMPORTANT: these coordinates are the blank fields in the 1080x1920 master artwork.
     # Draw values only; never redraw °C, LOW, Rain chance or %.
-    text(435,575,f"{w['high']}",132,anchor="mm")
-    text(790,565,f"{w['low']}",56,anchor="mm")
-    text(585,870,f"{w['rain']}",35,anchor="mm")
+    # The master artwork uses underscores as placeholders. Overlay values at those exact fields.
+    text(515,575,f"{w['high']}",132,anchor="mm")
+    text(820,625,f"{w['low']}",56,anchor="mm")
+
+    # Condition belongs inside the central white cloud label.
+    text(W//2,748,condition,68,ink,anchor="mm",stroke=0)
+
+    # Rain value belongs between "Rain chance" and the printed percent sign.
+    text(655,873,f"{w['rain']}",35,anchor="mm")
 
     # Small handwritten-style note at left, no dark UI card.
     note = "Day and night in balance.\nA gentler season begins." if is_equinox else tips[theme]
