@@ -4,6 +4,7 @@ from PIL import Image,ImageDraw,ImageFont
 from weather import get_weather
 from caption import make_caption
 from music import make_music
+from calendar_events import event_for_date
 
 W,H=1080,1920
 
@@ -11,12 +12,6 @@ def font(size):
     for p in ["/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc","/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"]:
         if os.path.exists(p): return ImageFont.truetype(p,size)
     return ImageFont.load_default()
-
-def seasonal_event(date_text):
-    # Taipei Meowcast special-day art direction.
-    # Autumnal Equinox falls around Sep 22-23; explicit 2026 date is Sep 23.
-    special={"2026-09-23":"autumn_equinox"}
-    return special.get(date_text)
 
 def fallback(theme):
     tones={"sunny":(235,196,104),"rainy":(91,119,145),"cloudy":(164,174,181),"hot":(221,145,98),"cold":(136,163,186)}
@@ -27,9 +22,14 @@ def fallback(theme):
     return im
 
 def asset_for(theme,event=None):
-    # Special-day artwork wins over normal weather artwork when provided.
+    # Calendar artwork wins over normal weather artwork when provided.
     if event:
-        for p in [f"asset/{event}.png", f"asset/{event}.jpg"]:
+        configured=event.get("asset")
+        key=event.get("key")
+        special=[]
+        if configured: special.append(f"asset/{configured}")
+        if key: special.extend([f"asset/{key}.png", f"asset/{key}.jpg"])
+        for p in special:
             if os.path.exists(p): return p
     candidates={
         "sunny":["asset/sunny.png","asset/sunny.jpg"],
@@ -45,7 +45,8 @@ def asset_for(theme,event=None):
 def add_weather_overlay(im,w,theme,event=None):
     d=ImageDraw.Draw(im,"RGBA")
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy","hot":"Hot","cold":"Cold"}[theme]
-    is_equinox=(event=="autumn_equinox")
+    event_key=event.get("key") if event else None
+    is_equinox=(event_key=="autumn_equinox")
     accent={"sunny":(255,205,88,255),"rainy":(155,205,245,255),"cloudy":(215,220,225,255),"hot":(255,165,80,255),"cold":(185,220,250,255)}[theme]
     ink=(28,30,34,255)
     tips={"sunny":"Sunshine is on duty.\nEnjoy the view!",
@@ -114,7 +115,7 @@ def add_weather_overlay(im,w,theme,event=None):
     text(W//2,1815,"GOOD WEATHER  ·  GOOD DAYS  ·  A HAPPIER YOU",23,stroke=2)
 
 def main():
-    w=get_weather(); t,cap=make_caption(w); event=seasonal_event(w["date"]); src=asset_for(t,event)
+    w=get_weather(); event=event_for_date(w["date"]); t,cap=make_caption(w,event=event); src=asset_for(t,event)
     if src:
         im=Image.open(src).convert("RGB"); scale=max(W/im.width,H/im.height); im=im.resize((int(im.width*scale),int(im.height*scale)))
         x=(im.width-W)//2; y=(im.height-H)//2; im=im.crop((x,y,x+W,y+H))
