@@ -74,6 +74,36 @@ jobs:
               out.write(f"slot={slot}\n")
           PY
 
+      - name: Verify next-year calendar on December 1
+        if: steps.schedule.outputs.run == 'true'
+        env:
+          PUBLISH_DATE: ${{ steps.schedule.outputs.date }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+
+          today=os.environ["PUBLISH_DATE"]
+          year,month,day=map(int,today.split("-"))
+          if (month,day)!=(12,1):
+              print("Not December 1; yearly calendar check not required.")
+              raise SystemExit(0)
+
+          target=year+1
+          path=Path("calendar") / f"{target}.json"
+          if not path.is_file():
+              raise SystemExit(f"ERROR: next-year calendar missing: {path}")
+
+          data=json.loads(path.read_text(encoding="utf-8"))
+          if data.get("year") != target:
+              raise SystemExit(f"ERROR: {path} year is {data.get('year')}, expected {target}")
+          events=data.get("events")
+          if not isinstance(events,dict) or not events:
+              raise SystemExit(f"ERROR: {path} has no events")
+
+          print(f"OK: next-year calendar ready: {path} ({len(events)} events)")
+          PY
+
       - name: Skip if this scheduled slot is already published
         if: steps.schedule.outputs.run == 'true'
         id: dedupe
