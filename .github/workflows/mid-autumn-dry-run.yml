@@ -1,4 +1,4 @@
-name: Mid-Autumn Dry Run # preview
+name: Mid-Autumn Dry Run # preview aligned
 on:
   push:
     branches: [main]
