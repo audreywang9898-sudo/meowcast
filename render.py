@@ -98,7 +98,7 @@ def add_weather_overlay(im,w,theme,event=None):
     # The master artwork uses underscores as placeholders. Overlay values at those exact fields.
     text(470,655,f"{w['high']}",132,anchor="mm")
     # Right-side blank: number sits immediately before the artwork's printed °C.
-    text(750,700,f"{w['low']}",50,anchor="mm")
+    text(758,700,f"{w['low']}",50,anchor="mm")
 
     # Condition is centered inside the white rounded label, not above it.
     text(W//2,790,condition,62,ink,anchor="mm",stroke=0)
