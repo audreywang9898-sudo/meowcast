@@ -20,30 +20,33 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Generate next year's calendar
         run: python generate_next_calendar.py
-      - name: Validate calendar and referenced assets/music
+      - name: Validate yearly calendars and referenced assets/music
         run: |
           python - <<'PY'
-          import json, os
-          c=json.load(open("calendar_next.json",encoding="utf-8"))
-          assert c["events"], "calendar has no events"
-          missing=[]
-          for day,e in c["events"].items():
-              asset=e.get("asset")
-              music=e.get("music")
-              if asset and not os.path.isfile("asset/"+asset):
-                  missing.append("asset/"+asset)
-              if music and not any(os.path.isfile(f"music/{music}.{ext}") for ext in ("mp3","wav","m4a")):
-                  missing.append("music/"+music+".(mp3|wav|m4a)")
-          if missing:
-              print("WARNING: missing optional media:")
-              print("\n".join(sorted(set(missing))))
-          print(f'Validated calendar year {c["year"]}: {len(c["events"])} events')
+          import glob, json, os
+          files=sorted(glob.glob("calendar/*.json"))
+          assert files, "no yearly calendars found"
+          for path in files:
+              c=json.load(open(path,encoding="utf-8"))
+              assert c["events"], f"{path}: calendar has no events"
+              missing=[]
+              for day,e in c["events"].items():
+                  asset=e.get("asset")
+                  music=e.get("music")
+                  if asset and not os.path.isfile("asset/"+asset):
+                      missing.append("asset/"+asset)
+                  if music and not any(os.path.isfile(f"music/{music}.{ext}") for ext in ("mp3","wav","m4a")):
+                      missing.append("music/"+music+".(mp3|wav|m4a)")
+              print(f'Validated {path}: {len(c["events"])} events')
+              if missing:
+                  print("WARNING: missing optional media:")
+                  print("\n".join(sorted(set(missing))))
           PY
-      - name: Commit updated calendar
+      - name: Commit next-year calendar
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add calendar_next.json
+          git add calendar/
           git diff --cached --quiet && exit 0
           git commit -m "Prepare next-year calendar"
           git push origin main
