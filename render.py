@@ -43,20 +43,19 @@ def asset_for(theme,event=None):
     return None
 
 def add_weather_overlay(im,w,theme,event=None):
-    """Draw the complete weather UI in code. Background artwork stays independent."""
+    """Draw a compact, high-legibility weather card entirely in code."""
     d=ImageDraw.Draw(im,"RGBA")
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy","hot":"Hot","cold":"Cold"}[theme]
 
-    # One fixed panel for every background. No weather_UI image asset is used.
-    x0,y0,x1,y1=155,500,925,960
-    radius=52
-    d.rounded_rectangle((x0,y0,x1,y1),radius=radius,
-                        fill=(238,242,246,224),
-                        outline=(255,255,255,205),width=3)
+    # Fixed compact card below the branding area.
+    x0,y0,x1,y1=145,610,935,1035
+    d.rounded_rectangle((x0,y0,x1,y1),radius=54,
+                        fill=(238,242,246,228),
+                        outline=(255,255,255,220),width=3)
 
-    ink=(25,31,40,255)
-    muted=(91,102,116,255)
-    line=(135,145,156,150)
+    ink=(24,30,39,255)
+    muted=(83,94,108,255)
+    line=(135,145,156,145)
     accent={"sunny":(226,169,47,255),"rainy":(92,145,185,255),
             "cloudy":(145,154,164,255),"hot":(218,126,62,255),
             "cold":(105,151,187,255)}[theme]
@@ -64,39 +63,39 @@ def add_weather_overlay(im,w,theme,event=None):
     def put(x,y,s,size,fill=ink,anchor="mm"):
         d.text((x,y),s,font=font(size),anchor=anchor,fill=fill)
 
+    # Date: larger and visually connected to the weather block.
     date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y / %m / %d (%a)").upper()
-    put(540,565,date_label,34)
-    d.line((205,615,875,615),fill=line,width=2)
+    put(540,665,date_label,40)
+    d.line((200,710,880,710),fill=line,width=2)
 
-    # Weather icon
-    cx,cy=270,720
-    r=28
+    # Compact main weather row: icon + high temperature + low temperature.
+    cx,cy=255,790
+    r=30
     if theme in ("sunny","hot"):
         d.ellipse((cx-r,cy-r,cx+r,cy+r),fill=accent)
-        for dx,dy in [(0,-60),(0,60),(-60,0),(60,0),(-43,-43),(43,-43),(-43,43),(43,43)]:
+        for dx,dy in [(0,-64),(0,64),(-64,0),(64,0),(-45,-45),(45,-45),(-45,45),(45,45)]:
             d.line((cx+dx*.68,cy+dy*.68,cx+dx,cy+dy),fill=accent,width=5)
     elif theme in ("rainy","cloudy"):
-        d.ellipse((cx-48,cy-12,cx+8,cy+38),fill=accent)
-        d.ellipse((cx-12,cy-38,cx+50,cy+38),fill=accent)
-        d.rectangle((cx-48,cy,cx+50,cy+38),fill=accent)
+        d.ellipse((cx-50,cy-12,cx+8,cy+40),fill=accent)
+        d.ellipse((cx-12,cy-40,cx+52,cy+40),fill=accent)
+        d.rectangle((cx-50,cy,cx+52,cy+40),fill=accent)
         if theme=="rainy":
             for off in (-25,10,42):
-                d.line((cx+off,cy+55,cx+off-8,cy+75),fill=accent,width=5)
+                d.line((cx+off,cy+58,cx+off-8,cy+80),fill=accent,width=5)
     else:
         d.ellipse((cx-r,cy-r,cx+r,cy+r),fill=accent)
 
-    put(485,705,f"{w['high']}°C",76)
-    d.line((630,660,630,755),fill=line,width=2)
-    put(705,680,"LOW",21,muted)
-    put(705,725,f"{w['low']}°C",34)
+    put(485,785,f"{w['high']}°C",92)
+    d.line((645,745,645,830),fill=line,width=2)
+    put(735,758,"LOW",24,muted)
+    put(735,808,f"{w['low']}°C",42)
 
-    # Condition pill
-    d.rounded_rectangle((285,785,795,855),radius=35,fill=(255,255,255,205))
-    put(540,820,condition,36)
+    # Condition is prominent but visually tied to the temperature row.
+    d.rounded_rectangle((255,855,825,925),radius=35,fill=(255,255,255,210))
+    put(540,890,condition,42)
 
-    d.line((205,885,875,885),fill=line,width=2)
-    put(430,925,"Rain chance",25,muted)
-    put(700,925,f"{w['rain']}%",38)
+    # Rain probability as one compact sentence, not two scattered fields.
+    put(540,980,f"Rain chance  {w['rain']}%",34,muted)
 
 
 def main():
