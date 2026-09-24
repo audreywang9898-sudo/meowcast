@@ -14,7 +14,7 @@ def font(size):
     return ImageFont.load_default()
 
 def fallback(theme):
-    tones={"sunny":(235,196,104),"rainy":(91,119,145),"cloudy":(164,174,181),"hot":(221,145,98),"cold":(136,163,186)}
+    tones={"sunny":(235,196,104),"rainy":(91,119,145),"cloudy":(164,174,181)}
     im=Image.new("RGB",(W,H),tones[theme]); d=ImageDraw.Draw(im)
     d.ellipse((290,570,790,1070),fill=(238,238,232)); d.ellipse((335,480,500,680),fill=(238,238,232)); d.ellipse((580,480,745,680),fill=(238,238,232))
     d.ellipse((390,690,455,755),fill=(35,35,35)); d.ellipse((625,690,690,755),fill=(35,35,35)); d.polygon([(520,790),(560,790),(540,825)],fill=(215,130,140))
@@ -35,8 +35,6 @@ def asset_for(theme,event=None):
         "sunny":["asset/sunny.png","asset/sunny.jpg"],
         "rainy":["asset/rainy.png","asset/rainy.jpg"],
         "cloudy":["asset/cloudy.png","asset/cloudy.jpg"],
-        "hot":["asset/hot.png","asset/hot.jpg"],
-        "cold":["asset/cold.png","asset/cold.jpg"],
     }
     for p in candidates[theme]:
         if os.path.exists(p): return p
@@ -60,8 +58,7 @@ def add_weather_overlay(im,w,theme,event=None):
     muted=(83,94,108,255)
     line=(135,145,156,145)
     accent={"sunny":(226,169,47,255),"rainy":(92,145,185,255),
-            "cloudy":(145,154,164,255),"hot":(218,126,62,255),
-            "cold":(105,151,187,255)}[theme]
+            "cloudy":(145,154,164,255)}[theme]
 
     def put(x,y,s,size,fill=ink,anchor="mm"):
         d.text((x,y),s,font=font(size),anchor=anchor,fill=fill)
@@ -74,7 +71,7 @@ def add_weather_overlay(im,w,theme,event=None):
     # Compact main weather row: icon + high temperature + low temperature.
     cx,cy=255,850
     r=30
-    if theme in ("sunny","hot"):
+    if theme=="sunny":
         d.ellipse((cx-r,cy-r,cx+r,cy+r),fill=accent)
         for dx,dy in [(0,-64),(0,64),(-64,0),(64,0),(-45,-45),(45,-45),(-45,45),(45,45)]:
             d.line((cx+dx*.68,cy+dy*.68,cx+dx,cy+dy),fill=accent,width=5)
