@@ -47,6 +47,9 @@ def add_weather_overlay(im,w,theme,event=None):
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy","hot":"Hot","cold":"Cold"}[theme]
     event_key=event.get("key") if event else None
     is_equinox=(event_key=="autumn_equinox")
+    # Special calendar artwork already contains its decorative icon/message/layout.
+    # Only overlay live values into the blank fields; do not duplicate artwork elements.
+    is_special=bool(event and event.get("asset") and os.path.exists(f"asset/{event.get('asset')}"))
     accent={"sunny":(255,205,88,255),"rainy":(155,205,245,255),"cloudy":(215,220,225,255),"hot":(255,165,80,255),"cold":(185,220,250,255)}[theme]
     ink=(28,30,34,255)
     tips={"sunny":"Sunshine is on duty.\nEnjoy the view!",
@@ -71,7 +74,7 @@ def add_weather_overlay(im,w,theme,event=None):
     # Do not draw TAIPEI / MEOWCAST / tagline dynamically.
 
     date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y / %m / %d (%a)").upper()
-    text(W//2-35,535,date_label,43)
+    text(W//2,500,date_label,43)
     if is_equinox:
         # Seasonal badge: weather remains live; only the art direction/message changes.
         d.rounded_rectangle((92,705,300,785),radius=34,fill=(245,181,74,235))
@@ -80,36 +83,37 @@ def add_weather_overlay(im,w,theme,event=None):
 
     # Weather icon only. The base artwork already contains all typography/labels.
     cx,cy=210,590
-    if theme in ("sunny","hot"):
+    if (not is_special) and theme in ("sunny","hot"):
         d.ellipse((cx-38,cy-38,cx+38,cy+38),fill=accent)
         for dx,dy in [(0,-68),(0,68),(-68,0),(68,0),(-48,-48),(48,-48),(-48,48),(48,48)]:
             d.line((cx+int(dx*.68),cy+int(dy*.68),cx+dx,cy+dy),fill=accent,width=7)
-    elif theme in ("rainy","cloudy"):
+    elif (not is_special) and theme in ("rainy","cloudy"):
         d.ellipse((150,565,215,620),fill=accent); d.ellipse((190,545,260,620),fill=accent)
         d.rectangle((150,590,260,620),fill=accent)
         if theme=="rainy":
             for xx in (165,205,245): d.line((xx,640,xx-12,670),fill=accent,width=6)
-    else:
+    elif not is_special:
         for ang in [(210,530,210,650),(150,590,270,590),(168,548,252,632),(252,548,168,632)]:
             d.line(ang,fill=accent,width=7)
 
     # IMPORTANT: these coordinates are the blank fields in the 1080x1920 master artwork.
     # Draw values only; never redraw °C, LOW, Rain chance or %.
     # The master artwork uses underscores as placeholders. Overlay values at those exact fields.
-    text(470,655,f"{w['high']}",132,anchor="mm")
+    text(430,610,f"{w['high']}",112,anchor="mm")
     # Right-side blank: number sits immediately before the artwork's printed °C.
-    text(758,700,f"{w['low']}",50,anchor="mm")
+    text(655,625,f"{w['low']}",46,anchor="mm")
 
     # Condition is centered inside the white rounded label, not above it.
-    text(W//2,790,condition,62,ink,anchor="mm",stroke=0)
+    text(W//2,745,condition,52,ink,anchor="mm",stroke=0)
 
     # Rain value sits on the underline between "Rain chance" and the printed %.
-    text(630,875,f"{w['rain']}",35,anchor="mm")
+    text(555,820,f"{w['rain']}",34,anchor="mm")
 
     # Small handwritten-style note at left, no dark UI card.
-    note = "Day and night in balance.\nA gentler season begins." if is_equinox else tips[theme]
-    d.multiline_text((125,920),note,font=font(31),fill=(255,255,255,255),
-                     spacing=7,stroke_width=2,stroke_fill=(0,0,0,95))
+    if not is_special:
+        note = "Day and night in balance.\nA gentler season begins." if is_equinox else tips[theme]
+        d.multiline_text((125,920),note,font=font(31),fill=(255,255,255,255),
+                         spacing=7,stroke_width=2,stroke_fill=(0,0,0,95))
 
     # No bottom toolbar: preserve the cat and scenery. One subtle brand line only.
     text(W//2,1815,"GOOD WEATHER  ·  GOOD DAYS  ·  A HAPPIER YOU",23,stroke=2)
