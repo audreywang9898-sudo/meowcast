@@ -61,6 +61,7 @@ def make_simple_caption(w, event=None):
         name_en = event.get("name_en", "")
         name_zh = event.get("name_zh", "")
         note_en = event.get("caption_en") or event.get("note_en", "")
+        note_zh = event.get("caption_zh", "")
         event_type = event.get("type", "")
         if name_en:
             seasonal_en = f"🐾 {name_en} in Taipei\n"
@@ -68,7 +69,12 @@ def make_simple_caption(w, event=None):
                 seasonal_en += f"{note_en}\n"
             seasonal_en += "\n"
         if name_zh:
-            seasonal_zh = f"🐱 台北・{name_zh}\n今天是{name_zh}，讓台北貓陪你一起感受今天的小小節日／季節氣氛。\n\n"
+            seasonal_zh = f"🐱 台北・{name_zh}\n"
+            if note_zh:
+                seasonal_zh += f"{note_zh}\n"
+            else:
+                seasonal_zh += f"今天是{name_zh}，讓台北貓陪你一起感受今天的小小節日／季節氣氛。\n"
+            seasonal_zh += "\n"
         tag_en = name_en.replace(" ", "").replace("'", "").replace("/", "") if name_en else ""
         tag_zh = name_zh.replace("／", "") if name_zh else ""
         if tag_en:
