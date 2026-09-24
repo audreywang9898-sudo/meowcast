@@ -50,8 +50,8 @@ def add_weather_overlay(im,w,theme,event=None):
     # Fixed compact card below the branding area.
     x0,y0,x1,y1=145,685,935,1065
     d.rounded_rectangle((x0,y0,x1,y1),radius=54,
-                        fill=(238,242,246,228),
-                        outline=(255,255,255,220),width=3)
+                        fill=(238,242,246,190),
+                        outline=(255,255,255,205),width=3)
 
     ink=(24,30,39,255)
     muted=(83,94,108,255)
