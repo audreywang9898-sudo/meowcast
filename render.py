@@ -1,7 +1,7 @@
 import os, subprocess
 from datetime import datetime
 from PIL import Image,ImageDraw,ImageFont
-from weather import get_weather
+from weather import get_weather, get_evening_weather
 from caption import make_caption, temperature_label
 from music import music_for_event
 from calendar_events import event_for_date
@@ -21,9 +21,9 @@ def fallback(theme):
     d.text((330,1120),"MEOW",font=font(100),fill="white")
     return im
 
-def asset_for(theme,event=None):
-    # Calendar artwork wins over normal weather artwork when provided.
-    if event:
+def asset_for(theme,event=None,period="morning"):
+    # Evening edition always uses weather artwork; holidays stay morning-only.
+    if period != "evening" and event:
         configured=event.get("asset")
         key=event.get("key")
         special=[]
@@ -31,10 +31,11 @@ def asset_for(theme,event=None):
         if key: special.extend([f"asset/{key}.png", f"asset/{key}.jpg"])
         for p in special:
             if os.path.exists(p): return p
+    suffix="_evening" if period=="evening" else ""
     candidates={
-        "sunny":["asset/sunny.png","asset/sunny.jpg"],
-        "rainy":["asset/rainy.png","asset/rainy.jpg"],
-        "cloudy":["asset/cloudy.png","asset/cloudy.jpg"],
+        "sunny":[f"asset/sunny{suffix}.png",f"asset/sunny{suffix}.jpg"],
+        "rainy":[f"asset/rainy{suffix}.png",f"asset/rainy{suffix}.jpg"],
+        "cloudy":[f"asset/cloudy{suffix}.png",f"asset/cloudy{suffix}.jpg"],
     }
     for p in candidates[theme]:
         if os.path.exists(p): return p
@@ -86,9 +87,10 @@ def add_weather_overlay(im,w,theme,event=None):
     else:
         d.ellipse((cx-r,cy-r,cx+r,cy+r),fill=accent)
 
-    put(485,845,f"{w['high']}°C",92)
+    main_temp=w.get("temperature",w["high"])
+    put(485,845,f"{main_temp}°C",92)
     d.line((645,805,645,890),fill=line,width=2)
-    put(735,812,"LOW",27,muted)
+    put(735,812,"TONIGHT LOW" if w.get("period")=="evening" else "LOW",23 if w.get("period")=="evening" else 27,muted)
     put(735,865,f"{w['low']}°C",47)
 
     # Condition is prominent but visually tied to the temperature row.
@@ -99,8 +101,15 @@ def add_weather_overlay(im,w,theme,event=None):
     put(540,1025,f"Rain chance  {w['rain']}%",36,(58,67,80,255))
 
 
-def main():
-    w=get_weather(); event=event_for_date(w["date"]); t,cap=make_caption(w,event=event); src=asset_for(t,event)
+def main(period=None):
+    period=(period or os.environ.get("MEOWCAST_PERIOD","morning")).lower()
+    if period not in ("morning","evening"):
+        raise ValueError(f"Unsupported MEOWCAST_PERIOD: {period}")
+    w=get_evening_weather() if period=="evening" else get_weather()
+    # Holidays affect morning artwork/copy only. Evening is weather-only.
+    event=None if period=="evening" else event_for_date(w["date"])
+    t,cap=make_caption(w,event=event)
+    src=asset_for(t,event,period=period)
     if src:
         im=Image.open(src).convert("RGB"); scale=max(W/im.width,H/im.height); im=im.resize((int(im.width*scale),int(im.height*scale)))
         x=(im.width-W)//2; y=(im.height-H)//2; im=im.crop((x,y,x+W,y+H))
@@ -108,7 +117,8 @@ def main():
         im=fallback(t)
     add_weather_overlay(im,w,t,event)
     os.makedirs("output",exist_ok=True); im.save("output/card.jpg",quality=94)
-    bgm=music_for_event(event)
+    # Evening uses the normal/default BGM; no holiday-specific music.
+    bgm=music_for_event(None if period=="evening" else event)
     subprocess.run(["ffmpeg","-y","-loop","1","-i","output/card.jpg","-i",bgm,"-vf","scale=1200:2134,zoompan=z='min(zoom+0.0005,1.08)':d=200:s=1080x1920:fps=25","-t","8","-c:v","libx264","-c:a","aac","-b:a","128k","-shortest","-pix_fmt","yuv420p","-movflags","+faststart","output/meowcast.mp4"],check=True)
     open("output/caption.txt","w",encoding="utf-8").write(cap)
 
