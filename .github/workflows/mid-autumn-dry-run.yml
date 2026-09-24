@@ -1,4 +1,4 @@
-name: Mid-Autumn Final-Polish Dry Run
+name: Teachers-Day Dry Run
 on:
   push:
     branches: [main]
@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt
-      - name: Render 2026-09-25 without publishing
+      - name: Render 2026-09-28 without publishing
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
@@ -27,7 +27,7 @@ jobs:
           real_get_weather = render.get_weather
           def dry_weather():
               w = real_get_weather()
-              w["date"] = "2026-09-25"
+              w["date"] = "2026-09-28"
               return w
           render.get_weather = dry_weather
           render.main()
@@ -41,10 +41,10 @@ jobs:
       - name: Save preview to GitHub
         run: |
           mkdir -p dry-run
-          cp output/card.jpg dry-run/mid_autumn_2026-09-25.jpg
-          cp output/caption.txt dry-run/mid_autumn_2026-09-25-caption.txt
+          cp output/card.jpg dry-run/teachers_day_2026-09-28.jpg
+          cp output/caption.txt dry-run/teachers_day_2026-09-28-caption.txt
           git config user.name "meowcast-bot"
           git config user.email "actions@users.noreply.github.com"
           git add dry-run/
-          git commit -m "Add Mid-Autumn dry-run preview" || exit 0
+          git commit -m "Add Teachers-Day dry-run preview" || exit 0
           git push origin main
