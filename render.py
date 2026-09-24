@@ -46,8 +46,9 @@ def add_weather_overlay(im,w,theme,event=None):
     d=ImageDraw.Draw(im,"RGBA")
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy"}[theme]
     temp_label=temperature_label(w)
-    temp_badge={"Hot":"🔥 Hot","Cold":"❄️ Cold"}.get(temp_label, "")
-    condition_text=f"{condition} ({temp_badge})" if temp_badge else condition
+    # Avoid emoji glyphs in the rendered card: the CI font stack can render them as tofu/boxes.
+    temp_badge={"Hot":"Hot","Cold":"Cold"}.get(temp_label, "")
+    condition_text=f"{condition} · {temp_badge}" if temp_badge else condition
 
     # Fixed compact card below the branding area.
     x0,y0,x1,y1=145,685,935,1065
@@ -97,8 +98,9 @@ def add_weather_overlay(im,w,theme,event=None):
     d.rounded_rectangle((310,915,770,975),radius=30,fill=(255,255,255,210))
     put(540,945,condition_text,42)
 
-    # Rain probability as one compact sentence, not two scattered fields.
-    put(540,1025,f"Rain chance  {w['rain']}%",36,(58,67,80,255))
+    # Evening card must explicitly read as a tonight forecast.
+    rain_prefix="Tonight rain chance" if w.get("period")=="evening" else "Rain chance"
+    put(540,1025,f"{rain_prefix}  {w['rain']}%",32 if w.get("period")=="evening" else 36,(58,67,80,255))
 
 
 def main(period=None):
