@@ -1,4 +1,4 @@
-name: Mid-Autumn New-Assets Dry Run
+name: Mid-Autumn Blank-UI Dry Run
 on:
   push:
     branches: [main]
