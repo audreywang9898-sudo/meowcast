@@ -1,9 +1,9 @@
 name: Daily Meowcast
 on:
   schedule:
-    # 23:00 UTC = 07:00 Asia/Taipei; 09:00 UTC = 17:00 Asia/Taipei
+    # 23:00 UTC = 07:00 Asia/Taipei; 08:55 UTC = 16:55 Asia/Taipei
     - cron: '0 23 * * *'
-    - cron: '0 9 * * *'
+    - cron: '55 8 * * *'
   workflow_dispatch:
   push:
     branches: [main]
@@ -131,7 +131,7 @@ jobs:
       - name: Generate today's Reel
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          MEOWCAST_PERIOD: ${{ steps.schedule.outputs.slot == '1700' && 'evening' || 'morning' }}
+          MEOWCAST_PERIOD: ${{ steps.schedule.outputs.slot == '1655' && 'evening' || 'morning' }}
         if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
         run: python render.py
 
