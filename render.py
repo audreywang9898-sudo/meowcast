@@ -43,25 +43,38 @@ def asset_for(theme,event=None):
     return None
 
 def add_weather_overlay(im,w,theme,event=None):
-    """Composite the fixed weather UI layer, then draw live data inside its panel."""
+    """Place the reusable weather panel in a fixed safe zone, then draw all live data inside it."""
     ui_path="asset/weather_UI.png"
     if not os.path.exists(ui_path):
         raise FileNotFoundError(f"Missing fixed weather UI: {ui_path}")
 
     ui=Image.open(ui_path).convert("RGBA").resize((W,H),Image.Resampling.LANCZOS)
-    # weather_UI is a full-canvas transparent PNG. Its non-transparent bbox defines
-    # the panel, so text placement follows the UI itself instead of any background.
+
+    # Find the real card, ignoring tiny semi-transparent generator artifacts.
     alpha=ui.getchannel("A")
-    bbox=alpha.getbbox()
+    mask=alpha.point(lambda a: 255 if a >= 80 else 0)
+    bbox=mask.getbbox()
     if not bbox:
-        raise ValueError("weather_UI.png has no visible pixels")
-    im_rgba=im.convert("RGBA")
-    im_rgba.alpha_composite(ui)
-    im.paste(im_rgba.convert("RGB"))
+        raise ValueError("weather_UI.png has no visible panel")
+
+    # Crop the UI card itself and place it in ONE fixed safe zone.
+    # This keeps the panel above the cat/foreground on every background.
+    card=ui.crop(bbox)
+    target_w=760
+    scale=target_w/card.width
+    target_h=int(card.height*scale)
+    card=card.resize((target_w,target_h),Image.Resampling.LANCZOS)
+    x0=(W-target_w)//2
+    y0=360
+    x1=x0+target_w
+    y1=y0+target_h
+
+    base=im.convert("RGBA")
+    base.alpha_composite(card,(x0,y0))
+    im.paste(base.convert("RGB"))
 
     d=ImageDraw.Draw(im,"RGBA")
-    x0,y0,x1,y1=bbox
-    pw,ph=x1-x0,y1-y0
+    pw,ph=target_w,target_h
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy","hot":"Hot","cold":"Cold"}[theme]
     ink=(28,30,34,255)
     muted=(95,105,118,255)
@@ -71,11 +84,10 @@ def add_weather_overlay(im,w,theme,event=None):
         d.text((x0+pw*rx,y0+ph*ry),s,font=font(size),anchor=anchor,fill=fill)
 
     date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y / %m / %d (%a)").upper()
-    put(.50,.13,date_label,40)
+    put(.50,.14,date_label,34)
 
-    # Weather icon at left of the temperature row.
-    cx=x0+pw*.20; cy=y0+ph*.43
-    r=max(18,int(min(pw,ph)*.045))
+    cx=x0+pw*.19; cy=y0+ph*.42
+    r=max(15,int(min(pw,ph)*.042))
     if theme in ("sunny","hot"):
         d.ellipse((cx-r,cy-r,cx+r,cy+r),fill=accent)
         for dx,dy in [(0,-2*r),(0,2*r),(-2*r,0),(2*r,0)]:
@@ -88,16 +100,14 @@ def add_weather_overlay(im,w,theme,event=None):
             for off in (-r*.7,0,r*.7):
                 d.line((cx+off,cy+r*1.2,cx+off-r*.2,cy+r*1.65),fill=accent,width=max(3,r//6))
     else:
-        for dx,dy in [(0,-2*r),(0,2*r),(-2*r,0),(2*r,0),(-1.4*r,-1.4*r),(1.4*r,-1.4*r)]:
-            d.line((cx+dx*.65,cy+dy*.65,cx+dx,cy+dy),fill=accent,width=max(3,r//5))
         d.ellipse((cx-r,cy-r,cx+r,cy+r),fill=accent)
 
-    put(.46,.43,f"{w['high']}°C",82)
-    put(.70,.36,"LOW",25,muted)
-    put(.70,.46,f"{w['low']}°C",39)
-    put(.50,.64,condition,43)
-    put(.39,.86,"Rain chance",28,muted)
-    put(.72,.86,f"{w['rain']}%",42)
+    put(.45,.42,f"{w['high']}°C",70)
+    put(.72,.33,"LOW",22,muted)
+    put(.72,.45,f"{w['low']}°C",34)
+    put(.50,.64,condition,36)
+    put(.40,.84,"Rain chance",24,muted)
+    put(.72,.84,f"{w['rain']}%",36)
 
 
 def main():
