@@ -1,6 +1,6 @@
 {
   "enabled": true,
   "timezone": "Asia/Taipei",
-  "publish_times": ["07:00", "17:00"],
+  "publish_times": ["07:00", "16:55"],
   "window_minutes": 60
 }
