@@ -74,7 +74,7 @@ jobs:
               out.write(f"slot={slot}\n")
           PY
 
-      - name: Verify next-year calendar on December 1
+      - name: Verify next-year calendar on December 2
         if: steps.schedule.outputs.run == 'true'
         env:
           PUBLISH_DATE: ${{ steps.schedule.outputs.date }}
@@ -85,8 +85,8 @@ jobs:
 
           today=os.environ["PUBLISH_DATE"]
           year,month,day=map(int,today.split("-"))
-          if (month,day)!=(12,1):
-              print("Not December 1; yearly calendar check not required.")
+          if (month,day)!=(12,2):
+              print("Not December 2; yearly calendar check not required.")
               raise SystemExit(0)
 
           target=year+1
