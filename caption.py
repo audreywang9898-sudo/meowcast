@@ -21,15 +21,21 @@ def load_config():
 
 
 def theme(w):
+    """Primary sky condition only; temperature is a separate label."""
     if w["rain"] >= 50 or w["code"] >= 51:
         return "rainy"
-    if w["high"] >= 32:
-        return "hot"
-    if w["high"] <= 18:
-        return "cold"
     if w["code"] in (0, 1):
         return "sunny"
     return "cloudy"
+
+
+def temperature_label(w):
+    """Secondary temperature label based on the day's forecast high."""
+    if w["high"] >= 32:
+        return "Hot"
+    if w["high"] <= 18:
+        return "Cold"
+    return ""
 
 
 LINES = {
