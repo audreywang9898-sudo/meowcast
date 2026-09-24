@@ -24,7 +24,7 @@ jobs:
         run: |
           python - <<'PY'
           import json, os
-          c=json.load(open("calendar.json",encoding="utf-8"))
+          c=json.load(open("calendar_next.json",encoding="utf-8"))
           assert c["events"], "calendar has no events"
           missing=[]
           for day,e in c["events"].items():
@@ -43,7 +43,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add calendar.json
+          git add calendar_next.json
           git diff --cached --quiet && exit 0
-          git commit -m "Update calendar for next year"
+          git commit -m "Prepare next-year calendar"
           git push origin main
