@@ -1,4 +1,4 @@
-name: Mid-Autumn Compact-UI Dry Run
+name: Mid-Autumn Polished-UI Dry Run
 on:
   push:
     branches: [main]
