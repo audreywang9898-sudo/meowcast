@@ -1,4 +1,5 @@
 import requests
+import time
 from datetime import datetime
 
 LAT=25.0330
@@ -7,10 +8,22 @@ TIMEZONE="Asia/Taipei"
 
 
 def _get_json(params):
+    """Fetch forecast with short retries so one transient API error does not kill publishing."""
     url="https://api.open-meteo.com/v1/forecast"
-    response=requests.get(url,params=params,timeout=30)
-    response.raise_for_status()
-    return response.json()
+    last_error=None
+    for attempt in range(3):
+        try:
+            response=requests.get(url,params=params,timeout=30)
+            response.raise_for_status()
+            data=response.json()
+            if not isinstance(data,dict):
+                raise RuntimeError("Weather API returned invalid JSON")
+            return data
+        except (requests.RequestException, ValueError, RuntimeError) as exc:
+            last_error=exc
+            if attempt < 2:
+                time.sleep(3*(attempt+1))
+    raise RuntimeError(f"Weather API failed after 3 attempts: {last_error}")
 
 
 def get_weather():
