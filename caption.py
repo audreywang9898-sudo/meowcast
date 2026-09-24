@@ -52,6 +52,8 @@ def make_simple_caption(w, event=None):
     en_condition, zh_condition = LINES[t]
     date = w["date"].replace("-", "/")
     rain = w["rain"]
+    is_evening = w.get("period") == "evening"
+
     seasonal_en = ""
     seasonal_zh = ""
     seasonal_tags = ""
@@ -59,7 +61,6 @@ def make_simple_caption(w, event=None):
         name_en = event.get("name_en", "")
         name_zh = event.get("name_zh", "")
         note_en = event.get("caption_en") or event.get("note_en", "")
-        note_zh = event.get("caption_zh", "")
         event_type = event.get("type", "")
         if name_en:
             seasonal_en = f"🐾 {name_en} in Taipei\n"
@@ -76,6 +77,39 @@ def make_simple_caption(w, event=None):
             seasonal_tags += f" #{tag_zh}"
         if event_type == "solar_term":
             seasonal_tags += " #二十四節氣"
+
+    if is_evening:
+        main_temp = w.get("temperature", w["high"])
+        caption = f"""Hi, I’m Taipei Cat! 🐱
+The city lights are coming on — here’s your little weather note for tonight.
+
+{date} Taipei Evening Weather 🌙 📍 Taipei Meowcast
+
+🌙 Tonight’s Weather
+📍 Taipei, Taiwan
+🌡️ Around 17:00: {main_temp}°C / Tonight’s low {w['low']}°C
+🌧️ Highest rain chance this evening: {rain}%
+This evening is {en_condition}.
+
+🐾 Taipei Cat’s evening note
+As Taipei slows down for the night, the light changes, the streets cool, and the city finds a different rhythm.
+Whether you’re heading home or taking one last walk, I hope your evening feels calm and cozy. 💛
+
+🌙 今晚台北天氣
+📍 台北，台灣
+🌡️ 17:00 約 {main_temp}°C / 今晚低溫 {w['low']}°C
+🌧️ 傍晚至今晚最高降雨機率：{rain}%
+今晚{zh_condition}。
+
+🐱 台北貓的晚安提醒
+天色慢慢暗下來，台北也換上了晚上的節奏。
+不管你正在回家，還是準備出去走走，都希望今晚的你舒服、平安，也有一點屬於自己的悠閒。 🌙
+
+Have a lovely evening in Taipei. 💛
+祝你在台北有個舒服的夜晚。
+
+#TaipeiCat #TaipeiMeowcast #TaipeiWeather #TaipeiEvening #WeatherCat #Taipei101 #Taipei #Taiwan #台北天氣 #台北夜晚"""
+        return t, caption
 
     caption = f"""Hi, I’m Taipei Cat! 🐱
 Exploring Taipei with you, one little adventure and one weather forecast at a time.
@@ -125,7 +159,7 @@ def make_ai_caption(w, simple_caption, config):
 
     prompt = f"""You write captions for Taipei Meowcast, a gentle cat-weather account.
 Rewrite the factual caption below into a warm, playful bilingual English + Traditional Chinese caption.
-Keep every weather number exactly unchanged. Do not invent weather facts.
+Keep every weather number exactly unchanged. Do not invent weather facts.\nPreserve the time-of-day framing: if the factual caption is an evening forecast, keep it clearly about tonight/evening and never rewrite it as a daytime forecast.
 Keep it concise enough for Instagram/Facebook. Keep the Taipei Cat voice cute but not childish.
 End with relevant hashtags.
 
