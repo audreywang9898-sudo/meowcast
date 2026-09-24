@@ -47,7 +47,8 @@ def add_weather_overlay(im,w,theme,event=None):
     d=ImageDraw.Draw(im,"RGBA")
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy"}[theme]
     temp_label=temperature_label(w)
-    condition_text=f"{condition} ({temp_label})" if temp_label else condition
+    temp_badge={"Hot":"🔥 Hot","Cold":"❄️ Cold"}.get(temp_label, "")
+    condition_text=f"{condition} ({temp_badge})" if temp_badge else condition
 
     # Fixed compact card below the branding area.
     x0,y0,x1,y1=145,685,935,1065
