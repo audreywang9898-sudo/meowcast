@@ -1,4 +1,4 @@
-name: Mid-Autumn Fixed-Panel Dry Run
+name: Mid-Autumn New-Assets Dry Run
 on:
   push:
     branches: [main]
