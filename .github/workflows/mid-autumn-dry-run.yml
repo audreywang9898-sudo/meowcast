@@ -1,4 +1,4 @@
-name: Today Weather-Label Dry Run
+name: Today Weather-Label Dry Run v2
 on:
   push:
     branches: [main]
