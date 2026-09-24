@@ -2,7 +2,7 @@ import os, subprocess
 from datetime import datetime
 from PIL import Image,ImageDraw,ImageFont
 from weather import get_weather
-from caption import make_caption
+from caption import make_caption, temperature_label
 from music import music_for_event
 from calendar_events import event_for_date
 
@@ -45,7 +45,9 @@ def asset_for(theme,event=None):
 def add_weather_overlay(im,w,theme,event=None):
     """Draw a compact, high-legibility weather card entirely in code."""
     d=ImageDraw.Draw(im,"RGBA")
-    condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy","hot":"Hot","cold":"Cold"}[theme]
+    condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy"}[theme]
+    temp_label=temperature_label(w)
+    condition_text=f"{condition} ({temp_label})" if temp_label else condition
 
     # Fixed compact card below the branding area.
     x0,y0,x1,y1=145,685,935,1065
@@ -93,7 +95,7 @@ def add_weather_overlay(im,w,theme,event=None):
 
     # Condition is prominent but visually tied to the temperature row.
     d.rounded_rectangle((310,915,770,975),radius=30,fill=(255,255,255,210))
-    put(540,945,condition,42)
+    put(540,945,condition_text,42)
 
     # Rain probability as one compact sentence, not two scattered fields.
     put(540,1025,f"Rain chance  {w['rain']}%",36,(58,67,80,255))
