@@ -1,4 +1,4 @@
-name: Teachers-Day Transparent-UI Dry Run
+name: Teachers-Day Extra-Transparent Dry Run
 on:
   push:
     branches: [main]
