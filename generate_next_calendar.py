@@ -6,7 +6,7 @@ from pathlib import Path
 from lunar_python import Lunar, Solar
 
 ROOT = Path(__file__).resolve().parent
-CALENDAR_PATH = ROOT / "calendar.json"
+CALENDAR_PATH = ROOT / "calendar.json"\nNEXT_CALENDAR_PATH = ROOT / "calendar_next.json"
 
 SOLAR_TERMS = {
     "小寒":"xiaohan","大寒":"dahan","立春":"lichun","雨水":"yushui","惊蛰":"jingzhe","驚蟄":"jingzhe",
