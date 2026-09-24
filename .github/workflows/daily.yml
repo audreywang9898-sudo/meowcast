@@ -2,8 +2,13 @@ name: Daily Meowcast
 on:
   schedule:
     # 23:00 UTC = 07:00 Asia/Taipei; 08:30 UTC = 16:30 Asia/Taipei
-    - cron: '0 23 * * *'
-    - cron: '30 8 * * *'
+    # Primary + recovery triggers. Dedupe makes recovery runs safe.
+    - cron: '0 23 * * *'   # 07:00 Taipei primary
+    - cron: '10 23 * * *'  # 07:10 recovery
+    - cron: '20 23 * * *'  # 07:20 recovery
+    - cron: '30 8 * * *'   # 16:30 Taipei primary
+    - cron: '40 8 * * *'   # 16:40 recovery
+    - cron: '50 8 * * *'   # 16:50 recovery
   workflow_dispatch:
   push:
     branches: [main]
