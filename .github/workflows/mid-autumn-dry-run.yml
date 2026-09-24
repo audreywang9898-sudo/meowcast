@@ -1,4 +1,4 @@
-name: Mid-Autumn Layered Dry Run
+name: Mid-Autumn Fixed-Panel Dry Run
 on:
   push:
     branches: [main]
