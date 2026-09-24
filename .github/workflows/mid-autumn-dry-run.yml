@@ -1,4 +1,4 @@
-name: Mid-Autumn Dry Run
+name: Mid-Autumn Dry Run # preview
 on:
   push:
     branches: [main]
