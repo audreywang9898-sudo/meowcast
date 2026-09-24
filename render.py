@@ -48,7 +48,7 @@ def add_weather_overlay(im,w,theme,event=None):
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy","hot":"Hot","cold":"Cold"}[theme]
 
     # Fixed compact card below the branding area.
-    x0,y0,x1,y1=145,610,935,1035
+    x0,y0,x1,y1=145,685,935,1065
     d.rounded_rectangle((x0,y0,x1,y1),radius=54,
                         fill=(238,242,246,228),
                         outline=(255,255,255,220),width=3)
@@ -65,11 +65,11 @@ def add_weather_overlay(im,w,theme,event=None):
 
     # Date: larger and visually connected to the weather block.
     date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y / %m / %d (%a)").upper()
-    put(540,665,date_label,40)
-    d.line((200,710,880,710),fill=line,width=2)
+    put(540,735,date_label,40)
+    d.line((200,775,880,775),fill=line,width=2)
 
     # Compact main weather row: icon + high temperature + low temperature.
-    cx,cy=255,790
+    cx,cy=255,850
     r=30
     if theme in ("sunny","hot"):
         d.ellipse((cx-r,cy-r,cx+r,cy+r),fill=accent)
@@ -85,17 +85,17 @@ def add_weather_overlay(im,w,theme,event=None):
     else:
         d.ellipse((cx-r,cy-r,cx+r,cy+r),fill=accent)
 
-    put(485,785,f"{w['high']}°C",92)
-    d.line((645,745,645,830),fill=line,width=2)
-    put(735,758,"LOW",24,muted)
-    put(735,808,f"{w['low']}°C",42)
+    put(485,845,f"{w['high']}°C",92)
+    d.line((645,805,645,890),fill=line,width=2)
+    put(735,815,"LOW",24,muted)
+    put(735,865,f"{w['low']}°C",42)
 
     # Condition is prominent but visually tied to the temperature row.
-    d.rounded_rectangle((255,855,825,925),radius=35,fill=(255,255,255,210))
-    put(540,890,condition,42)
+    d.rounded_rectangle((310,915,770,975),radius=30,fill=(255,255,255,210))
+    put(540,945,condition,42)
 
     # Rain probability as one compact sentence, not two scattered fields.
-    put(540,980,f"Rain chance  {w['rain']}%",34,muted)
+    put(540,1025,f"Rain chance  {w['rain']}%",34,muted)
 
 
 def main():
