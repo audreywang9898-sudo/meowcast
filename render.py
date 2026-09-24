@@ -43,71 +43,60 @@ def asset_for(theme,event=None):
     return None
 
 def add_weather_overlay(im,w,theme,event=None):
-    """Place the reusable weather panel in a fixed safe zone, then draw all live data inside it."""
-    ui_path="asset/weather_UI.png"
-    if not os.path.exists(ui_path):
-        raise FileNotFoundError(f"Missing fixed weather UI: {ui_path}")
-
-    ui=Image.open(ui_path).convert("RGBA").resize((W,H),Image.Resampling.LANCZOS)
-
-    # Find the real card, ignoring tiny semi-transparent generator artifacts.
-    alpha=ui.getchannel("A")
-    mask=alpha.point(lambda a: 255 if a >= 80 else 0)
-    bbox=mask.getbbox()
-    if not bbox:
-        raise ValueError("weather_UI.png has no visible panel")
-
-    # Crop the UI card itself and place it in ONE fixed safe zone.
-    # This keeps the panel above the cat/foreground on every background.
-    card=ui.crop(bbox)
-    target_w=760
-    scale=target_w/card.width
-    target_h=int(card.height*scale)
-    card=card.resize((target_w,target_h),Image.Resampling.LANCZOS)
-    x0=(W-target_w)//2
-    y0=360
-    x1=x0+target_w
-    y1=y0+target_h
-
-    base=im.convert("RGBA")
-    base.alpha_composite(card,(x0,y0))
-    im.paste(base.convert("RGB"))
-
+    """Draw the complete weather UI in code. Background artwork stays independent."""
     d=ImageDraw.Draw(im,"RGBA")
-    pw,ph=target_w,target_h
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy","hot":"Hot","cold":"Cold"}[theme]
-    ink=(28,30,34,255)
-    muted=(95,105,118,255)
-    accent={"sunny":(226,169,47,255),"rainy":(92,145,185,255),"cloudy":(145,154,164,255),"hot":(218,126,62,255),"cold":(105,151,187,255)}[theme]
 
-    def put(rx,ry,s,size,fill=ink,anchor="mm"):
-        d.text((x0+pw*rx,y0+ph*ry),s,font=font(size),anchor=anchor,fill=fill)
+    # One fixed panel for every background. No weather_UI image asset is used.
+    x0,y0,x1,y1=155,500,925,960
+    radius=52
+    d.rounded_rectangle((x0,y0,x1,y1),radius=radius,
+                        fill=(238,242,246,224),
+                        outline=(255,255,255,205),width=3)
+
+    ink=(25,31,40,255)
+    muted=(91,102,116,255)
+    line=(135,145,156,150)
+    accent={"sunny":(226,169,47,255),"rainy":(92,145,185,255),
+            "cloudy":(145,154,164,255),"hot":(218,126,62,255),
+            "cold":(105,151,187,255)}[theme]
+
+    def put(x,y,s,size,fill=ink,anchor="mm"):
+        d.text((x,y),s,font=font(size),anchor=anchor,fill=fill)
 
     date_label=datetime.strptime(w["date"],"%Y-%m-%d").strftime("%Y / %m / %d (%a)").upper()
-    put(.50,.14,date_label,34)
+    put(540,565,date_label,34)
+    d.line((205,615,875,615),fill=line,width=2)
 
-    cx=x0+pw*.19; cy=y0+ph*.42
-    r=max(15,int(min(pw,ph)*.042))
+    # Weather icon
+    cx,cy=270,720
+    r=28
     if theme in ("sunny","hot"):
         d.ellipse((cx-r,cy-r,cx+r,cy+r),fill=accent)
-        for dx,dy in [(0,-2*r),(0,2*r),(-2*r,0),(2*r,0)]:
-            d.line((cx+dx*.65,cy+dy*.65,cx+dx,cy+dy),fill=accent,width=max(3,r//5))
+        for dx,dy in [(0,-60),(0,60),(-60,0),(60,0),(-43,-43),(43,-43),(-43,43),(43,43)]:
+            d.line((cx+dx*.68,cy+dy*.68,cx+dx,cy+dy),fill=accent,width=5)
     elif theme in ("rainy","cloudy"):
-        d.ellipse((cx-r*1.2,cy-r*.25,cx+r*.15,cy+r*.85),fill=accent)
-        d.ellipse((cx-r*.35,cy-r*.8,cx+r*1.15,cy+r*.85),fill=accent)
-        d.rectangle((cx-r*1.2,cy,cx+r*1.15,cy+r*.85),fill=accent)
+        d.ellipse((cx-48,cy-12,cx+8,cy+38),fill=accent)
+        d.ellipse((cx-12,cy-38,cx+50,cy+38),fill=accent)
+        d.rectangle((cx-48,cy,cx+50,cy+38),fill=accent)
         if theme=="rainy":
-            for off in (-r*.7,0,r*.7):
-                d.line((cx+off,cy+r*1.2,cx+off-r*.2,cy+r*1.65),fill=accent,width=max(3,r//6))
+            for off in (-25,10,42):
+                d.line((cx+off,cy+55,cx+off-8,cy+75),fill=accent,width=5)
     else:
         d.ellipse((cx-r,cy-r,cx+r,cy+r),fill=accent)
 
-    put(.45,.42,f"{w['high']}°C",70)
-    put(.72,.33,"LOW",22,muted)
-    put(.72,.45,f"{w['low']}°C",34)
-    put(.50,.64,condition,36)
-    put(.40,.84,"Rain chance",24,muted)
-    put(.72,.84,f"{w['rain']}%",36)
+    put(485,705,f"{w['high']}°C",76)
+    d.line((630,660,630,755),fill=line,width=2)
+    put(705,680,"LOW",21,muted)
+    put(705,725,f"{w['low']}°C",34)
+
+    # Condition pill
+    d.rounded_rectangle((285,785,795,855),radius=35,fill=(255,255,255,205))
+    put(540,820,condition,36)
+
+    d.line((205,885,875,885),fill=line,width=2)
+    put(430,925,"Rain chance",25,muted)
+    put(700,925,f"{w['rain']}%",38)
 
 
 def main():
