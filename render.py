@@ -76,9 +76,10 @@ def add_weather_overlay(im,w,theme,event=None):
         for dx,dy in [(0,-64),(0,64),(-64,0),(64,0),(-45,-45),(45,-45),(-45,45),(45,45)]:
             d.line((cx+dx*.68,cy+dy*.68,cx+dx,cy+dy),fill=accent,width=5)
     elif theme in ("rainy","cloudy"):
-        d.ellipse((cx-50,cy-12,cx+8,cy+40),fill=accent)
-        d.ellipse((cx-12,cy-40,cx+52,cy+40),fill=accent)
-        d.rectangle((cx-50,cy,cx+52,cy+40),fill=accent)
+        d.ellipse((cx-52,cy-2,cx+4,cy+42),fill=accent)
+        d.ellipse((cx-30,cy-34,cx+34,cy+42),fill=accent)
+        d.ellipse((cx+5,cy-15,cx+58,cy+42),fill=accent)
+        d.rounded_rectangle((cx-52,cy+8,cx+58,cy+43),radius=17,fill=accent)
         if theme=="rainy":
             for off in (-25,10,42):
                 d.line((cx+off,cy+58,cx+off-8,cy+80),fill=accent,width=5)
@@ -87,15 +88,15 @@ def add_weather_overlay(im,w,theme,event=None):
 
     put(485,845,f"{w['high']}°C",92)
     d.line((645,805,645,890),fill=line,width=2)
-    put(735,815,"LOW",24,muted)
-    put(735,865,f"{w['low']}°C",42)
+    put(735,812,"LOW",27,muted)
+    put(735,865,f"{w['low']}°C",47)
 
     # Condition is prominent but visually tied to the temperature row.
     d.rounded_rectangle((310,915,770,975),radius=30,fill=(255,255,255,210))
     put(540,945,condition,42)
 
     # Rain probability as one compact sentence, not two scattered fields.
-    put(540,1025,f"Rain chance  {w['rain']}%",34,muted)
+    put(540,1025,f"Rain chance  {w['rain']}%",36,(58,67,80,255))
 
 
 def main():
