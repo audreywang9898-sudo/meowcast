@@ -1,0 +1,64 @@
+name: Year-End Assets Dry Run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/year-end-assets-dry-run.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Render all remaining 2026 event cards
+        run: |
+          python - <<'PY'
+          import json, os
+          from PIL import Image
+          import render
+          from caption import theme
+
+          start="2026-09-24"
+          cal=json.load(open("calendar/2026.json",encoding="utf-8"))
+          events={d:e for d,e in cal["events"].items() if start < d <= "2026-12-31"}
+          os.makedirs("dry-run/year-end-2026",exist_ok=True)
+
+          # Neutral sample weather is deliberate: this run checks composition,
+          # asset selection and weather-UI placement, not the forecast.
+          sample={"code":2,"high":26,"low":20,"rain":30}
+          for day,event in events.items():
+              w={**sample,"date":day}
+              t=theme(w)
+              src=render.asset_for(t,event)
+              if not src:
+                  raise SystemExit(f"Missing event asset for {day}: {event.get('asset')}")
+              im=Image.open(src).convert("RGB")
+              scale=max(render.W/im.width,render.H/im.height)
+              im=im.resize((int(im.width*scale),int(im.height*scale)))
+              x=(im.width-render.W)//2; y=(im.height-render.H)//2
+              im=im.crop((x,y,x+render.W,y+render.H))
+              render.add_weather_overlay(im,w,t,event)
+              key=event.get("key","event")
+              out=f"dry-run/year-end-2026/{day}_{key}.jpg"
+              im.save(out,quality=92)
+              print("Rendered",out)
+          print("TOTAL",len(events))
+          PY
+      - name: Save previews to GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dry-run/year-end-2026/
+          git diff --cached --quiet && exit 0
+          git commit -m "Generate 2026 year-end event previews"
+          git push origin main
