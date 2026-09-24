@@ -1,4 +1,5 @@
 name: Evening Meowcast Dry Run
+# rerun-trigger: 2026-09-24 badge-tonight-fix
 
 on:
   push:
