@@ -11,9 +11,9 @@ def _get_json(params):
     """Fetch forecast with short retries so one transient API error does not kill publishing."""
     url="https://api.open-meteo.com/v1/forecast"
     last_error=None
-    for attempt in range(3):
+    for attempt in range(5):
         try:
-            response=requests.get(url,params=params,timeout=30)
+            response=requests.get(url,params=params,timeout=(10,45))
             response.raise_for_status()
             data=response.json()
             if not isinstance(data,dict):
@@ -21,9 +21,9 @@ def _get_json(params):
             return data
         except (requests.RequestException, ValueError, RuntimeError) as exc:
             last_error=exc
-            if attempt < 2:
-                time.sleep(3*(attempt+1))
-    raise RuntimeError(f"Weather API failed after 3 attempts: {last_error}")
+            if attempt < 4:
+                time.sleep(5*(attempt+1))
+    raise RuntimeError(f"Weather API failed after 5 attempts: {last_error}")
 
 
 def get_weather():
