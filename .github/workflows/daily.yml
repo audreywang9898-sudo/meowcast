@@ -14,6 +14,7 @@ on:
     branches: [main]
     paths:
       - '.github/trigger-meowcast-evening'
+      - '.github/workflows/daily.yml'
 
 permissions:
   contents: read
@@ -52,7 +53,9 @@ jobs:
           reason="manual run"
 
           if event=="push":
-              # Explicit production recovery trigger: choose slot from the trigger file changed.
+              # Production recovery: workflow-file pushes default to evening; trigger marker can select morning.
+              # This also gives the guard a second recovery path if a trigger-file push is not dispatched.
+              
               before=os.environ.get("GITHUB_EVENT_BEFORE","")
               # Morning recovery pushes use a dedicated marker in the commit message/file.
               try:
