@@ -15,6 +15,8 @@ on:
     paths:
       - '.github/trigger-meowcast-evening'
       - '.github/workflows/daily.yml'
+      - '.github/recovery/morning-*'
+      - '.github/recovery/evening-*'
 
 permissions:
   contents: read
@@ -23,7 +25,9 @@ jobs:
   reel:
     runs-on: ubuntu-latest
     concurrency:
-      group: meowcast-publisher
+      # Serialize each slot. Recovery runs queue behind an in-flight primary run,
+      # then dedupe against the published marker before doing any work.
+      group: meowcast-publisher-${{ github.ref }}
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
@@ -135,15 +139,9 @@ jobs:
           PUBLISH_DATE: ${{ steps.schedule.outputs.date }}
         run: |
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            echo "Manual run: bypassing scheduled-slot dedupe."
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "Manual run still uses publication dedupe for safety."
           fi
-          if [ "$GITHUB_EVENT_NAME" = "push" ] && grep -q "force-publish" .github/trigger-meowcast-evening; then
-            echo "Explicit force-publish trigger: bypassing scheduled-slot dedupe."
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          # Never bypass dedupe in production. A recovery trigger must not create a duplicate post.
           MARKER="${PUBLISH_DATE}-${SLOT}"
           URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-slot.txt?ts=${GITHUB_RUN_ID}"
           PUBLISHED=$(curl -fsSL "$URL" || true)
