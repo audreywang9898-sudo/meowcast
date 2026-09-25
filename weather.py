@@ -1,5 +1,6 @@
 import requests
 import time
+import os
 from datetime import datetime
 
 LAT=25.0330
@@ -26,15 +27,48 @@ def _get_json(params):
     raise RuntimeError(f"Weather API failed after 5 attempts: {last_error}")
 
 
+
+def _cwa_code(text):
+    text=(text or "").replace(" ","")
+    if "雷" in text: return 95
+    if "雨" in text: return 61
+    if "陰" in text: return 3
+    if "雲" in text: return 2
+    return 0
+
+def _cwa_weather(evening=False):
+    key=os.environ.get("CWA_API_KEY")
+    if not key:
+        raise RuntimeError("CWA_API_KEY is not configured")
+    url="https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001"
+    r=requests.get(url,params={"Authorization":key,"locationName":"臺北市","format":"JSON"},timeout=(10,45))
+    r.raise_for_status()
+    loc=r.json()["records"]["location"][0]
+    elements={x["elementName"]:x["time"] for x in loc["weatherElement"]}
+    idx=1 if evening and len(elements["Wx"])>1 else 0
+    wx=elements["Wx"][idx]["parameter"]["parameterName"]
+    pop=int(elements["PoP"][idx]["parameter"]["parameterName"])
+    low=int(elements["MinT"][idx]["parameter"]["parameterName"])
+    high=int(elements["MaxT"][idx]["parameter"]["parameterName"])
+    date=elements["Wx"][idx]["startTime"][:10]
+    if evening:
+        return {"date":date,"code":_cwa_code(wx),"temperature":high,"high":high,"low":low,"rain":pop,"period":"evening","window":"CWA 12-hour forecast","source":"CWA"}
+    return {"date":date,"code":_cwa_code(wx),"high":high,"low":low,"rain":pop,"source":"CWA"}
+
+
 def get_weather():
     """Morning/daytime weather. Kept unchanged for the existing 07:00 flow."""
-    data=_get_json({
-        "latitude":LAT,
-        "longitude":LON,
-        "daily":"weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
-        "timezone":TIMEZONE,
-        "forecast_days":1,
-    })["daily"]
+    try:
+        data=_get_json({
+            "latitude":LAT,
+            "longitude":LON,
+            "daily":"weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+            "timezone":TIMEZONE,
+            "forecast_days":1,
+        })["daily"]
+    except Exception as exc:
+        print(f"Open-Meteo morning failed; falling back to CWA: {exc}")
+        return _cwa_weather(False)
     return {
         "date":data["time"][0],
         "code":data["weather_code"][0],
@@ -55,13 +89,17 @@ def get_evening_weather():
     This function is intentionally separate from get_weather() so the existing
     morning production path remains unchanged until the evening flow is tested.
     """
-    data=_get_json({
-        "latitude":LAT,
-        "longitude":LON,
-        "hourly":"temperature_2m,precipitation_probability,weather_code",
-        "timezone":TIMEZONE,
-        "forecast_days":1,
-    })["hourly"]
+    try:
+        data=_get_json({
+            "latitude":LAT,
+            "longitude":LON,
+            "hourly":"temperature_2m,precipitation_probability,weather_code",
+            "timezone":TIMEZONE,
+            "forecast_days":1,
+        })["hourly"]
+    except Exception as exc:
+        print(f"Open-Meteo evening failed; falling back to CWA: {exc}")
+        return _cwa_weather(True)
 
     rows=[]
     for time_text,temp,rain,code in zip(
