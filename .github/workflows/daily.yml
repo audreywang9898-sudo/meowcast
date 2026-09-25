@@ -14,7 +14,6 @@ on:
     branches: [main]
     paths:
       - '.github/trigger-meowcast-evening'
-      - '.github/trigger-meowcast-morning'
 
 permissions:
   contents: read
@@ -57,10 +56,10 @@ jobs:
               before=os.environ.get("GITHUB_EVENT_BEFORE","")
               # Morning recovery pushes use a dedicated marker in the commit message/file.
               try:
-                  morning_trigger=open(".github/trigger-meowcast-morning",encoding="utf-8").read()
+                  recovery_trigger=open(".github/trigger-meowcast-evening",encoding="utf-8").read()
               except FileNotFoundError:
-                  morning_trigger=""
-              if "force-morning" in morning_trigger:
+                  recovery_trigger=""
+              if "force-morning" in recovery_trigger:
                   slot="0700"
                   reason="production morning recovery trigger"
               else:
