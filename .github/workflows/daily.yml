@@ -3,9 +3,9 @@ on:
   schedule:
     # 23:00 UTC = 07:00 Asia/Taipei; 08:30 UTC = 16:30 Asia/Taipei
     # Primary + recovery triggers. Dedupe makes recovery runs safe.
-    - cron: '0 23 * * *'   # 07:00 Taipei primary
-    - cron: '10 23 * * *'  # 07:10 recovery
-    - cron: '20 23 * * *'  # 07:20 recovery
+    - cron: '1 23 * * *'   # 07:01 Taipei primary
+    - cron: '11 23 * * *'  # 07:11 recovery
+    - cron: '21 23 * * *'  # 07:21 recovery
     - cron: '30 8 * * *'   # 16:30 Taipei primary
     - cron: '40 8 * * *'   # 16:40 recovery
     - cron: '50 8 * * *'   # 16:50 recovery
@@ -14,7 +14,6 @@ on:
     branches: [main]
     paths:
       - '.github/trigger-meowcast-evening'
-      - '.github/workflows/daily.yml'
       - '.github/recovery/morning-*'
       - '.github/recovery/evening-*'
 
@@ -81,7 +80,7 @@ jobs:
                   # Identify the intended slot from the cron expression that fired.
                   # Do NOT infer it from wall-clock start time: GitHub schedule jobs can be delayed.
                   trigger=os.environ.get("TRIGGER_SCHEDULE","").strip()
-                  morning={"0 23 * * *","10 23 * * *","20 23 * * *"}
+                  morning={"1 23 * * *","11 23 * * *","21 23 * * *"}
                   evening={"30 8 * * *","40 8 * * *","50 8 * * *"}
                   if trigger in morning:
                       run=True; slot="0700"; reason=f"morning cron trigger: {trigger}"
