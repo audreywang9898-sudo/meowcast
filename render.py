@@ -103,11 +103,30 @@ def add_weather_overlay(im,w,theme,event=None):
 
     # Condition is prominent but visually tied to the temperature row.
     d.rounded_rectangle((310,915,770,975),radius=30,fill=(255,255,255,210))
-    put(540,945,condition_text,42)
+    # English is primary; Chinese translations are intentionally smaller.
+    parts=[(condition,42),(condition_zh,28)]
+    if temp_badge:
+        parts += [(" · "+temp_badge,42),(temp_zh,28)]
+    fonts=[font(sz) for _,sz in parts]
+    widths=[d.textlength(txt,font=ft) for (txt,_),ft in zip(parts,fonts)]
+    total=sum(widths)+14*(len(parts)-1)
+    x=540-total/2
+    for (txt,_),ft,wid in zip(parts,fonts,widths):
+        d.text((x,945),txt,font=ft,anchor="lm",fill=ink)
+        x += wid+14
 
     # Evening card must explicitly read as a tonight forecast.
-    rain_prefix="今晚降雨機率  Tonight rain chance" if w.get("period")=="evening" else "降雨機率  Rain chance"
-    put(540,1025,f"{rain_prefix}  {w['rain']}%",30 if w.get("period")=="evening" else 34,(58,67,80,255))
+    rain_en="Tonight rain chance" if w.get("period")=="evening" else "Rain chance"
+    rain_main=f"{rain_en}  {w['rain']}%"
+    rain_zh="今晚降雨機率" if w.get("period")=="evening" else "降雨機率"
+    main_ft=font(30 if w.get("period")=="evening" else 34)
+    zh_ft=font(23)
+    main_w=d.textlength(rain_main,font=main_ft)
+    zh_w=d.textlength(rain_zh,font=zh_ft)
+    gap=18
+    x=540-(main_w+gap+zh_w)/2
+    d.text((x,1025),rain_main,font=main_ft,anchor="lm",fill=(58,67,80,255))
+    d.text((x+main_w+gap,1025),rain_zh,font=zh_ft,anchor="lm",fill=(58,67,80,255))
 
 
 def main(period=None):
