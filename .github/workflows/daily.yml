@@ -42,6 +42,8 @@ jobs:
 
       - name: Check schedule config
         id: schedule
+        env:
+          TRIGGER_SCHEDULE: ${{ github.event.schedule }}
         run: |
           python - <<'PY'
           import json, os
@@ -76,21 +78,17 @@ jobs:
               if not cfg.get("enabled", True):
                   run=False; reason="schedule disabled"
               else:
-                  # GitHub scheduled workflows may start a few minutes late.
-                  # Keep a grace window so a delayed 07:00 trigger still publishes.
-                  window=int(cfg.get("window_minutes",60))
-                  run=False
-                  for value in cfg.get("publish_times",["07:00"]):
-                      hh,mm=map(int,value.split(":"))
-                      target=now.replace(hour=hh,minute=mm,second=0,microsecond=0)
-                      delta=(now-target).total_seconds()/60
-                      if 0 <= delta < window:
-                          run=True
-                          slot=value.replace(":","")
-                          reason=f"inside {value} + {window}min window"
-                          break
-                  if not run:
-                      reason=f"outside configured publish window at {now:%H:%M}"
+                  # Identify the intended slot from the cron expression that fired.
+                  # Do NOT infer it from wall-clock start time: GitHub schedule jobs can be delayed.
+                  trigger=os.environ.get("TRIGGER_SCHEDULE","").strip()
+                  morning={"0 23 * * *","10 23 * * *","20 23 * * *"}
+                  evening={"30 8 * * *","40 8 * * *","50 8 * * *"}
+                  if trigger in morning:
+                      run=True; slot="0700"; reason=f"morning cron trigger: {trigger}"
+                  elif trigger in evening:
+                      run=True; slot="1630"; reason=f"evening cron trigger: {trigger}"
+                  else:
+                      run=False; reason=f"unknown schedule trigger: {trigger!r}"
 
           date=now.strftime("%Y-%m-%d")
           print(reason)
@@ -100,6 +98,13 @@ jobs:
               out.write(f"date={date}\n")
               out.write(f"slot={slot}\n")
           PY
+
+      - name: Reject unknown scheduled trigger
+        if: github.event_name == 'schedule' && steps.schedule.outputs.run != 'true'
+        run: |
+          echo "ERROR: scheduled workflow did not map to a publish slot."
+          echo "This prevents a false-green run where every publish step is skipped."
+          exit 1
 
       - name: Verify next-year calendar on December 2
         if: steps.schedule.outputs.run == 'true'
