@@ -47,8 +47,12 @@ def add_weather_overlay(im,w,theme,event=None):
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy"}[theme]
     temp_label=temperature_label(w)
     # Avoid emoji glyphs in the rendered card: the CI font stack can render them as tofu/boxes.
+    condition_zh={"Sunny":"晴朗","Rainy":"雨天","Cloudy":"陰天"}[condition]
+    temp_zh={"Hot":"炎熱","Cold":"寒冷"}.get(temp_label, "")
     temp_badge={"Hot":"Hot","Cold":"Cold"}.get(temp_label, "")
-    condition_text=f"{condition} · {temp_badge}" if temp_badge else condition
+    condition_text=f"{condition} {condition_zh}"
+    if temp_badge:
+        condition_text += f" · {temp_badge} {temp_zh}"
 
     # Fixed compact card below the branding area.
     x0,y0,x1,y1=145,685,935,1065
@@ -89,18 +93,21 @@ def add_weather_overlay(im,w,theme,event=None):
         d.ellipse((cx-r,cy-r,cx+r,cy+r),fill=accent)
 
     main_temp=w.get("temperature",w["high"])
-    put(485,845,f"{main_temp}°C",92)
+    # Bilingual high/low labels above each temperature.
+    put(485,795,"最高溫  HIGH",25,muted)
+    put(485,855,f"{main_temp}°C",82)
     d.line((645,805,645,890),fill=line,width=2)
-    put(735,812,"TONIGHT LOW" if w.get("period")=="evening" else "LOW",23 if w.get("period")=="evening" else 27,muted)
-    put(735,865,f"{w['low']}°C",47)
+    low_label="今晚最低溫  TONIGHT LOW" if w.get("period")=="evening" else "最低溫  LOW"
+    put(760,805,low_label,22 if w.get("period")=="evening" else 25,muted)
+    put(760,860,f"{w['low']}°C",45)
 
     # Condition is prominent but visually tied to the temperature row.
     d.rounded_rectangle((310,915,770,975),radius=30,fill=(255,255,255,210))
     put(540,945,condition_text,42)
 
     # Evening card must explicitly read as a tonight forecast.
-    rain_prefix="Tonight rain chance" if w.get("period")=="evening" else "Rain chance"
-    put(540,1025,f"{rain_prefix}  {w['rain']}%",32 if w.get("period")=="evening" else 36,(58,67,80,255))
+    rain_prefix="今晚降雨機率  Tonight rain chance" if w.get("period")=="evening" else "降雨機率  Rain chance"
+    put(540,1025,f"{rain_prefix}  {w['rain']}%",30 if w.get("period")=="evening" else 34,(58,67,80,255))
 
 
 def main(period=None):
