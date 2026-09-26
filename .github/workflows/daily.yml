@@ -10,6 +10,12 @@ on:
     - cron: '40 8 * * *'   # 16:40 recovery
     - cron: '50 8 * * *'   # 16:50 recovery
   workflow_dispatch:
+    inputs:
+      republish:
+        description: 'Explicit one-time republish; bypass slot dedupe only for manual dispatch'
+        required: false
+        default: false
+        type: boolean
   push:
     branches: [main]
     paths:
@@ -142,10 +148,15 @@ jobs:
           SLOT: ${{ steps.schedule.outputs.slot }}
           PUBLISH_DATE: ${{ steps.schedule.outputs.date }}
         run: |
-          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            echo "Manual run still uses publication dedupe for safety."
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "${{ inputs.republish }}" = "true" ]; then
+            echo "Explicit one-time manual republish requested; bypassing slot dedupe for this run only."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
-          # Never bypass dedupe in production. A recovery trigger must not create a duplicate post.
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "Manual run uses publication dedupe unless republish=true was explicitly requested."
+          fi
+          # Recovery/scheduled runs never bypass dedupe.
           MARKER="${PUBLISH_DATE}-${SLOT}"
           URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-slot.txt?ts=${GITHUB_RUN_ID}"
           PUBLISHED=$(curl -fsSL "$URL" || true)
