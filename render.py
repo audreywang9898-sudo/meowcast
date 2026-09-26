@@ -104,9 +104,9 @@ def add_weather_overlay(im,w,theme,event=None):
     # Condition is prominent but visually tied to the temperature row.
     d.rounded_rectangle((310,915,770,975),radius=30,fill=(255,255,255,210))
     # English is primary; Chinese translations are intentionally smaller.
-    parts=[(condition,42),(condition_zh,28)]
+    parts=[(condition_zh,28),(condition,42)]
     if temp_badge:
-        parts += [(" · "+temp_badge,42),(temp_zh,28)]
+        parts += [(" · "+temp_zh,28),(temp_badge,42)]
     fonts=[font(sz) for _,sz in parts]
     widths=[d.textlength(txt,font=ft) for (txt,_),ft in zip(parts,fonts)]
     total=sum(widths)+14*(len(parts)-1)
@@ -117,16 +117,30 @@ def add_weather_overlay(im,w,theme,event=None):
 
     # Evening card must explicitly read as a tonight forecast.
     rain_en="Tonight rain chance" if w.get("period")=="evening" else "Rain chance"
-    rain_main=f"{rain_en}  {w['rain']}%"
     rain_zh="今晚降雨機率" if w.get("period")=="evening" else "降雨機率"
-    main_ft=font(30 if w.get("period")=="evening" else 34)
     zh_ft=font(23)
-    main_w=d.textlength(rain_main,font=main_ft)
+    pct_ft=font(34)
+    en_ft=font(30 if w.get("period")=="evening" else 32)
     zh_w=d.textlength(rain_zh,font=zh_ft)
-    gap=18
-    x=540-(main_w+gap+zh_w)/2
-    d.text((x,1025),rain_main,font=main_ft,anchor="lm",fill=(58,67,80,255))
-    d.text((x+main_w+gap,1025),rain_zh,font=zh_ft,anchor="lm",fill=(58,67,80,255))
+    pct_text=f"{w['rain']}%"
+    pct_w=d.textlength(pct_text,font=pct_ft)
+    en_w=d.textlength(rain_en,font=en_ft)
+    gap=16
+    drop_w=28
+    total=drop_w+gap+zh_w+gap+pct_w+gap+en_w
+    x=540-total/2
+    # Draw a real blue raindrop so CI does not depend on emoji glyph support.
+    drop_cx=x+drop_w/2
+    drop_cy=1025
+    blue=(30,144,255,255)
+    d.polygon([(drop_cx,drop_cy-22),(drop_cx-15,drop_cy+5),(drop_cx+15,drop_cy+5)],fill=blue)
+    d.ellipse((drop_cx-15,drop_cy-7,drop_cx+15,drop_cy+20),fill=blue)
+    x += drop_w+gap
+    d.text((x,1025),rain_zh,font=zh_ft,anchor="lm",fill=(58,67,80,255))
+    x += zh_w+gap
+    d.text((x,1025),pct_text,font=pct_ft,anchor="lm",fill=(58,67,80,255))
+    x += pct_w+gap
+    d.text((x,1025),rain_en,font=en_ft,anchor="lm",fill=(58,67,80,255))
 
 
 def main(period=None):
