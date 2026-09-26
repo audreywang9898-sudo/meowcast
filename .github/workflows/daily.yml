@@ -9,6 +9,7 @@ on:
     - cron: '30 8 * * *'   # 16:30 Taipei primary
     - cron: '40 8 * * *'   # 16:40 recovery
     - cron: '50 8 * * *'   # 16:50 recovery
+    - cron: '0 9 * * *'     # 17:00 final GitHub self-guard
   workflow_dispatch:
     inputs:
       republish:
@@ -207,7 +208,6 @@ jobs:
         run: |
           test -n "$MEDIA_REPO_TOKEN" || (echo "MEDIA_REPO_TOKEN missing" && exit 1)
           SAFE_SLOT="$SLOT"
-          [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && SAFE_SLOT="manual"
           MEDIA_PATH="reels/${PUBLISH_DATE}/meowcast-${SAFE_SLOT}-${GITHUB_RUN_ID}.mp4"
           git clone "https://x-access-token:${MEDIA_REPO_TOKEN}@github.com/audreywang9898-sudo/meowcast-media.git" /tmp/meowcast-media
           mkdir -p "/tmp/meowcast-media/$(dirname "$MEDIA_PATH")"
@@ -253,7 +253,7 @@ jobs:
           python publish_instagram.py
 
       - name: Mark scheduled slot as published
-        if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true' && success() && github.event_name != 'workflow_dispatch'
+        if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true' && success()
         env:
           MEDIA_REPO_TOKEN: ${{ secrets.MEDIA_REPO_TOKEN }}
           PUBLISH_DATE: ${{ steps.schedule.outputs.date }}
