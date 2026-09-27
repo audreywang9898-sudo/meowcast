@@ -148,6 +148,7 @@ def main(period=None):
     if period not in ("morning","evening"):
         raise ValueError(f"Unsupported MEOWCAST_PERIOD: {period}")
     w=get_evening_weather() if period=="evening" else get_weather()
+    print("Weather input:", w)
     # Holidays affect morning artwork/copy only. Evening is weather-only.
     event=None if period=="evening" else event_for_date(w["date"])
     t,cap=make_caption(w,event=event)
