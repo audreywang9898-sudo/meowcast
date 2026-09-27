@@ -24,7 +24,7 @@ def theme(w):
     """Primary sky condition only; temperature is a separate label."""
     if w["rain"] >= 50 or w["code"] >= 51:
         return "rainy"
-    if w["code"] in (0, 1):
+    if w["code"] in (0, 1, 2):
         return "sunny"
     return "cloudy"
 
