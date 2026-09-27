@@ -57,24 +57,53 @@ def _cwa_weather(evening=False):
 
 
 def get_weather():
-    """Morning/daytime weather. Kept unchanged for the existing 07:00 flow."""
+    """Morning/daytime weather using hourly weather codes from 07:00-17:00.
+
+    The representative condition is the most frequent hourly WMO weather code
+    in the daytime window. Ties prefer the clearer/lower code. Temperature
+    high/low and rain probability are also derived from the same window.
+    """
     try:
         data=_get_json({
             "latitude":LAT,
             "longitude":LON,
-            "daily":"weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+            "hourly":"temperature_2m,precipitation_probability,weather_code",
             "timezone":TIMEZONE,
             "forecast_days":1,
-        })["daily"]
+        })["hourly"]
     except Exception as exc:
         print(f"Open-Meteo morning failed; falling back to CWA: {exc}")
         return _cwa_weather(False)
+
+    rows=[]
+    for time_text,temp,rain,code in zip(
+        data["time"],
+        data["temperature_2m"],
+        data["precipitation_probability"],
+        data["weather_code"],
+    ):
+        hour=datetime.fromisoformat(time_text).hour
+        if 7 <= hour <= 17:
+            rows.append((time_text,temp,rain,code))
+
+    if not rows:
+        raise RuntimeError("No 07:00-17:00 hourly forecast returned by Open-Meteo")
+
+    counts={}
+    for row in rows:
+        counts[row[3]]=counts.get(row[3],0)+1
+    representative_code=min(counts, key=lambda code: (-counts[code], code))
+    print("Morning hourly weather codes:", [(datetime.fromisoformat(r[0]).hour, r[3]) for r in rows])
+    print("Morning representative weather code:", representative_code, "counts:", counts)
+
     return {
-        "date":data["time"][0],
-        "code":data["weather_code"][0],
-        "high":round(data["temperature_2m_max"][0]),
-        "low":round(data["temperature_2m_min"][0]),
-        "rain":data["precipitation_probability_max"][0],
+        "date":rows[0][0][:10],
+        "code":representative_code,
+        "high":round(max(row[1] for row in rows)),
+        "low":round(min(row[1] for row in rows)),
+        "rain":max(row[2] for row in rows),
+        "period":"morning",
+        "window":"07:00-17:00",
     }
 
 
