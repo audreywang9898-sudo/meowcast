@@ -72,7 +72,8 @@ def _simple_english_caption(w, city, event=None):
             if note:
                 seasonal+=f"{note}\n"
             seasonal+="\n"
-            extra_tags+=f" #{event_name.replace(' ','').replace("'",'').replace('/','')}"
+            safe_tag=event_name.replace(" ","").replace("'","").replace("/","")
+            extra_tags+=f" #{safe_tag}"
 
     if is_evening:
         main_temp=w.get("temperature",w["high"])
