@@ -30,6 +30,8 @@ permissions:
 jobs:
   reel:
     runs-on: ubuntu-latest
+    env:
+      CITY: taipei
     concurrency:
       # Serialize each slot. Recovery runs queue behind an in-flight primary run,
       # then dedupe against the published marker before doing any work.
