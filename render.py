@@ -1,5 +1,5 @@
 import os, subprocess, json, urllib.request
-from datetime import datetime, timedelta
+from datetime import datetime
 from PIL import Image,ImageDraw,ImageFont
 from weather import get_weather, get_evening_weather
 from caption import make_caption, temperature_label
@@ -22,23 +22,21 @@ def fallback(theme):
     return im
 
 def _rotation_state(theme, date_str, period):
-    """Return the next consecutive-weather artwork index (1..7).
+    """Return the next independent artwork index (1..7) for this weather theme.
 
-    State is read from meowcast-media only after a prior Reel was successfully
-    published, so failed/dry runs do not advance the rotation.
+    Morning/evening and sunny/cloudy/rainy each keep their own cursor. The
+    cursor advances only after a successful Instagram publish.
     """
     slot="1630" if period=="evening" else "0700"
-    url=f"https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/weather-state-{slot}.json"
-    idx=1
+    url=f"https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/weather-rotation-{slot}.json"
     try:
         with urllib.request.urlopen(url,timeout=8) as r:
-            prev=json.load(r)
-        yesterday=(datetime.strptime(date_str,"%Y-%m-%d")-timedelta(days=1)).strftime("%Y-%m-%d")
-        if prev.get("date")==yesterday and prev.get("theme")==theme:
-            idx=(int(prev.get("index",0)) % 7)+1
+            state=json.load(r)
+        prev_idx=int(state.get(theme,0))
+        return (prev_idx % 7)+1
     except Exception as e:
         print("Weather rotation state unavailable; starting at 1:",e)
-    return idx
+        return 1
 
 def asset_for(theme,event=None,period="morning",date_str=None):
     # Evening edition always uses weather artwork; holidays stay morning-only.
