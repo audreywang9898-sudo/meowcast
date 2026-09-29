@@ -1,0 +1,66 @@
+name: Multi-city Smoke Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'city_config.py'
+      - 'cities/**'
+      - 'weather.py'
+      - 'caption.py'
+      - 'render.py'
+      - '.github/trigger-multicity'
+      - '.github/workflows/multicity-smoke.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Compile Python
+        run: python -m py_compile city_config.py weather.py caption.py render.py
+      - name: Taipei config and caption smoke test
+        env:
+          CITY: taipei
+        run: |
+          python - <<'PY'
+          from city_config import load_city_config
+          from caption import make_simple_caption
+          c=load_city_config()
+          assert c["id"]=="taipei"
+          w={"date":"2026-09-29","code":1,"high":31,"low":25,"rain":10,"period":"morning"}
+          t,cap=make_simple_caption(w,city=c)
+          assert t=="sunny" and "Taipei Cat" in cap and "台北" in cap
+          print("Taipei caption OK")
+          PY
+      - name: Melbourne config and caption smoke test
+        env:
+          CITY: melbourne
+        run: |
+          python - <<'PY'
+          from city_config import load_city_config
+          from caption import make_simple_caption
+          c=load_city_config()
+          assert c["id"]=="melbourne"
+          assert c["timezone"]=="Australia/Melbourne"
+          w={"date":"2026-09-29","code":3,"high":18,"low":11,"rain":20,"period":"morning"}
+          t,cap=make_simple_caption(w,city=c)
+          assert t=="cloudy" and "Melbourne Cat" in cap and "台北" not in cap
+          print("Melbourne caption OK")
+          PY
+      - name: Fetch live Melbourne weather
+        env:
+          CITY: melbourne
+        run: |
+          python - <<'PY'
+          from city_config import load_city_config
+          from weather import get_weather, get_evening_weather
+          c=load_city_config()
+          print(get_weather(c))
+          print(get_evening_weather(c))
+          PY
