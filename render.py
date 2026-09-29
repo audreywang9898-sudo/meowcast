@@ -1,5 +1,5 @@
-import os, subprocess
-from datetime import datetime
+import os, subprocess, json, urllib.request
+from datetime import datetime, timedelta
 from PIL import Image,ImageDraw,ImageFont
 from weather import get_weather, get_evening_weather
 from caption import make_caption, temperature_label
@@ -21,7 +21,26 @@ def fallback(theme):
     d.text((330,1120),"MEOW",font=font(100),fill="white")
     return im
 
-def asset_for(theme,event=None,period="morning"):
+def _rotation_state(theme, date_str, period):
+    """Return the next consecutive-weather artwork index (1..7).
+
+    State is read from meowcast-media only after a prior Reel was successfully
+    published, so failed/dry runs do not advance the rotation.
+    """
+    slot="1630" if period=="evening" else "0700"
+    url=f"https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/weather-state-{slot}.json"
+    idx=1
+    try:
+        with urllib.request.urlopen(url,timeout=8) as r:
+            prev=json.load(r)
+        yesterday=(datetime.strptime(date_str,"%Y-%m-%d")-timedelta(days=1)).strftime("%Y-%m-%d")
+        if prev.get("date")==yesterday and prev.get("theme")==theme:
+            idx=(int(prev.get("index",0)) % 7)+1
+    except Exception as e:
+        print("Weather rotation state unavailable; starting at 1:",e)
+    return idx
+
+def asset_for(theme,event=None,period="morning",date_str=None):
     # Evening edition always uses weather artwork; holidays stay morning-only.
     if period != "evening" and event:
         configured=event.get("asset")
@@ -30,16 +49,28 @@ def asset_for(theme,event=None,period="morning"):
         if configured: special.append(f"asset/{configured}")
         if key: special.extend([f"asset/{key}.png", f"asset/{key}.jpg"])
         for p in special:
-            if os.path.exists(p): return p
+            if os.path.exists(p): return p, None
+
     suffix="_evening" if period=="evening" else ""
-    candidates={
-        "sunny":[f"asset/sunny{suffix}.png",f"asset/sunny{suffix}.jpg"],
-        "rainy":[f"asset/rainy{suffix}.png",f"asset/rainy{suffix}.jpg"],
-        "cloudy":[f"asset/cloudy{suffix}.png",f"asset/cloudy{suffix}.jpg"],
-    }
-    for p in candidates[theme]:
-        if os.path.exists(p): return p
-    return None
+    idx=_rotation_state(theme,date_str,period) if date_str else 1
+    # Preferred names: sunny-1.png ... sunny-7.png.
+    # Evening can independently use sunny_evening-1.png ... sunny_evening-7.png.
+    numbered=[
+        f"asset/{theme}{suffix}-{idx}.png",
+        f"asset/{theme}{suffix}-{idx}.jpg",
+    ]
+    for p in numbered:
+        if os.path.exists(p):
+            print(f"Weather artwork rotation: theme={theme} index={idx} asset={p}")
+            return p, idx
+
+    # Backward-compatible fallback while the 7-image sets are being built.
+    candidates=[f"asset/{theme}{suffix}.png",f"asset/{theme}{suffix}.jpg"]
+    for p in candidates:
+        if os.path.exists(p):
+            print(f"Numbered artwork {theme}{suffix}-{idx} missing; fallback={p}")
+            return p, idx
+    return None, idx
 
 def add_weather_overlay(im,w,theme,event=None):
     """Draw a compact, high-legibility weather card entirely in code."""
@@ -152,7 +183,7 @@ def main(period=None):
     # Holidays affect morning artwork/copy only. Evening is weather-only.
     event=None if period=="evening" else event_for_date(w["date"])
     t,cap=make_caption(w,event=event)
-    src=asset_for(t,event,period=period)
+    src,rotation_index=asset_for(t,event,period=period,date_str=w["date"])
     if src:
         im=Image.open(src).convert("RGB"); scale=max(W/im.width,H/im.height); im=im.resize((int(im.width*scale),int(im.height*scale)))
         x=(im.width-W)//2; y=(im.height-H)//2; im=im.crop((x,y,x+W,y+H))
@@ -160,6 +191,9 @@ def main(period=None):
         im=fallback(t)
     add_weather_overlay(im,w,t,event)
     os.makedirs("output",exist_ok=True); im.save("output/card.jpg",quality=94)
+    # Candidate state is committed by the workflow only after Instagram publish succeeds.
+    with open("output/weather-state.json","w",encoding="utf-8") as sf:
+        json.dump({"date":w["date"],"theme":t,"index":rotation_index or 1,"period":period},sf,ensure_ascii=False)
     # Evening uses the normal/default BGM; no holiday-specific music.
     bgm=music_for_event(None if period=="evening" else event)
     subprocess.run(["ffmpeg","-y","-loop","1","-i","output/card.jpg","-i",bgm,"-vf","scale=1200:2134,zoompan=z='min(zoom+0.0005,1.08)':d=200:s=1080x1920:fps=25","-t","8","-c:v","libx264","-c:a","aac","-b:a","128k","-shortest","-pix_fmt","yuv420p","-movflags","+faststart","output/meowcast.mp4"],check=True)
