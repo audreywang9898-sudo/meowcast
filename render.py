@@ -5,6 +5,7 @@ from weather import get_weather, get_evening_weather
 from caption import make_caption, temperature_label
 from music import music_for_event
 from calendar_events import event_for_date
+from city_config import load_city_config
 
 W,H=1080,1920
 
@@ -21,14 +22,16 @@ def fallback(theme):
     d.text((330,1120),"MEOW",font=font(100),fill="white")
     return im
 
-def _rotation_state(theme, date_str, period):
+def _rotation_state(theme, date_str, period, city=None):
     """Return the next independent artwork index (1..7) for this weather theme.
 
     Morning/evening and sunny/cloudy/rainy each keep their own cursor. The
     cursor advances only after a successful Instagram publish.
     """
+    city=city or load_city_config()
     slot="1630" if period=="evening" else "0700"
-    url=f"https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/weather-rotation-{slot}.json"
+    prefix=city.get("media_state_prefix",f"latest/{city[\'id\']}").strip("/")
+    url=f"https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/{prefix}/weather-rotation-{slot}.json"
     try:
         with urllib.request.urlopen(url,timeout=8) as r:
             state=json.load(r)
@@ -38,24 +41,26 @@ def _rotation_state(theme, date_str, period):
         print("Weather rotation state unavailable; starting at 1:",e)
         return 1
 
-def asset_for(theme,event=None,period="morning",date_str=None):
+def asset_for(theme,event=None,period="morning",date_str=None,city=None):
+    city=city or load_city_config()
+    asset_prefix=city.get("asset_prefix","asset").rstrip("/")
     # Evening edition always uses weather artwork; holidays stay morning-only.
     if period != "evening" and event:
         configured=event.get("asset")
         key=event.get("key")
         special=[]
-        if configured: special.append(f"asset/{configured}")
-        if key: special.extend([f"asset/{key}.png", f"asset/{key}.jpg"])
+        if configured: special.append(f"{asset_prefix}/{configured}")
+        if key: special.extend([f"{asset_prefix}/{key}.png", f"{asset_prefix}/{key}.jpg"])
         for p in special:
             if os.path.exists(p): return p, None
 
     suffix="_evening" if period=="evening" else ""
-    idx=_rotation_state(theme,date_str,period) if date_str else 1
+    idx=_rotation_state(theme,date_str,period,city=city) if date_str else 1
     # Preferred names: sunny-1.png ... sunny-7.png.
     # Evening can independently use sunny_evening-1.png ... sunny_evening-7.png.
     numbered=[
-        f"asset/{theme}{suffix}-{idx}.png",
-        f"asset/{theme}{suffix}-{idx}.jpg",
+        f"{asset_prefix}/{theme}{suffix}-{idx}.png",
+        f"{asset_prefix}/{theme}{suffix}-{idx}.jpg",
     ]
     for p in numbered:
         if os.path.exists(p):
@@ -64,22 +69,24 @@ def asset_for(theme,event=None,period="morning",date_str=None):
 
     # Global fail-safe: any missing numbered/weather asset falls back to sunny-1.
     # This keeps production rendering alive even when a theme set is incomplete.
-    failsafe=["asset/sunny-1.png","asset/sunny-1.jpg"]
+    failsafe=[f"{asset_prefix}/sunny-1.png",f"{asset_prefix}/sunny-1.jpg"]
     for p in failsafe:
         if os.path.exists(p):
             print(f"Requested artwork {theme}{suffix}-{idx} missing; GLOBAL FALLBACK={p}")
             return p, 1
 
     # Temporary compatibility until sunny-1 itself has been added.
-    legacy=["asset/sunny.png","asset/sunny.jpg"]
+    legacy=[f"{asset_prefix}/sunny.png",f"{asset_prefix}/sunny.jpg"]
     for p in legacy:
         if os.path.exists(p):
             print(f"WARNING: sunny-1 missing; temporary legacy fallback={p}")
             return p, 1
     return None, 1
 
-def add_weather_overlay(im,w,theme,event=None):
+def add_weather_overlay(im,w,theme,event=None,city=None):
     """Draw a compact, high-legibility weather card entirely in code."""
+    city=city or load_city_config()
+    english_only=city.get("language")=="english"
     d=ImageDraw.Draw(im,"RGBA")
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy"}[theme]
     temp_label=temperature_label(w)
@@ -87,9 +94,9 @@ def add_weather_overlay(im,w,theme,event=None):
     condition_zh={"Sunny":"晴朗","Rainy":"雨天","Cloudy":"陰天"}[condition]
     temp_zh={"Hot":"炎熱","Cold":"寒冷"}.get(temp_label, "")
     temp_badge={"Hot":"Hot","Cold":"Cold"}.get(temp_label, "")
-    condition_text=f"{condition} {condition_zh}"
+    condition_text=condition if english_only else f"{condition} {condition_zh}"
     if temp_badge:
-        condition_text += f" · {temp_badge} {temp_zh}"
+        condition_text += f" · {temp_badge}" if english_only else f" · {temp_badge} {temp_zh}"
 
     # Fixed compact card below the branding area.
     x0,y0,x1,y1=145,685,935,1065
@@ -131,19 +138,22 @@ def add_weather_overlay(im,w,theme,event=None):
 
     main_temp=w.get("temperature",w["high"])
     # Bilingual high/low labels above each temperature.
-    put(485,795,"最高溫  HIGH",25,muted)
+    put(485,795,"HIGH" if english_only else "最高溫  HIGH",25,muted)
     put(485,855,f"{main_temp}°C",82)
     d.line((645,805,645,890),fill=line,width=2)
-    low_label="今晚最低溫  TONIGHT LOW" if w.get("period")=="evening" else "最低溫  LOW"
+    if english_only:
+        low_label="TONIGHT LOW" if w.get("period")=="evening" else "LOW"
+    else:
+        low_label="今晚最低溫  TONIGHT LOW" if w.get("period")=="evening" else "最低溫  LOW"
     put(760,805,low_label,22 if w.get("period")=="evening" else 25,muted)
     put(760,860,f"{w['low']}°C",45)
 
     # Condition is prominent but visually tied to the temperature row.
     d.rounded_rectangle((310,915,770,975),radius=30,fill=(255,255,255,210))
     # English is primary; Chinese translations are intentionally smaller.
-    parts=[(condition_zh,28),(condition,42)]
+    parts=[(condition,42)] if english_only else [(condition_zh,28),(condition,42)]
     if temp_badge:
-        parts += [(" · "+temp_zh,28),(temp_badge,42)]
+        parts += [(" · "+temp_badge,42)] if english_only else [(" · "+temp_zh,28),(temp_badge,42)]
     fonts=[font(sz) for _,sz in parts]
     widths=[d.textlength(txt,font=ft) for (txt,_),ft in zip(parts,fonts)]
     total=sum(widths)+14*(len(parts)-1)
@@ -173,33 +183,36 @@ def add_weather_overlay(im,w,theme,event=None):
     d.polygon([(drop_cx,drop_cy-22),(drop_cx-15,drop_cy+5),(drop_cx+15,drop_cy+5)],fill=blue)
     d.ellipse((drop_cx-15,drop_cy-7,drop_cx+15,drop_cy+20),fill=blue)
     x += drop_w+gap
-    d.text((x,1025),rain_zh,font=zh_ft,anchor="lm",fill=(58,67,80,255))
-    x += zh_w+gap
+    if not english_only:
+        d.text((x,1025),rain_zh,font=zh_ft,anchor="lm",fill=(58,67,80,255))
+        x += zh_w+gap
     d.text((x,1025),pct_text,font=pct_ft,anchor="lm",fill=(58,67,80,255))
     x += pct_w+gap
     d.text((x,1025),rain_en,font=en_ft,anchor="lm",fill=(58,67,80,255))
 
 
 def main(period=None):
+    city=load_city_config()
+    print(f"City config: {city[\'id\']} timezone={city[\'timezone\']} language={city[\'language\']}")
     period=(period or os.environ.get("MEOWCAST_PERIOD","morning")).lower()
     if period not in ("morning","evening"):
         raise ValueError(f"Unsupported MEOWCAST_PERIOD: {period}")
-    w=get_evening_weather() if period=="evening" else get_weather()
+    w=get_evening_weather(city) if period=="evening" else get_weather(city)
     print("Weather input:", w)
     # Holidays affect morning artwork/copy only. Evening is weather-only.
-    event=None if period=="evening" else event_for_date(w["date"])
-    t,cap=make_caption(w,event=event)
-    src,rotation_index=asset_for(t,event,period=period,date_str=w["date"])
+    event=None if period=="evening" or not city.get("holiday_mode",False) else event_for_date(w["date"])
+    t,cap=make_caption(w,event=event,city=city)
+    src,rotation_index=asset_for(t,event,period=period,date_str=w["date"],city=city)
     if src:
         im=Image.open(src).convert("RGB"); scale=max(W/im.width,H/im.height); im=im.resize((int(im.width*scale),int(im.height*scale)))
         x=(im.width-W)//2; y=(im.height-H)//2; im=im.crop((x,y,x+W,y+H))
     else:
         im=fallback(t)
-    add_weather_overlay(im,w,t,event)
+    add_weather_overlay(im,w,t,event,city=city)
     os.makedirs("output",exist_ok=True); im.save("output/card.jpg",quality=94)
     # Candidate state is committed by the workflow only after Instagram publish succeeds.
     with open("output/weather-state.json","w",encoding="utf-8") as sf:
-        json.dump({"date":w["date"],"theme":t,"index":rotation_index or 1,"period":period},sf,ensure_ascii=False)
+        json.dump({"date":w["date"],"city":city["id"],"theme":t,"index":rotation_index or 1,"period":period},sf,ensure_ascii=False)
     # Evening uses the normal/default BGM; no holiday-specific music.
     bgm=music_for_event(None if period=="evening" else event)
     subprocess.run(["ffmpeg","-y","-loop","1","-i","output/card.jpg","-i",bgm,"-vf","scale=1200:2134,zoompan=z='min(zoom+0.0005,1.08)':d=200:s=1080x1920:fps=25","-t","8","-c:v","libx264","-c:a","aac","-b:a","128k","-shortest","-pix_fmt","yuv420p","-movflags","+faststart","output/meowcast.mp4"],check=True)
