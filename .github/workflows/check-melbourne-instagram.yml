@@ -1,6 +1,11 @@
 name: Check Melbourne Instagram Connection
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/trigger-melbourne-ig-check'
+      - '.github/workflows/check-melbourne-instagram.yml'
   workflow_dispatch:
 
 permissions:
