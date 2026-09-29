@@ -1,11 +1,10 @@
-import requests
-import time
 import os
+import time
 from datetime import datetime
 
-LAT=25.0330
-LON=121.5654
-TIMEZONE="Asia/Taipei"
+import requests
+
+from city_config import load_city_config
 
 
 def _get_json(params):
@@ -27,7 +26,6 @@ def _get_json(params):
     raise RuntimeError(f"Weather API failed after 5 attempts: {last_error}")
 
 
-
 def _cwa_code(text):
     text=(text or "").replace(" ","")
     if "雷" in text: return 95
@@ -36,12 +34,19 @@ def _cwa_code(text):
     if "雲" in text: return 2
     return 0
 
-def _cwa_weather(evening=False):
+
+def _cwa_weather(city, evening=False):
+    if city.get("id") != "taipei":
+        raise RuntimeError("CWA fallback is only configured for Taipei")
     key=os.environ.get("CWA_API_KEY")
     if not key:
         raise RuntimeError("CWA_API_KEY is not configured")
     url="https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001"
-    r=requests.get(url,params={"Authorization":key,"locationName":"臺北市","format":"JSON"},timeout=(10,45))
+    r=requests.get(
+        url,
+        params={"Authorization":key,"locationName":"臺北市","format":"JSON"},
+        timeout=(10,45),
+    )
     r.raise_for_status()
     loc=r.json()["records"]["location"][0]
     elements={x["elementName"]:x["time"] for x in loc["weatherElement"]}
@@ -52,28 +57,52 @@ def _cwa_weather(evening=False):
     high=int(elements["MaxT"][idx]["parameter"]["parameterName"])
     date=elements["Wx"][idx]["startTime"][:10]
     if evening:
-        return {"date":date,"code":_cwa_code(wx),"temperature":high,"high":high,"low":low,"rain":pop,"period":"evening","window":"CWA 12-hour forecast","source":"CWA"}
-    return {"date":date,"code":_cwa_code(wx),"high":high,"low":low,"rain":pop,"source":"CWA"}
+        return {
+            "date":date,
+            "code":_cwa_code(wx),
+            "temperature":high,
+            "high":high,
+            "low":low,
+            "rain":pop,
+            "period":"evening",
+            "window":"CWA 12-hour forecast",
+            "source":"CWA",
+            "city":city["id"],
+        }
+    return {
+        "date":date,
+        "code":_cwa_code(wx),
+        "high":high,
+        "low":low,
+        "rain":pop,
+        "period":"morning",
+        "window":"CWA 12-hour forecast",
+        "source":"CWA",
+        "city":city["id"],
+    }
 
 
-def get_weather():
-    """Morning/daytime weather using hourly weather codes from 07:00-17:00.
+def _open_meteo_hourly(city):
+    return _get_json({
+        "latitude":city["latitude"],
+        "longitude":city["longitude"],
+        "hourly":"temperature_2m,precipitation_probability,weather_code",
+        "timezone":city["timezone"],
+        "forecast_days":1,
+    })["hourly"]
 
-    The representative condition is the most frequent hourly WMO weather code
-    in the daytime window. Ties prefer the clearer/lower code. Temperature
-    high/low and rain probability are also derived from the same window.
-    """
+
+def get_weather(city=None):
+    """Morning/daytime forecast using the selected city's local timezone."""
+    city=city or load_city_config()
+    start_hour,end_hour=city.get("morning_window",[7,17])
     try:
-        data=_get_json({
-            "latitude":LAT,
-            "longitude":LON,
-            "hourly":"temperature_2m,precipitation_probability,weather_code",
-            "timezone":TIMEZONE,
-            "forecast_days":1,
-        })["hourly"]
+        data=_open_meteo_hourly(city)
     except Exception as exc:
-        print(f"Open-Meteo morning failed; falling back to CWA: {exc}")
-        return _cwa_weather(False)
+        if city.get("weather_fallback")=="cwa":
+            print(f"Open-Meteo morning failed; falling back to CWA: {exc}")
+            return _cwa_weather(city,False)
+        raise
 
     rows=[]
     for time_text,temp,rain,code in zip(
@@ -83,18 +112,21 @@ def get_weather():
         data["weather_code"],
     ):
         hour=datetime.fromisoformat(time_text).hour
-        if 7 <= hour <= 17:
+        if start_hour <= hour <= end_hour:
             rows.append((time_text,temp,rain,code))
 
     if not rows:
-        raise RuntimeError("No 07:00-17:00 hourly forecast returned by Open-Meteo")
+        raise RuntimeError(f"No {start_hour:02d}:00-{end_hour:02d}:00 hourly forecast returned by Open-Meteo")
 
     counts={}
     for row in rows:
         counts[row[3]]=counts.get(row[3],0)+1
     representative_code=min(counts, key=lambda code: (-counts[code], code))
-    print("Morning hourly weather codes:", [(datetime.fromisoformat(r[0]).hour, r[3]) for r in rows])
-    print("Morning representative weather code:", representative_code, "counts:", counts)
+    print(
+        f"{city['display_name']} morning hourly weather codes:",
+        [(datetime.fromisoformat(r[0]).hour, r[3]) for r in rows],
+    )
+    print("Morning representative weather code:",representative_code,"counts:",counts)
 
     return {
         "date":rows[0][0][:10],
@@ -103,32 +135,23 @@ def get_weather():
         "low":round(min(row[1] for row in rows)),
         "rain":max(row[2] for row in rows),
         "period":"morning",
-        "window":"07:00-17:00",
+        "window":f"{start_hour:02d}:00-{end_hour:02d}:00",
+        "source":"Open-Meteo",
+        "city":city["id"],
     }
 
 
-def get_evening_weather():
-    """Weather for the 17:00 evening edition.
-
-    - condition: representative 17:00 weather code
-    - temperature: forecast temperature at 17:00
-    - low: minimum forecast temperature from 17:00 through 23:00
-    - rain: maximum precipitation probability from 17:00 through 23:00
-
-    This function is intentionally separate from get_weather() so the existing
-    morning production path remains unchanged until the evening flow is tested.
-    """
+def get_evening_weather(city=None):
+    """Evening forecast using the selected city's local timezone."""
+    city=city or load_city_config()
+    start_hour,end_hour=city.get("evening_window",[17,23])
     try:
-        data=_get_json({
-            "latitude":LAT,
-            "longitude":LON,
-            "hourly":"temperature_2m,precipitation_probability,weather_code",
-            "timezone":TIMEZONE,
-            "forecast_days":1,
-        })["hourly"]
+        data=_open_meteo_hourly(city)
     except Exception as exc:
-        print(f"Open-Meteo evening failed; falling back to CWA: {exc}")
-        return _cwa_weather(True)
+        if city.get("weather_fallback")=="cwa":
+            print(f"Open-Meteo evening failed; falling back to CWA: {exc}")
+            return _cwa_weather(city,True)
+        raise
 
     rows=[]
     for time_text,temp,rain,code in zip(
@@ -138,26 +161,32 @@ def get_evening_weather():
         data["weather_code"],
     ):
         hour=datetime.fromisoformat(time_text).hour
-        if 17 <= hour <= 23:
+        if start_hour <= hour <= end_hour:
             rows.append((time_text,temp,rain,code))
 
     if not rows:
-        raise RuntimeError("No 17:00-23:00 hourly forecast returned by Open-Meteo")
+        raise RuntimeError(f"No {start_hour:02d}:00-{end_hour:02d}:00 hourly forecast returned by Open-Meteo")
 
-    at_17=next((row for row in rows if datetime.fromisoformat(row[0]).hour==17),rows[0])
+    at_start=next(
+        (row for row in rows if datetime.fromisoformat(row[0]).hour==start_hour),
+        rows[0],
+    )
     return {
-        "date":at_17[0][:10],
-        "code":at_17[3],
-        "temperature":round(at_17[1]),
-        # Keep 'high' for compatibility with the current theme/temperature helpers.
-        "high":round(at_17[1]),
+        "date":at_start[0][:10],
+        "code":at_start[3],
+        "temperature":round(at_start[1]),
+        "high":round(at_start[1]),
         "low":round(min(row[1] for row in rows)),
         "rain":max(row[2] for row in rows),
         "period":"evening",
-        "window":"17:00-23:00",
+        "window":f"{start_hour:02d}:00-{end_hour:02d}:00",
+        "source":"Open-Meteo",
+        "city":city["id"],
     }
 
 
 if __name__=="__main__":
-    print("Morning:",get_weather())
-    print("Evening:",get_evening_weather())
+    city=load_city_config()
+    print("City:",city["id"])
+    print("Morning:",get_weather(city))
+    print("Evening:",get_evening_weather(city))
