@@ -64,13 +64,21 @@ def asset_for(theme,event=None,period="morning",date_str=None):
             print(f"Weather artwork rotation: theme={theme} index={idx} asset={p}")
             return p, idx
 
-    # Backward-compatible fallback while the 7-image sets are being built.
-    candidates=[f"asset/{theme}{suffix}.png",f"asset/{theme}{suffix}.jpg"]
-    for p in candidates:
+    # Global fail-safe: any missing numbered/weather asset falls back to sunny-1.
+    # This keeps production rendering alive even when a theme set is incomplete.
+    failsafe=["asset/sunny-1.png","asset/sunny-1.jpg"]
+    for p in failsafe:
         if os.path.exists(p):
-            print(f"Numbered artwork {theme}{suffix}-{idx} missing; fallback={p}")
-            return p, idx
-    return None, idx
+            print(f"Requested artwork {theme}{suffix}-{idx} missing; GLOBAL FALLBACK={p}")
+            return p, 1
+
+    # Temporary compatibility until sunny-1 itself has been added.
+    legacy=["asset/sunny.png","asset/sunny.jpg"]
+    for p in legacy:
+        if os.path.exists(p):
+            print(f"WARNING: sunny-1 missing; temporary legacy fallback={p}")
+            return p, 1
+    return None, 1
 
 def add_weather_overlay(im,w,theme,event=None):
     """Draw a compact, high-legibility weather card entirely in code."""
