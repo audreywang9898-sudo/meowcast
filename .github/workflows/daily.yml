@@ -189,6 +189,7 @@ jobs:
           test -s music/daily_gentle.mp3
           test -s output/meowcast.mp4
           test -s output/caption.txt
+          test -s output/weather-state.json
           ffprobe -v error -show_entries stream=codec_type,codec_name -of compact output/meowcast.mp4
 
       - name: Upload private artifact
@@ -263,9 +264,10 @@ jobs:
           git clone "https://x-access-token:${MEDIA_REPO_TOKEN}@github.com/audreywang9898-sudo/meowcast-media.git" /tmp/meowcast-marker
           mkdir -p /tmp/meowcast-marker/latest
           printf "%s" "$MARKER" > /tmp/meowcast-marker/latest/published-slot.txt
+          cp output/weather-state.json "/tmp/meowcast-marker/latest/weather-state-${SLOT}.json"
           cd /tmp/meowcast-marker
           git config user.name "meowcast-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add latest/published-slot.txt
+          git add latest/published-slot.txt "latest/weather-state-${SLOT}.json"
           git commit -m "Mark Meowcast published $MARKER" || exit 0
           git push origin main
