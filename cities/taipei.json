@@ -8,7 +8,7 @@
   "longitude": 121.5654,
   "timezone": "Asia/Taipei",
   "language": "bilingual",
-  "asset_prefix": "asset",
+  "asset_prefix": "asset/taipei",
   "media_state_prefix": "latest",
   "holiday_mode": true,
   "weather_fallback": "cwa",
