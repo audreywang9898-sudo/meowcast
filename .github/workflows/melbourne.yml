@@ -82,9 +82,9 @@ jobs:
           elif event=="push":
               period="morning"
               slot="0700"
-              publish=True
+              publish=False
               date=datetime.now(tz).date().isoformat()
-              reason="User-requested first Melbourne production publish"
+              reason="Melbourne non-publishing preview trigger"
           else:
               if os.environ.get("MELBOURNE_PRODUCTION_ENABLED","").lower()!="true":
                   run=False
