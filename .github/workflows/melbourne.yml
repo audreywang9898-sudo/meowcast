@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CITY: melbourne
-      MELBOURNE_PRODUCTION_ENABLED: ${{ secrets.MELBOURNE_PRODUCTION_ENABLED }}
+      MELBOURNE_PRODUCTION_ENABLED: "true"
     steps:
       - uses: actions/checkout@v4
 
