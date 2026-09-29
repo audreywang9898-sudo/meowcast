@@ -1,6 +1,11 @@
 name: Melbourne Meowcast
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/trigger-melbourne-preview'
+      - '.github/workflows/melbourne.yml'
   workflow_dispatch:
     inputs:
       period:
@@ -74,6 +79,12 @@ jobs:
               publish=os.environ.get("MANUAL_PUBLISH","false").lower()=="true"
               date=datetime.now(tz).date().isoformat()
               reason=f"manual {period} preview/publish"
+          elif event=="push":
+              period="morning"
+              slot="0700"
+              publish=False
+              date=datetime.now(tz).date().isoformat()
+              reason="Melbourne non-publishing preview trigger"
           else:
               if os.environ.get("MELBOURNE_PRODUCTION_ENABLED","").lower()!="true":
                   run=False
