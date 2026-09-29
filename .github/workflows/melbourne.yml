@@ -1,0 +1,269 @@
+name: Melbourne Meowcast
+
+on:
+  workflow_dispatch:
+    inputs:
+      period:
+        description: 'Edition to generate'
+        required: true
+        default: morning
+        type: choice
+        options:
+          - morning
+          - evening
+      publish:
+        description: 'Publish to Melbourne Instagram after generation'
+        required: false
+        default: false
+        type: boolean
+      republish:
+        description: 'Bypass Melbourne slot dedupe for this manual run'
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    # Melbourne 07:xx local: 20:xx UTC during AEDT, 21:xx UTC during AEST.
+    - cron: '1 20 * * *'
+    - cron: '11 20 * * *'
+    - cron: '1 21 * * *'
+    - cron: '11 21 * * *'
+    # Melbourne 16:3x/16:4x local: 05:3x UTC during AEDT, 06:3x UTC during AEST.
+    - cron: '30 5 * * *'
+    - cron: '40 5 * * *'
+    - cron: '30 6 * * *'
+    - cron: '40 6 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: melbourne-meowcast-publisher
+  cancel-in-progress: false
+
+jobs:
+  reel:
+    runs-on: ubuntu-latest
+    env:
+      CITY: melbourne
+      MELBOURNE_PRODUCTION_ENABLED: ${{ secrets.MELBOURNE_PRODUCTION_ENABLED }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve Melbourne local slot
+        id: slot
+        env:
+          TRIGGER_SCHEDULE: ${{ github.event.schedule }}
+          MANUAL_PERIOD: ${{ inputs.period }}
+          MANUAL_PUBLISH: ${{ inputs.publish }}
+        run: |
+          python - <<'PY'
+          import os
+          from datetime import datetime, timezone
+          from zoneinfo import ZoneInfo
+
+          event=os.environ.get("GITHUB_EVENT_NAME","")
+          tz=ZoneInfo("Australia/Melbourne")
+          run=True
+          publish=False
+          slot=""
+          period=""
+
+          if event=="workflow_dispatch":
+              period=os.environ.get("MANUAL_PERIOD","morning")
+              slot="1630" if period=="evening" else "0700"
+              publish=os.environ.get("MANUAL_PUBLISH","false").lower()=="true"
+              date=datetime.now(tz).date().isoformat()
+              reason=f"manual {period} preview/publish"
+          else:
+              if os.environ.get("MELBOURNE_PRODUCTION_ENABLED","").lower()!="true":
+                  run=False
+                  reason="Melbourne production schedule is gated off"
+                  date=datetime.now(tz).date().isoformat()
+              else:
+                  trigger=os.environ.get("TRIGGER_SCHEDULE","").strip()
+                  hh,mm=map(int,trigger.split()[0:2][::-1])
+                  now_utc=datetime.now(timezone.utc)
+                  intended_utc=datetime(
+                      now_utc.year,now_utc.month,now_utc.day,hh,mm,tzinfo=timezone.utc
+                  )
+                  intended_local=intended_utc.astimezone(tz)
+                  date=intended_local.date().isoformat()
+                  hm=(intended_local.hour,intended_local.minute)
+                  if hm in {(7,1),(7,11)}:
+                      period="morning"; slot="0700"; publish=True
+                      reason=f"Melbourne morning cron {trigger} -> {intended_local.isoformat()}"
+                  elif hm in {(16,30),(16,40)}:
+                      period="evening"; slot="1630"; publish=True
+                      reason=f"Melbourne evening cron {trigger} -> {intended_local.isoformat()}"
+                  else:
+                      run=False
+                      reason=f"DST alternate cron not active now: {trigger} -> {intended_local.isoformat()}"
+
+          print(reason)
+          print(f"run={run} publish={publish} date={date} period={period} slot={slot}")
+          with open(os.environ["GITHUB_OUTPUT"],"a") as out:
+              out.write(f"run={'true' if run else 'false'}\n")
+              out.write(f"publish={'true' if publish else 'false'}\n")
+              out.write(f"date={date}\n")
+              out.write(f"period={period}\n")
+              out.write(f"slot={slot}\n")
+          PY
+
+      - uses: actions/setup-python@v5
+        if: steps.slot.outputs.run == 'true'
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        if: steps.slot.outputs.run == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+          pip install -r requirements.txt
+
+      - name: Check Melbourne publication evidence
+        if: steps.slot.outputs.run == 'true' && steps.slot.outputs.publish == 'true'
+        id: dedupe
+        env:
+          SLOT: ${{ steps.slot.outputs.slot }}
+          PUBLISH_DATE: ${{ steps.slot.outputs.date }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "${{ inputs.republish }}" = "true" ]; then
+            echo "Explicit Melbourne republish requested."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PREFIX="latest/melbourne"
+          MARKER="${PUBLISH_DATE}-${SLOT}"
+          BASE="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/${PREFIX}"
+          PUBLISHED=$(curl -fsSL "${BASE}/published-slot.txt?run=${GITHUB_RUN_ID}" || true)
+          VALID=false
+          if [ "$PUBLISHED" = "$MARKER" ] && curl -fsSL "${BASE}/published-evidence-${SLOT}.json?run=${GITHUB_RUN_ID}" -o /tmp/evidence.json; then
+            if PUBLISH_DATE="$PUBLISH_DATE" SLOT="$SLOT" python - <<'PY'
+          import json, os, sys
+          from datetime import datetime, time
+          from zoneinfo import ZoneInfo
+          try:
+              e=json.load(open("/tmp/evidence.json",encoding="utf-8"))
+              if e.get("date")!=os.environ["PUBLISH_DATE"] or e.get("slot")!=os.environ["SLOT"]:
+                  raise ValueError("date/slot mismatch")
+              published=datetime.fromisoformat(e["published_at"].replace("Z","+00:00")).astimezone(ZoneInfo("Australia/Melbourne"))
+              d=datetime.fromisoformat(os.environ["PUBLISH_DATE"]).date()
+              cutoff=time(6,45) if os.environ["SLOT"]=="0700" else time(16,20)
+              if published.date()!=d or published.time()<cutoff:
+                  raise ValueError("publish time outside valid slot window")
+          except Exception as exc:
+              print(exc)
+              sys.exit(1)
+          PY
+            then
+              VALID=true
+            fi
+          fi
+
+          if [ "$PUBLISHED" = "$MARKER" ] && [ "$VALID" = "true" ]; then
+            echo "Melbourne slot already published with valid evidence: $MARKER"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate Melbourne Reel
+        if: steps.slot.outputs.run == 'true' && (steps.slot.outputs.publish != 'true' || steps.dedupe.outputs.skip != 'true')
+        env:
+          MEOWCAST_PERIOD: ${{ steps.slot.outputs.period }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python render.py
+
+      - name: Verify generated files
+        if: steps.slot.outputs.run == 'true' && (steps.slot.outputs.publish != 'true' || steps.dedupe.outputs.skip != 'true')
+        run: |
+          test -s output/card.jpg
+          test -s output/meowcast.mp4
+          test -s output/caption.txt
+          test -s output/weather-state.json
+          ffprobe -v error -show_entries stream=codec_type,codec_name -of compact output/meowcast.mp4
+
+      - name: Upload Melbourne preview artifact
+        if: steps.slot.outputs.run == 'true' && (steps.slot.outputs.publish != 'true' || steps.dedupe.outputs.skip != 'true')
+        uses: actions/upload-artifact@v4
+        with:
+          name: melbourne-meowcast-${{ steps.slot.outputs.period }}-${{ github.run_id }}
+          path: output/
+
+      - name: Upload Melbourne Reel to public media URL
+        if: steps.slot.outputs.run == 'true' && steps.slot.outputs.publish == 'true' && steps.dedupe.outputs.skip != 'true'
+        id: media
+        env:
+          MEDIA_REPO_TOKEN: ${{ secrets.MEDIA_REPO_TOKEN }}
+          PUBLISH_DATE: ${{ steps.slot.outputs.date }}
+          SLOT: ${{ steps.slot.outputs.slot }}
+        run: |
+          test -n "$MEDIA_REPO_TOKEN" || (echo "MEDIA_REPO_TOKEN missing" && exit 1)
+          MEDIA_PATH="melbourne/reels/${PUBLISH_DATE}/meowcast-${SLOT}-${GITHUB_RUN_ID}.mp4"
+          git clone "https://x-access-token:${MEDIA_REPO_TOKEN}@github.com/audreywang9898-sudo/meowcast-media.git" /tmp/media
+          mkdir -p "/tmp/media/$(dirname "$MEDIA_PATH")"
+          cp output/meowcast.mp4 "/tmp/media/$MEDIA_PATH"
+          cd /tmp/media
+          git config user.name "meowcast-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$MEDIA_PATH"
+          git commit -m "Add Melbourne Meowcast Reel ${PUBLISH_DATE} ${SLOT} run ${GITHUB_RUN_ID}"
+          git push origin main
+          echo "url=https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/$MEDIA_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Publish Melbourne Reel to Instagram
+        if: steps.slot.outputs.run == 'true' && steps.slot.outputs.publish == 'true' && steps.dedupe.outputs.skip != 'true'
+        env:
+          IG_USER_ID: ${{ secrets.MELBOURNE_IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.MELBOURNE_IG_ACCESS_TOKEN }}
+          REEL_PUBLIC_URL: ${{ steps.media.outputs.url }}?run=${{ github.run_id }}
+        run: |
+          test -n "$IG_USER_ID" || (echo "MELBOURNE_IG_USER_ID missing" && exit 1)
+          test -n "$IG_ACCESS_TOKEN" || (echo "MELBOURNE_IG_ACCESS_TOKEN missing" && exit 1)
+          python publish_instagram.py
+
+      - name: Persist Melbourne publication state
+        if: steps.slot.outputs.run == 'true' && steps.slot.outputs.publish == 'true' && steps.dedupe.outputs.skip != 'true' && success()
+        env:
+          MEDIA_REPO_TOKEN: ${{ secrets.MEDIA_REPO_TOKEN }}
+          PUBLISH_DATE: ${{ steps.slot.outputs.date }}
+          SLOT: ${{ steps.slot.outputs.slot }}
+        run: |
+          PREFIX="latest/melbourne"
+          MARKER="${PUBLISH_DATE}-${SLOT}"
+          git clone "https://x-access-token:${MEDIA_REPO_TOKEN}@github.com/audreywang9898-sudo/meowcast-media.git" /tmp/state
+          mkdir -p "/tmp/state/$PREFIX"
+          printf "%s" "$MARKER" > "/tmp/state/$PREFIX/published-slot.txt"
+          cp output/weather-state.json "/tmp/state/$PREFIX/weather-state-${SLOT}.json"
+          PUBLISHED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          PREFIX="$PREFIX" PUBLISHED_AT="$PUBLISHED_AT" PUBLISH_DATE="$PUBLISH_DATE" SLOT="$SLOT" python - <<'PY'
+          import json, os
+          base="/tmp/state/"+os.environ["PREFIX"]
+          slot=os.environ["SLOT"]
+          candidate=json.load(open("output/weather-state.json",encoding="utf-8"))
+          rotation=f"{base}/weather-rotation-{slot}.json"
+          try:
+              state=json.load(open(rotation,encoding="utf-8"))
+          except Exception:
+              state={}
+          state[candidate["theme"]]=candidate["index"]
+          with open(rotation,"w",encoding="utf-8") as f:
+              json.dump(state,f,ensure_ascii=False,sort_keys=True)
+          evidence={
+              "city":"melbourne",
+              "date":os.environ["PUBLISH_DATE"],
+              "slot":slot,
+              "run_id":os.environ.get("GITHUB_RUN_ID"),
+              "published_at":os.environ["PUBLISHED_AT"],
+          }
+          with open(f"{base}/published-evidence-{slot}.json","w",encoding="utf-8") as f:
+              json.dump(evidence,f,ensure_ascii=False,sort_keys=True)
+          PY
+          cd /tmp/state
+          git config user.name "meowcast-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$PREFIX"
+          git commit -m "Mark Melbourne Meowcast published $MARKER"
+          git push origin main
