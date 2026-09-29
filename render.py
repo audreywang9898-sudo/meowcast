@@ -30,7 +30,7 @@ def _rotation_state(theme, date_str, period, city=None):
     """
     city=city or load_city_config()
     slot="1630" if period=="evening" else "0700"
-    prefix=city.get("media_state_prefix",f"latest/{city[\'id\']}").strip("/")
+    prefix=city.get("media_state_prefix",f"latest/{city['id']}").strip("/")
     url=f"https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/{prefix}/weather-rotation-{slot}.json"
     try:
         with urllib.request.urlopen(url,timeout=8) as r:
@@ -168,13 +168,15 @@ def add_weather_overlay(im,w,theme,event=None,city=None):
     zh_ft=font(23)
     pct_ft=font(34)
     en_ft=font(30 if w.get("period")=="evening" else 32)
-    zh_w=d.textlength(rain_zh,font=zh_ft)
+    zh_w=0 if english_only else d.textlength(rain_zh,font=zh_ft)
     pct_text=f"{w['rain']}%"
     pct_w=d.textlength(pct_text,font=pct_ft)
     en_w=d.textlength(rain_en,font=en_ft)
     gap=16
     drop_w=28
-    total=drop_w+gap+zh_w+gap+pct_w+gap+en_w
+    total=(drop_w+gap+pct_w+gap+en_w
+           if english_only
+           else drop_w+gap+zh_w+gap+pct_w+gap+en_w)
     x=540-total/2
     # Draw a real blue raindrop so CI does not depend on emoji glyph support.
     drop_cx=x+drop_w/2
@@ -193,7 +195,7 @@ def add_weather_overlay(im,w,theme,event=None,city=None):
 
 def main(period=None):
     city=load_city_config()
-    print(f"City config: {city[\'id\']} timezone={city[\'timezone\']} language={city[\'language\']}")
+    print(f"City config: {city['id']} timezone={city['timezone']} language={city['language']}")
     period=(period or os.environ.get("MEOWCAST_PERIOD","morning")).lower()
     if period not in ("morning","evening"):
         raise ValueError(f"Unsupported MEOWCAST_PERIOD: {period}")
