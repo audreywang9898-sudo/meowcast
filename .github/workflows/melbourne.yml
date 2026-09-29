@@ -80,11 +80,11 @@ jobs:
               date=datetime.now(tz).date().isoformat()
               reason=f"manual {period} preview/publish"
           elif event=="push":
-              period="morning"
-              slot="0700"
-              publish=False
+              period="evening"
+              slot="1630"
+              publish=True
               date=datetime.now(tz).date().isoformat()
-              reason="Melbourne non-publishing preview trigger"
+              reason="User-requested Melbourne evening production publish"
           else:
               if os.environ.get("MELBOURNE_PRODUCTION_ENABLED","").lower()!="true":
                   run=False
