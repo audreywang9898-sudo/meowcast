@@ -265,9 +265,23 @@ jobs:
           mkdir -p /tmp/meowcast-marker/latest
           printf "%s" "$MARKER" > /tmp/meowcast-marker/latest/published-slot.txt
           cp output/weather-state.json "/tmp/meowcast-marker/latest/weather-state-${SLOT}.json"
+          python - <<'PY'
+          import json, os
+          slot=os.environ["SLOT"]
+          latest="/tmp/meowcast-marker/latest"
+          candidate=json.load(open("output/weather-state.json",encoding="utf-8"))
+          path=f"{latest}/weather-rotation-{slot}.json"
+          try:
+              state=json.load(open(path,encoding="utf-8"))
+          except Exception:
+              state={}
+          state[candidate["theme"]]=candidate["index"]
+          with open(path,"w",encoding="utf-8") as f:
+              json.dump(state,f,ensure_ascii=False,sort_keys=True)
+          PY
           cd /tmp/meowcast-marker
           git config user.name "meowcast-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add latest/published-slot.txt "latest/weather-state-${SLOT}.json"
+          git add latest/published-slot.txt "latest/weather-state-${SLOT}.json" "latest/weather-rotation-${SLOT}.json"
           git commit -m "Mark Meowcast published $MARKER" || exit 0
           git push origin main
