@@ -19,6 +19,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install requests
+        run: pip install requests
+
       - name: Verify Melbourne Instagram credentials
         env:
           IG_USER_ID: ${{ secrets.MELBOURNE_IG_USER_ID }}
