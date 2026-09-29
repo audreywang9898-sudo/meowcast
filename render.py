@@ -63,17 +63,27 @@ def asset_for(theme,event=None,period="morning",date_str=None,city=None):
         f"{asset_prefix}/{theme}{suffix}-{idx}.jpg",
     ]
     for p in numbered:
-        if os.path.exists(p):
+        if os.path.exists(p) and os.path.getsize(p) > 1024:
             print(f"Weather artwork rotation: theme={theme} index={idx} asset={p}")
             return p, idx
 
-    # Global fail-safe: any missing numbered/weather asset falls back to sunny-1.
-    # This keeps production rendering alive even when a theme set is incomplete.
-    failsafe=[f"{asset_prefix}/sunny-1.png",f"{asset_prefix}/sunny-1.jpg"]
+    # If the selected rotation file is missing or invalid, use the next valid
+    # artwork from the same weather theme. This preserves production without
+    # replacing or modifying any source artwork.
+    for offset in range(1, 7):
+        fallback_idx=((idx - 1 + offset) % 7) + 1
+        for ext in ("png","jpg"):
+            p=f"{asset_prefix}/{theme}{suffix}-{fallback_idx}.{ext}"
+            if os.path.exists(p) and os.path.getsize(p) > 1024:
+                print(f"Requested artwork {theme}{suffix}-{idx} invalid; SAME-THEME FALLBACK={p}")
+                return p, fallback_idx
+
+    # Global fail-safe: use the first valid sunny rotation asset.
+    failsafe=[f"{asset_prefix}/sunny-{i}.{ext}" for i in range(1,8) for ext in ("png","jpg")]
     for p in failsafe:
-        if os.path.exists(p):
-            print(f"Requested artwork {theme}{suffix}-{idx} missing; GLOBAL FALLBACK={p}")
-            return p, 1
+        if os.path.exists(p) and os.path.getsize(p) > 1024:
+            print(f"Requested artwork {theme}{suffix}-{idx} unavailable; GLOBAL FALLBACK={p}")
+            return p, int(p.rsplit("-",1)[1].split(".",1)[0])
 
     # Temporary compatibility until sunny-1 itself has been added.
     legacy=[f"{asset_prefix}/sunny.png",f"{asset_prefix}/sunny.jpg"]
