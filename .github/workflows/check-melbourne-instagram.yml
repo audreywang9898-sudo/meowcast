@@ -37,7 +37,7 @@ jobs:
           if not token:
               raise SystemExit("MELBOURNE_IG_ACCESS_TOKEN is missing")
 
-          url=f"https://graph.instagram.com/v24.0/{ig}"
+          url="https://graph.instagram.com/v24.0/me"
           r=requests.get(url,params={
               "fields":"id,username",
               "access_token":token,
@@ -54,10 +54,14 @@ jobs:
               )
 
           data=r.json()
-          if str(data.get("id")) != str(ig):
-              raise SystemExit(f"Instagram ID mismatch: expected {ig}, got {data.get('id')}")
-
-          print("Melbourne Instagram connection OK")
+          print("Instagram token is valid")
           print("Instagram user id:",data.get("id"))
           print("Instagram username:",data.get("username"))
+          if str(data.get("id")) != str(ig):
+              raise SystemExit(
+                  "MELBOURNE_IG_USER_ID does not match the account authorized by the token. "
+                  f"Use this ID instead: {data.get('id')}"
+              )
+
+          print("Melbourne Instagram connection OK")
           PY
