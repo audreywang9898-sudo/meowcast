@@ -48,6 +48,30 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      - name: Validate production weather artwork
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          failures=[]
+          for p in sorted(Path("asset/taipei").glob("*.png")):
+              # Rotating weather artwork only; festival/UI assets are checked by render when selected.
+              if not any(p.name.startswith(x) for x in ("sunny-","cloudy-","rainy-","sunny_evening-","cloudy_evening-","rainy_evening-")):
+                  continue
+              try:
+                  if p.stat().st_size <= 1024:
+                      raise ValueError(f"file too small ({p.stat().st_size} bytes)")
+                  with Image.open(p) as im:
+                      im.verify()
+              except Exception as exc:
+                  failures.append(f"{p}: {exc}")
+          if failures:
+              print("WARNING: invalid rotating artwork found; render.py will skip these files:")
+              print("\\n".join(failures))
+          else:
+              print("All rotating Taipei weather artwork is valid.")
+          PY
+
       - name: Check schedule config
         id: schedule
         env:
