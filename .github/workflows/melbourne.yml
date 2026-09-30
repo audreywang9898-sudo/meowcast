@@ -80,15 +80,15 @@ jobs:
               date=datetime.now(tz).date().isoformat()
               reason=f"manual {period} preview/publish"
           elif event=="push":
-              period="morning"
-              slot="0700"
               try:
                   trigger=open(".github/trigger-melbourne-preview",encoding="utf-8").read()
               except FileNotFoundError:
                   trigger=""
+              period="evening" if "evening" in trigger else "morning"
+              slot="1630" if period=="evening" else "0700"
               publish="force-publish" in trigger
               date=datetime.now(tz).date().isoformat()
-              reason="Melbourne forced production publish trigger" if publish else "Melbourne non-publishing preview trigger"
+              reason=f"Melbourne forced {period} production publish trigger" if publish else f"Melbourne non-publishing {period} preview trigger"
           else:
               if os.environ.get("MELBOURNE_PRODUCTION_ENABLED","").lower()!="true":
                   run=False
