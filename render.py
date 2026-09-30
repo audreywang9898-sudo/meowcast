@@ -24,9 +24,7 @@ def fallback(theme):
 
 def _available_artwork_indices(asset_prefix, theme, suffix=""):
     """Return sorted valid artwork indices that actually exist on disk."""
-    directory=os.path.dirname(f"{asset_prefix}/x") or "."
-    basename=os.path.basename(asset_prefix)
-    directory=os.path.join(directory,basename) if basename else directory
+    directory=asset_prefix or "."
     if not os.path.isdir(directory):
         return []
     pattern=re.compile(rf"^{re.escape(theme+suffix)}-(\\d+)\\.(?:png|jpg)$",re.IGNORECASE)
