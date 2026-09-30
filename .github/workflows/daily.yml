@@ -122,7 +122,12 @@ jobs:
                       # date must come from the cron's intended UTC day, not the
                       # runner's delayed Taipei wall clock. 23:xx UTC belongs to
                       # the following Taipei calendar day.
-                      intended_date=(now_utc.date()+timedelta(days=1)).isoformat()
+                      # Resolve the most recent occurrence of this cron, even after midnight UTC.
+                      hour,minute=map(int,trigger.split()[:2])
+                      intended_utc=now_utc.replace(hour=minute,minute=hour,second=0,microsecond=0)
+                      if intended_utc>now_utc:
+                          intended_utc-=timedelta(days=1)
+                      intended_date=intended_utc.astimezone(tz).date().isoformat()
                   elif trigger in evening:
                       run=True; slot="1630"; reason=f"evening cron trigger: {trigger}"
                       # 08:30-09:00 UTC belongs to the same Taipei calendar day.
