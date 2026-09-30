@@ -1,4 +1,4 @@
-import os, subprocess, json, urllib.request
+import os, subprocess, json, urllib.request, re
 from datetime import datetime
 from PIL import Image,ImageDraw,ImageFont
 from weather import get_weather, get_evening_weather
@@ -22,13 +22,35 @@ def fallback(theme):
     d.text((330,1120),"MEOW",font=font(100),fill="white")
     return im
 
-def _rotation_state(theme, date_str, period, city=None):
-    """Return the next independent artwork index (1..7) for this weather theme.
+def _available_artwork_indices(asset_prefix, theme, suffix=""):
+    """Return sorted valid artwork indices that actually exist on disk."""
+    directory=os.path.dirname(f"{asset_prefix}/x") or "."
+    basename=os.path.basename(asset_prefix)
+    directory=os.path.join(directory,basename) if basename else directory
+    if not os.path.isdir(directory):
+        return []
+    pattern=re.compile(rf"^{re.escape(theme+suffix)}-(\\d+)\\.(?:png|jpg)$",re.IGNORECASE)
+    indices=set()
+    for name in os.listdir(directory):
+        match=pattern.match(name)
+        if not match:
+            continue
+        path=os.path.join(directory,name)
+        try:
+            if os.path.getsize(path)>1024:
+                indices.add(int(match.group(1)))
+        except OSError:
+            pass
+    return sorted(indices)
+
+def _rotation_state(theme, date_str, period, city=None, available_indices=None):
+    """Return the next artwork index from the files that actually exist.
 
     Morning/evening and sunny/cloudy/rainy each keep their own cursor. The
     cursor advances only after a successful Instagram publish.
     """
     city=city or load_city_config()
+    available_indices=sorted(set(available_indices or [1]))
     slot="1630" if period=="evening" else "0700"
     prefix=city.get("media_state_prefix",f"latest/{city['id']}").strip("/")
     url=f"https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/{prefix}/weather-rotation-{slot}.json"
@@ -36,10 +58,16 @@ def _rotation_state(theme, date_str, period, city=None):
         with urllib.request.urlopen(url,timeout=8) as r:
             state=json.load(r)
         prev_idx=int(state.get(theme,0))
-        return (prev_idx % 7)+1
+        if prev_idx in available_indices:
+            pos=available_indices.index(prev_idx)
+            return available_indices[(pos+1)%len(available_indices)]
+        for idx in available_indices:
+            if idx>prev_idx:
+                return idx
+        return available_indices[0]
     except Exception as e:
-        print("Weather rotation state unavailable; starting at 1:",e)
-        return 1
+        print(f"Weather rotation state unavailable; starting at {available_indices[0]}:",e)
+        return available_indices[0]
 
 def asset_for(theme,event=None,period="morning",date_str=None,city=None):
     city=city or load_city_config()
@@ -55,35 +83,48 @@ def asset_for(theme,event=None,period="morning",date_str=None,city=None):
             if os.path.exists(p): return p, None
 
     suffix="_evening" if period=="evening" else ""
-    idx=_rotation_state(theme,date_str,period,city=city) if date_str else 1
-    # Preferred names: sunny-1.png ... sunny-7.png.
-    # Evening can independently use sunny_evening-1.png ... sunny_evening-7.png.
-    numbered=[
-        f"{asset_prefix}/{theme}{suffix}-{idx}.png",
-        f"{asset_prefix}/{theme}{suffix}-{idx}.jpg",
-    ]
-    for p in numbered:
-        if os.path.exists(p) and os.path.getsize(p) > 1024:
-            print(f"Weather artwork rotation: theme={theme} index={idx} asset={p}")
-            return p, idx
-
-    # If the selected rotation file is missing or invalid, use the next valid
-    # artwork from the same weather theme. This preserves production without
-    # replacing or modifying any source artwork.
-    for offset in range(1, 7):
-        fallback_idx=((idx - 1 + offset) % 7) + 1
+    available=_available_artwork_indices(asset_prefix,theme,suffix)
+    if available:
+        idx=_rotation_state(
+            theme,date_str,period,city=city,available_indices=available
+        ) if date_str else available[0]
+        print(f"Available artwork indices: theme={theme}{suffix} indices={available}")
         for ext in ("png","jpg"):
-            p=f"{asset_prefix}/{theme}{suffix}-{fallback_idx}.{ext}"
-            if os.path.exists(p) and os.path.getsize(p) > 1024:
-                print(f"Requested artwork {theme}{suffix}-{idx} invalid; SAME-THEME FALLBACK={p}")
+            p=f"{asset_prefix}/{theme}{suffix}-{idx}.{ext}"
+            if os.path.exists(p) and os.path.getsize(p)>1024:
+                print(f"Weather artwork rotation: theme={theme} index={idx} asset={p}")
+                return p, idx
+
+        # Extremely defensive: if the selected file disappears between scan
+        # and open, stay inside the same theme and period.
+        for fallback_idx in available:
+            for ext in ("png","jpg"):
+                p=f"{asset_prefix}/{theme}{suffix}-{fallback_idx}.{ext}"
+                if os.path.exists(p) and os.path.getsize(p)>1024:
+                    print(f"Selected artwork vanished; SAME-THEME FALLBACK={p}")
+                    return p, fallback_idx
+    else:
+        idx=1
+        print(f"No valid artwork found for theme={theme}{suffix}")
+
+    # Global fail-safe prefers sunny artwork from the same period.
+    sunny_available=_available_artwork_indices(asset_prefix,"sunny",suffix)
+    for fallback_idx in sunny_available:
+        for ext in ("png","jpg"):
+            p=f"{asset_prefix}/sunny{suffix}-{fallback_idx}.{ext}"
+            if os.path.exists(p) and os.path.getsize(p)>1024:
+                print(f"Requested artwork {theme}{suffix}-{idx} unavailable; GLOBAL FALLBACK={p}")
                 return p, fallback_idx
 
-    # Global fail-safe: use the first valid sunny rotation asset.
-    failsafe=[f"{asset_prefix}/sunny-{i}.{ext}" for i in range(1,8) for ext in ("png","jpg")]
-    for p in failsafe:
-        if os.path.exists(p) and os.path.getsize(p) > 1024:
-            print(f"Requested artwork {theme}{suffix}-{idx} unavailable; GLOBAL FALLBACK={p}")
-            return p, int(p.rsplit("-",1)[1].split(".",1)[0])
+    # Last-resort compatibility: if an evening set is entirely absent, allow a
+    # valid daytime sunny asset rather than failing the production render.
+    if suffix:
+        for fallback_idx in _available_artwork_indices(asset_prefix,"sunny",""):
+            for ext in ("png","jpg"):
+                p=f"{asset_prefix}/sunny-{fallback_idx}.{ext}"
+                if os.path.exists(p) and os.path.getsize(p)>1024:
+                    print(f"Evening artwork unavailable; DAYTIME SUNNY FALLBACK={p}")
+                    return p, fallback_idx
 
     # Temporary compatibility until sunny-1 itself has been added.
     legacy=[f"{asset_prefix}/sunny.png",f"{asset_prefix}/sunny.jpg"]
