@@ -133,7 +133,11 @@ jobs:
                       # 08:30-09:00 UTC belongs to the same Taipei calendar day.
                       # Keeping the UTC calendar date prevents a delayed evening
                       # run after Taipei midnight from becoming tomorrow's slot.
-                      intended_date=now_utc.date().isoformat()
+                      minute,hour=map(int,trigger.split()[:2])
+                      intended_utc=now_utc.replace(hour=hour,minute=minute,second=0,microsecond=0)
+                      if intended_utc>now_utc:
+                          intended_utc-=timedelta(days=1)
+                      intended_date=intended_utc.astimezone(tz).date().isoformat()
                   else:
                       run=False; reason=f"unknown schedule trigger: {trigger!r}"
 
@@ -192,11 +196,6 @@ jobs:
         run: |
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "${{ inputs.republish }}" = "true" ]; then
             echo "Explicit one-time manual republish requested; bypassing slot dedupe for this run only."
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          if [ "$GITHUB_EVENT_NAME" = "push" ] && grep -q "force-republish" .github/trigger-meowcast-evening 2>/dev/null; then
-            echo "Explicit one-time production republish trigger; bypassing slot dedupe for this run only."
             echo "skip=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
