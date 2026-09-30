@@ -27,7 +27,7 @@ def _available_artwork_indices(asset_prefix, theme, suffix=""):
     directory=asset_prefix or "."
     if not os.path.isdir(directory):
         return []
-    pattern=re.compile(rf"^{re.escape(theme+suffix)}-(\\d+)\\.(?:png|jpg)$",re.IGNORECASE)
+    pattern=re.compile(rf"^{re.escape(theme+suffix)}-(\d+)\.(?:png|jpg)$",re.IGNORECASE)
     indices=set()
     for name in os.listdir(directory):
         match=pattern.match(name)
