@@ -123,8 +123,8 @@ jobs:
                       # runner's delayed Taipei wall clock. 23:xx UTC belongs to
                       # the following Taipei calendar day.
                       # Resolve the most recent occurrence of this cron, even after midnight UTC.
-                      hour,minute=map(int,trigger.split()[:2])
-                      intended_utc=now_utc.replace(hour=minute,minute=hour,second=0,microsecond=0)
+                      minute,hour=map(int,trigger.split()[:2])
+                      intended_utc=now_utc.replace(hour=hour,minute=minute,second=0,microsecond=0)
                       if intended_utc>now_utc:
                           intended_utc-=timedelta(days=1)
                       intended_date=intended_utc.astimezone(tz).date().isoformat()
