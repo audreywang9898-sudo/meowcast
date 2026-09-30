@@ -53,6 +53,21 @@ jobs:
           assert t=="cloudy" and "Melbourne Cat" in cap and "台北" not in cap
           print("Melbourne caption OK")
           PY
+      - name: Melbourne dynamic artwork rotation smoke test
+        env:
+          CITY: melbourne
+        run: |
+          python - <<'PY'
+          from city_config import load_city_config
+          from render import _available_artwork_indices
+          c=load_city_config()
+          prefix=c["asset_prefix"]
+          expected=[1,2]
+          for theme in ("sunny","cloudy","rainy"):
+              assert _available_artwork_indices(prefix,theme,"")==expected, (theme,_available_artwork_indices(prefix,theme,""))
+              assert _available_artwork_indices(prefix,theme,"_evening")==expected, (theme+"_evening",_available_artwork_indices(prefix,theme,"_evening"))
+          print("Melbourne dynamic artwork rotation assets OK")
+          PY
       - name: Fetch live Melbourne weather
         env:
           CITY: melbourne
