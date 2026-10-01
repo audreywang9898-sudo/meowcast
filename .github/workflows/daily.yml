@@ -352,6 +352,14 @@ jobs:
           PUBLISH_DATE: ${{ steps.schedule.outputs.date }}
           SLOT: ${{ steps.schedule.outputs.slot }}
         run: |
+          # A successful workflow is insufficient: require this run's Meta receipt.
+          python - <<'PY'
+          import json, os
+          result=json.load(open("output/publish-result.json",encoding="utf-8"))
+          expected="taipei"
+          if result.get("status")!="published" or not result.get("media_id") or not result.get("container_id") or result.get("city")!=expected or result.get("run_id")!=os.environ.get("GITHUB_RUN_ID"):
+              raise SystemExit("Missing or invalid Meta publication receipt; refusing success marker")
+          PY
           MARKER="${PUBLISH_DATE}-${SLOT}"
           git clone "https://x-access-token:${MEDIA_REPO_TOKEN}@github.com/audreywang9898-sudo/meowcast-media.git" /tmp/meowcast-marker
           mkdir -p /tmp/meowcast-marker/latest
@@ -372,7 +380,11 @@ jobs:
           with open(path,"w",encoding="utf-8") as f:
               json.dump(state,f,ensure_ascii=False,sort_keys=True)
 
+          receipt=json.load(open("output/publish-result.json",encoding="utf-8"))
           evidence={
+              "media_id":receipt["media_id"],
+              "container_id":receipt["container_id"],
+              "status":"published",
               "date": os.environ["PUBLISH_DATE"],
               "slot": slot,
               "run_id": os.environ.get("GITHUB_RUN_ID"),
