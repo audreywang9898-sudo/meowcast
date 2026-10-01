@@ -38,6 +38,15 @@ jobs:
           assert t=="sunny" and "Taipei Cat" in cap and "台北" in cap
           print("Taipei caption OK")
           PY
+      - name: Weather artwork classification regression test
+        run: |
+          python - <<'PY'
+          from caption import theme
+          assert theme({"code":2,"rain":53,"high":34})=="cloudy"
+          assert theme({"code":0,"rain":80,"high":34})=="sunny"
+          assert theme({"code":51,"rain":20,"high":28})=="rainy"
+          print("Artwork condition classification OK")
+          PY
       - name: Melbourne config and caption smoke test
         env:
           CITY: melbourne
@@ -62,7 +71,7 @@ jobs:
           from render import _available_artwork_indices
           c=load_city_config()
           prefix=c["asset_prefix"]
-          expected=[1,2]
+          expected=list(range(1,8))
           for theme in ("sunny","cloudy","rainy"):
               assert _available_artwork_indices(prefix,theme,"")==expected, (theme,_available_artwork_indices(prefix,theme,""))
               assert _available_artwork_indices(prefix,theme,"_evening")==expected, (theme+"_evening",_available_artwork_indices(prefix,theme,"_evening"))
