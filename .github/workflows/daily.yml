@@ -12,6 +12,12 @@ on:
     - cron: '0 9 * * *'     # 17:00 final GitHub self-guard
   workflow_dispatch:
     inputs:
+      period:
+        description: 'Edition to publish; auto selects the current local shift'
+        required: true
+        default: auto
+        type: choice
+        options: [auto, morning, evening]
       republish:
         description: 'Explicit one-time republish; bypass slot dedupe only for manual dispatch'
         required: false
@@ -76,6 +82,7 @@ jobs:
         id: schedule
         env:
           TRIGGER_SCHEDULE: ${{ github.event.schedule }}
+          MANUAL_PERIOD: ${{ inputs.period }}
         run: |
           python - <<'PY'
           import json, os
@@ -91,7 +98,13 @@ jobs:
           slot="manual"
           reason="manual run"
 
-          if event=="push":
+          if event=="workflow_dispatch":
+              period=os.environ.get("MANUAL_PERIOD","auto")
+              if period=="auto":
+                  period="evening" if now.hour>=16 else "morning"
+              slot="1630" if period=="evening" else "0700"
+              reason=f"manual {period} production publish"
+          elif event=="push":
               # Production recovery: workflow-file pushes default to evening; trigger marker can select morning.
               # This also gives the guard a second recovery path if a trigger-file push is not dispatched.
               
@@ -210,6 +223,12 @@ jobs:
           EVIDENCE_URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-evidence-${SLOT}.json?ts=${GITHUB_RUN_ID}"
           PUBLISHED=$(curl -fsSL "$URL" || true)
           VALID_EVIDENCE=false
+          # Compatibility with morning manual runs made before slot normalization.
+          # Their evidence must still pass the same date/time checks below.
+          if [ "$SLOT" = "0700" ] && [ "$PUBLISHED" = "${PUBLISH_DATE}-manual" ]; then
+            MARKER="$PUBLISHED"
+            EVIDENCE_URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-evidence-manual.json?ts=${GITHUB_RUN_ID}"
+          fi
           if [ "$PUBLISHED" = "$MARKER" ] && curl -fsSL "$EVIDENCE_URL" -o /tmp/published-evidence.json; then
             if PUBLISH_DATE="$PUBLISH_DATE" SLOT="$SLOT" python - <<'PY'
           import json, os, sys
@@ -218,7 +237,7 @@ jobs:
 
           try:
               e=json.load(open("/tmp/published-evidence.json",encoding="utf-8"))
-              if e.get("date") != os.environ["PUBLISH_DATE"] or e.get("slot") != os.environ["SLOT"]:
+              if e.get("date") != os.environ["PUBLISH_DATE"] or e.get("slot") not in ({os.environ["SLOT"], "manual"} if os.environ["SLOT"]=="0700" else {os.environ["SLOT"]}):
                   raise ValueError("date/slot mismatch")
               published=datetime.fromisoformat(e["published_at"].replace("Z","+00:00")).astimezone(ZoneInfo("Asia/Taipei"))
               d=datetime.fromisoformat(os.environ["PUBLISH_DATE"]).date()
