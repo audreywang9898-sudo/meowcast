@@ -1,4 +1,5 @@
 import os,time,requests,json
+from pathlib import Path
 
 API="https://graph.instagram.com/v24.0"
 
@@ -11,8 +12,7 @@ def fail(r,label):
 def publish_reel(video_url,caption):
     ig=os.environ.get("IG_USER_ID"); token=os.environ.get("IG_ACCESS_TOKEN")
     if not ig or not token:
-        print("IG publishing skipped: missing GitHub secrets.")
-        return
+        raise RuntimeError("IG publishing failed: missing GitHub secrets.")
     base=f"{API}/{ig}"
     r=requests.post(base+"/media",data={"media_type":"REELS","video_url":video_url,"caption":caption,"share_to_feed":"true","access_token":token},timeout=60)
     fail(r,"Create Reel container")
@@ -30,8 +30,17 @@ def publish_reel(video_url,caption):
     for attempt in range(1,6):
         r=requests.post(base+"/media_publish",data={"creation_id":cid,"access_token":token},timeout=60)
         if r.ok:
-            print("Published:",r.json())
-            return
+            published=r.json()
+            media_id=published.get("id")
+            if not media_id:
+                raise RuntimeError("Meta publish response has no media ID; publication is unconfirmed")
+            receipt={"city":os.environ.get("CITY","taipei"),"container_id":cid,"media_id":str(media_id),"status":"published","run_id":os.environ.get("GITHUB_RUN_ID")}
+            out=Path("output"); out.mkdir(exist_ok=True)
+            temporary=out/"publish-result.json.tmp"
+            temporary.write_text(json.dumps(receipt,ensure_ascii=False),encoding="utf-8")
+            temporary.replace(out/"publish-result.json")
+            print("Published:",published)
+            return receipt
         try:
             detail=r.json()
         except Exception:
@@ -46,6 +55,8 @@ def publish_reel(video_url,caption):
         fail(r,"Publish Reel")
 
 if __name__=="__main__":
+    # Never accept a stale receipt from a prior local invocation.
+    Path("output/publish-result.json").unlink(missing_ok=True)
     url=os.environ.get("REEL_PUBLIC_URL")
     if not url: raise SystemExit("REEL_PUBLIC_URL missing")
     publish_reel(url,open("output/caption.txt",encoding="utf-8").read())
