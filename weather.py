@@ -1,6 +1,7 @@
 import os
 import time
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import requests
 
@@ -118,19 +119,27 @@ def get_weather(city=None):
     if not rows:
         raise RuntimeError(f"No {start_hour:02d}:00-{end_hour:02d}:00 hourly forecast returned by Open-Meteo")
 
-    counts={}
-    for row in rows:
-        counts[row[3]]=counts.get(row[3],0)+1
-    representative_code=min(counts, key=lambda code: (-counts[code], code))
+    # Artwork should reflect the sky around publication time, not the worst
+    # precipitation probability later in the day. Keep the full-day maximum
+    # rain chance as an informational number on the card.
+    local_hour=datetime.now(ZoneInfo(city["timezone"])).hour
+    target_hour=min(max(local_hour,start_hour),end_hour)
+    condition_row=min(
+        rows,
+        key=lambda row: abs(datetime.fromisoformat(row[0]).hour-target_hour),
+    )
     print(
         f"{city['display_name']} morning hourly weather codes:",
         [(datetime.fromisoformat(r[0]).hour, r[3]) for r in rows],
     )
-    print("Morning representative weather code:",representative_code,"counts:",counts)
+    print(
+        "Morning artwork condition:",
+        f"publish_hour={local_hour} target_hour={target_hour} code={condition_row[3]}",
+    )
 
     return {
         "date":rows[0][0][:10],
-        "code":representative_code,
+        "code":condition_row[3],
         "high":round(max(row[1] for row in rows)),
         "low":round(min(row[1] for row in rows)),
         "rain":max(row[2] for row in rows),
