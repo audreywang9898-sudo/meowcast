@@ -26,15 +26,25 @@ on:
         default: false
         type: boolean
   schedule:
-    # GitHub supports IANA timezone-aware schedules. Keep Melbourne wall-clock
-    # times stable across AEST/AEDT instead of maintaining duplicate UTC crons.
-    - cron: '1 7 * * *'
+    # Keep Melbourne wall-clock times stable across AEST/AEDT.
+    # Avoid :00/:01 and use multiple deduped recovery triggers.
+    - cron: '7 7 * * *'
       timezone: 'Australia/Melbourne'
-    - cron: '11 7 * * *'
+    - cron: '17 7 * * *'
+      timezone: 'Australia/Melbourne'
+    - cron: '27 7 * * *'
+      timezone: 'Australia/Melbourne'
+    - cron: '37 7 * * *'
+      timezone: 'Australia/Melbourne'
+    - cron: '7 8 * * *'
       timezone: 'Australia/Melbourne'
     - cron: '30 16 * * *'
       timezone: 'Australia/Melbourne'
     - cron: '40 16 * * *'
+      timezone: 'Australia/Melbourne'
+    - cron: '50 16 * * *'
+      timezone: 'Australia/Melbourne'
+    - cron: '7 17 * * *'
       timezone: 'Australia/Melbourne'
 
 permissions:
@@ -97,8 +107,8 @@ jobs:
                   trigger=os.environ.get("TRIGGER_SCHEDULE","").strip()
                   now=datetime.now(tz)
                   date=now.date().isoformat()
-                  morning={"1 7 * * *","11 7 * * *"}
-                  evening={"30 16 * * *","40 16 * * *"}
+                  morning={"7 7 * * *","17 7 * * *","27 7 * * *","37 7 * * *","7 8 * * *"}
+                  evening={"30 16 * * *","40 16 * * *","50 16 * * *","7 17 * * *"}
                   if trigger in morning:
                       period="morning"; slot="0700"; publish=True
                       reason=f"Melbourne morning local-time cron: {trigger}"
