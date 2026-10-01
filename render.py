@@ -22,8 +22,21 @@ def fallback(theme):
     d.text((330,1120),"MEOW",font=font(100),fill="white")
     return im
 
+def _valid_artwork_file(path):
+    """Return True only for a non-trivial image Pillow can actually decode."""
+    try:
+        if not os.path.isfile(path) or os.path.getsize(path)<=1024:
+            return False
+        with Image.open(path) as im:
+            im.verify()
+        return True
+    except Exception as exc:
+        print(f"Skipping invalid artwork {path}: {exc}")
+        return False
+
+
 def _available_artwork_indices(asset_prefix, theme, suffix=""):
-    """Return sorted valid artwork indices that actually exist on disk."""
+    """Return sorted decodable artwork indices that actually exist on disk."""
     directory=asset_prefix or "."
     if not os.path.isdir(directory):
         return []
@@ -34,11 +47,8 @@ def _available_artwork_indices(asset_prefix, theme, suffix=""):
         if not match:
             continue
         path=os.path.join(directory,name)
-        try:
-            if os.path.getsize(path)>1024:
-                indices.add(int(match.group(1)))
-        except OSError:
-            pass
+        if _valid_artwork_file(path):
+            indices.add(int(match.group(1)))
     return sorted(indices)
 
 def _rotation_state(theme, date_str, period, city=None, available_indices=None):
@@ -78,7 +88,7 @@ def asset_for(theme,event=None,period="morning",date_str=None,city=None):
         if configured: special.append(f"{asset_prefix}/{configured}")
         if key: special.extend([f"{asset_prefix}/{key}.png", f"{asset_prefix}/{key}.jpg"])
         for p in special:
-            if os.path.exists(p): return p, None
+            if _valid_artwork_file(p): return p, None
 
     suffix="_evening" if period=="evening" else ""
     available=_available_artwork_indices(asset_prefix,theme,suffix)
@@ -89,7 +99,7 @@ def asset_for(theme,event=None,period="morning",date_str=None,city=None):
         print(f"Available artwork indices: theme={theme}{suffix} indices={available}")
         for ext in ("png","jpg"):
             p=f"{asset_prefix}/{theme}{suffix}-{idx}.{ext}"
-            if os.path.exists(p) and os.path.getsize(p)>1024:
+            if _valid_artwork_file(p):
                 print(f"Weather artwork rotation: theme={theme} index={idx} asset={p}")
                 return p, idx
 
@@ -98,7 +108,7 @@ def asset_for(theme,event=None,period="morning",date_str=None,city=None):
         for fallback_idx in available:
             for ext in ("png","jpg"):
                 p=f"{asset_prefix}/{theme}{suffix}-{fallback_idx}.{ext}"
-                if os.path.exists(p) and os.path.getsize(p)>1024:
+                if _valid_artwork_file(p):
                     print(f"Selected artwork vanished; SAME-THEME FALLBACK={p}")
                     return p, fallback_idx
     else:
@@ -110,7 +120,7 @@ def asset_for(theme,event=None,period="morning",date_str=None,city=None):
     for fallback_idx in sunny_available:
         for ext in ("png","jpg"):
             p=f"{asset_prefix}/sunny{suffix}-{fallback_idx}.{ext}"
-            if os.path.exists(p) and os.path.getsize(p)>1024:
+            if _valid_artwork_file(p):
                 print(f"Requested artwork {theme}{suffix}-{idx} unavailable; GLOBAL FALLBACK={p}")
                 return p, fallback_idx
 
@@ -120,14 +130,14 @@ def asset_for(theme,event=None,period="morning",date_str=None,city=None):
         for fallback_idx in _available_artwork_indices(asset_prefix,"sunny",""):
             for ext in ("png","jpg"):
                 p=f"{asset_prefix}/sunny-{fallback_idx}.{ext}"
-                if os.path.exists(p) and os.path.getsize(p)>1024:
+                if _valid_artwork_file(p):
                     print(f"Evening artwork unavailable; DAYTIME SUNNY FALLBACK={p}")
                     return p, fallback_idx
 
     # Temporary compatibility until sunny-1 itself has been added.
     legacy=[f"{asset_prefix}/sunny.png",f"{asset_prefix}/sunny.jpg"]
     for p in legacy:
-        if os.path.exists(p):
+        if _valid_artwork_file(p):
             print(f"WARNING: sunny-1 missing; temporary legacy fallback={p}")
             return p, 1
     return None, 1
