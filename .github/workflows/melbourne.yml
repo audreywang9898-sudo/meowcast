@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - '.github/trigger-melbourne-preview'
-      - '.github/workflows/melbourne.yml'
   workflow_dispatch:
     inputs:
       period:
@@ -63,7 +62,7 @@ jobs:
         run: |
           python - <<'PY'
           import os
-          from datetime import datetime, timezone
+          from datetime import datetime, timedelta, timezone
           from zoneinfo import ZoneInfo
 
           event=os.environ.get("GITHUB_EVENT_NAME","")
@@ -109,6 +108,13 @@ jobs:
                   else:
                       run=False
                       reason=f"unknown Melbourne schedule trigger: {trigger!r}"
+                  if run:
+                      # Resolve the intended local cron date when a runner starts after midnight.
+                      minute,hour=map(int,trigger.split()[:2])
+                      intended=now.replace(hour=hour,minute=minute,second=0,microsecond=0)
+                      if intended>now:
+                          intended-=timedelta(days=1)
+                      date=intended.date().isoformat()
 
           print(reason)
           print(f"run={run} publish={publish} date={date} period={period} slot={slot}")
@@ -119,6 +125,12 @@ jobs:
               out.write(f"period={period}\n")
               out.write(f"slot={slot}\n")
           PY
+
+      - name: Reject unknown scheduled trigger
+        if: github.event_name == 'schedule' && steps.slot.outputs.run != 'true'
+        run: |
+          echo "ERROR: Melbourne schedule did not resolve to a production slot."
+          exit 1
 
       - uses: actions/setup-python@v5
         if: steps.slot.outputs.run == 'true'
