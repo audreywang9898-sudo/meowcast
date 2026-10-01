@@ -23,10 +23,16 @@ def load_config():
 
 
 def theme(w):
-    """Primary sky condition only; temperature is a separate label."""
-    if w["rain"] >= 50 or w["code"] >= 51:
+    """Choose artwork from the actual forecast condition code.
+
+    Rain probability stays informational and must not force rainy artwork.
+    WMO 0-1 = clear/mainly clear, 2-3/45/48 = cloudy/fog,
+    and precipitation codes 51+ use rainy artwork.
+    """
+    code=int(w["code"])
+    if code >= 51:
         return "rainy"
-    if w["code"] in (0, 1, 2):
+    if code in (0, 1):
         return "sunny"
     return "cloudy"
 
