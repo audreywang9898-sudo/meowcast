@@ -1,15 +1,17 @@
 name: Daily Meowcast
 on:
   schedule:
-    # 23:00 UTC = 07:00 Asia/Taipei; 08:30 UTC = 16:30 Asia/Taipei
-    # Primary + recovery triggers. Dedupe makes recovery runs safe.
-    - cron: '1 23 * * *'   # 07:01 Taipei primary
-    - cron: '11 23 * * *'  # 07:11 recovery
-    - cron: '21 23 * * *'  # 07:21 recovery
+    # Avoid :00/:01 where GitHub Actions scheduled-event load is highest.
+    # Multiple recovery triggers are safe because publication evidence dedupes each slot.
+    - cron: '7 23 * * *'   # 07:07 Taipei primary
+    - cron: '17 23 * * *'  # 07:17 recovery
+    - cron: '27 23 * * *'  # 07:27 recovery
+    - cron: '37 23 * * *'  # 07:37 recovery
+    - cron: '7 0 * * *'    # 08:07 final morning self-guard
     - cron: '30 8 * * *'   # 16:30 Taipei primary
     - cron: '40 8 * * *'   # 16:40 recovery
     - cron: '50 8 * * *'   # 16:50 recovery
-    - cron: '0 9 * * *'     # 17:00 final GitHub self-guard
+    - cron: '7 9 * * *'    # 17:07 final evening self-guard
   workflow_dispatch:
     inputs:
       period:
@@ -127,8 +129,8 @@ jobs:
                   # Identify the intended slot from the cron expression that fired.
                   # Do NOT infer it from wall-clock start time: GitHub schedule jobs can be delayed.
                   trigger=os.environ.get("TRIGGER_SCHEDULE","").strip()
-                  morning={"1 23 * * *","11 23 * * *","21 23 * * *"}
-                  evening={"30 8 * * *","40 8 * * *","50 8 * * *","0 9 * * *"}
+                  morning={"7 23 * * *","17 23 * * *","27 23 * * *","37 23 * * *","7 0 * * *"}
+                  evening={"30 8 * * *","40 8 * * *","50 8 * * *","7 9 * * *"}
                   if trigger in morning:
                       run=True; slot="0700"; reason=f"morning cron trigger: {trigger}"
                       # GitHub Actions cron may start many hours late. The publish
