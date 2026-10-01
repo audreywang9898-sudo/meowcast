@@ -254,6 +254,14 @@ jobs:
           PUBLISH_DATE: ${{ steps.slot.outputs.date }}
           SLOT: ${{ steps.slot.outputs.slot }}
         run: |
+          # A successful workflow is insufficient: require this run's Meta receipt.
+          python - <<'PY'
+          import json, os
+          result=json.load(open("output/publish-result.json",encoding="utf-8"))
+          expected="melbourne"
+          if result.get("status")!="published" or not result.get("media_id") or not result.get("container_id") or result.get("city")!=expected or result.get("run_id")!=os.environ.get("GITHUB_RUN_ID"):
+              raise SystemExit("Missing or invalid Meta publication receipt; refusing success marker")
+          PY
           PREFIX="latest/melbourne"
           MARKER="${PUBLISH_DATE}-${SLOT}"
           git clone "https://x-access-token:${MEDIA_REPO_TOKEN}@github.com/audreywang9898-sudo/meowcast-media.git" /tmp/state
@@ -274,7 +282,11 @@ jobs:
           state[candidate["theme"]]=candidate["index"]
           with open(rotation,"w",encoding="utf-8") as f:
               json.dump(state,f,ensure_ascii=False,sort_keys=True)
+          receipt=json.load(open("output/publish-result.json",encoding="utf-8"))
           evidence={
+              "media_id":receipt["media_id"],
+              "container_id":receipt["container_id"],
+              "status":"published",
               "city":"melbourne",
               "date":os.environ["PUBLISH_DATE"],
               "slot":slot,
