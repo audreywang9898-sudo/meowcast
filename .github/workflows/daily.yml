@@ -97,6 +97,7 @@ jobs:
           now=datetime.now(tz)
           now_utc=datetime.now(timezone.utc)
           run=True
+          valid=True
           slot="manual"
           reason="manual run"
 
@@ -130,6 +131,7 @@ jobs:
                   # Do NOT infer it from wall-clock start time: GitHub schedule jobs can be delayed.
                   trigger=os.environ.get("TRIGGER_SCHEDULE","").strip()
                   morning={"7 23 * * *","17 23 * * *","27 23 * * *","37 23 * * *","7 0 * * *"}
+                  evening_probe={"30 5 * * *","30 6 * * *","30 7 * * *"}
                   evening={"30 8 * * *","40 8 * * *","50 8 * * *","7 9 * * *"}
                   if trigger in morning:
                       run=True; slot="0700"; reason=f"morning cron trigger: {trigger}"
@@ -143,8 +145,12 @@ jobs:
                       if intended_utc>now_utc:
                           intended_utc-=timedelta(days=1)
                       intended_date=intended_utc.astimezone(tz).date().isoformat()
-                  elif trigger in evening:
-                      run=True; slot="1630"; reason=f"evening cron trigger: {trigger}"
+                  elif trigger in evening_probe or trigger in evening:
+                      slot="1630"
+                      if trigger in evening_probe and (now.hour, now.minute) < (16,25):
+                          run=False; reason=f"early evening recovery probe exited safely: {trigger}"
+                      else:
+                          run=True; reason=f"evening cron trigger: {trigger}"
                       # 08:30-09:00 UTC belongs to the same Taipei calendar day.
                       # Keeping the UTC calendar date prevents a delayed evening
                       # run after Taipei midnight from becoming tomorrow's slot.
@@ -154,13 +160,14 @@ jobs:
                           intended_utc-=timedelta(days=1)
                       intended_date=intended_utc.astimezone(tz).date().isoformat()
                   else:
-                      run=False; reason=f"unknown schedule trigger: {trigger!r}"
+                      run=False; valid=False; reason=f"unknown schedule trigger: {trigger!r}"
 
           date=intended_date if event=="schedule" and run else now.strftime("%Y-%m-%d")
           print(reason)
           print(f"date={date} slot={slot}")
           with open(os.environ["GITHUB_OUTPUT"],"a") as out:
               out.write(f"run={'true' if run else 'false'}\n")
+              out.write(f"valid={'true' if valid else 'false'}\n")
               out.write(f"date={date}\n")
               out.write(f"slot={slot}\n")
           PY
