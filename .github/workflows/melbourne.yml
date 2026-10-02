@@ -137,7 +137,7 @@ jobs:
           PY
 
       - name: Reject unknown scheduled trigger
-        if: github.event_name == 'schedule' && steps.slot.outputs.run != 'true'
+        if: github.event_name == 'schedule' && steps.slot.outputs.valid != 'true'
         run: |
           echo "ERROR: Melbourne schedule did not resolve to a production slot."
           exit 1
