@@ -38,6 +38,13 @@ on:
       timezone: 'Australia/Melbourne'
     - cron: '7 8 * * *'
       timezone: 'Australia/Melbourne'
+    # Early recovery probes: safe before 16:25, useful if GitHub delivers them late.
+    - cron: '30 13 * * *'
+      timezone: 'Australia/Melbourne'
+    - cron: '30 14 * * *'
+      timezone: 'Australia/Melbourne'
+    - cron: '30 15 * * *'
+      timezone: 'Australia/Melbourne'
     - cron: '30 16 * * *'
       timezone: 'Australia/Melbourne'
     - cron: '40 16 * * *'
@@ -78,6 +85,7 @@ jobs:
           event=os.environ.get("GITHUB_EVENT_NAME","")
           tz=ZoneInfo("Australia/Melbourne")
           run=True
+          valid=True
           publish=False
           slot=""
           period=""
@@ -108,15 +116,21 @@ jobs:
                   now=datetime.now(tz)
                   date=now.date().isoformat()
                   morning={"7 7 * * *","17 7 * * *","27 7 * * *","37 7 * * *","7 8 * * *"}
+                  evening_probe={"30 13 * * *","30 14 * * *","30 15 * * *"}
                   evening={"30 16 * * *","40 16 * * *","50 16 * * *","7 17 * * *"}
                   if trigger in morning:
                       period="morning"; slot="0700"; publish=True
                       reason=f"Melbourne morning local-time cron: {trigger}"
-                  elif trigger in evening:
-                      period="evening"; slot="1630"; publish=True
-                      reason=f"Melbourne evening local-time cron: {trigger}"
+                  elif trigger in evening_probe or trigger in evening:
+                      period="evening"; slot="1630"
+                      if trigger in evening_probe and (now.hour, now.minute) < (16,25):
+                          run=False; publish=False
+                          reason=f"Melbourne early evening recovery probe exited safely: {trigger}"
+                      else:
+                          publish=True
+                          reason=f"Melbourne evening local-time cron: {trigger}"
                   else:
-                      run=False
+                      run=False; valid=False
                       reason=f"unknown Melbourne schedule trigger: {trigger!r}"
                   if run:
                       # Resolve the intended local cron date when a runner starts after midnight.
@@ -130,6 +144,7 @@ jobs:
           print(f"run={run} publish={publish} date={date} period={period} slot={slot}")
           with open(os.environ["GITHUB_OUTPUT"],"a") as out:
               out.write(f"run={'true' if run else 'false'}\n")
+              out.write(f"valid={'true' if valid else 'false'}\n")
               out.write(f"publish={'true' if publish else 'false'}\n")
               out.write(f"date={date}\n")
               out.write(f"period={period}\n")
