@@ -193,10 +193,10 @@ def weather_icon(code, size=76):
 def render(rows, city, fetched, art_path, font_file, out, preview=True):
     zh = city['id'] == 'taipei'
     def ft(size): return ImageFont.truetype(font_file, size)
-    def put(d, xy, text, size, fill=INK):
+    def put(d, xy, text, size, fill=INK, bold=False):
         if d.textlength(text, font=ft(size)) > W - xy[0] - 56:
             raise ValueError(f'Text too wide: {text}')
-        d.text(xy, text, font=ft(size), fill=fill)
+        d.text(xy, text, font=ft(size), fill=fill, stroke_width=1 if bold else 0, stroke_fill=fill)
     def wrapped(d, text, x, y, size, width):
         line = ''
         # Word wrapping for English; character wrapping for Chinese.
@@ -232,46 +232,46 @@ def render(rows, city, fetched, art_path, font_file, out, preview=True):
         put(d, (58, 205), f"{rows[0]['date']} — {rows[-1]['date']}  |  {page}/2", 29, MUTED)
         if zh: put(d, (58, 253), 'Taipei Meowcast | Weekly forecast', 23, MUTED)
         if page == 1:
-            put(d, (58, 305), '日期 DAY' if zh else 'DAY / DATE', 23, MUTED)
-            put(d, (352, 305), '天氣 WEATHER' if zh else 'WEATHER', 23, MUTED)
-            put(d, (628, 305), '高／低 HIGH / LOW' if zh else 'HIGH / LOW', 22, MUTED)
-            put(d, (887, 305), '雨 RAIN' if zh else 'RAIN', 22, MUTED)
+            put(d, (58, 305), '日期 DAY' if zh else 'DAY / DATE', 26, MUTED)
+            put(d, (352, 305), '天氣 WEATHER' if zh else 'WEATHER', 26, MUTED)
+            put(d, (616, 305), '最高 HIGH' if zh else 'HIGH', 26, '#be4b26', bold=True)
+            put(d, (755, 305), '最低 LOW' if zh else 'LOW', 25, MUTED)
+            put(d, (904, 305), '雨 RAIN' if zh else 'RAIN', 25, MUTED)
             for i, r in enumerate(rows):
                 y = 350 + i * 89
                 _, tint, accent = weather_style(r['code'])
                 d.rounded_rectangle((48, y, 1032, y + 80), radius=20, fill=tint)
                 d.rounded_rectangle((48, y+12, 54, y+68), radius=3, fill=accent)
-                put(d, (68, y + 17), (ZH_DAYS[i] if zh else EN_DAYS[i]) + ' ' + r['date'][5:].replace('-', '/'), 27)
+                put(d, (68, y + 17), (ZH_DAYS[i] if zh else EN_DAYS[i]) + ' ' + r['date'][5:].replace('-', '/'), 31)
                 icon = weather_icon(r['code'], 76)
                 im.paste(icon, (260, y+2), icon)
                 a, b = condition(r['code'])
-                put(d, (352, y + 5 if zh else y+18), a if zh else b, 27 if zh else 25)
-                if zh: put(d, (352, y + 43), b, 18, MUTED)
-                put(d, (635, y + 16), str(r['high']), 31, '#c96d48')
-                put(d, (688, y + 16), '/', 31, MUTED)
-                put(d, (718, y + 16), f"{r['low']}°C", 31, '#4887b1')
-                put(d, (897, y + 16), f"{r['rain']}%", 31, '#287ba1')
+                put(d, (352, y + 5 if zh else y+18), a if zh else b, 31 if zh else 28)
+                if zh: put(d, (352, y + 43), b, 21, MUTED)
+                put(d, (616, y - 2), f"{r['high']}°", 50, '#be4b26', bold=True)
+                put(d, (755, y + 13), f"{r['low']}°C", 35, '#367fae')
+                put(d, (912, y + 13), f"{r['rain']}%", 35, '#287ba1')
             put(d, (58, 997), '雨＝每日最高降雨機率' if zh else 'Rain = daily maximum precipitation probability', 24, MUTED)
         else:
             y = 335
             for index, (title, body) in enumerate(highlights(rows, zh)):
                 tint, accent, code = [('#e0f3ff', '#619bd0', 61), ('#fff0ce', '#d69b2e', 0), ('#ede7fb', '#a48bc9', -1)][index]
-                d.rounded_rectangle((48, y - 10, 1032, y + 185), radius=28, fill=tint)
+                d.rounded_rectangle((48, y - 10, 1032, y + 205), radius=28, fill=tint)
                 icon = weather_icon(code, 76)
                 im.paste(icon, (70, y-1), icon)
-                put(d, (162, y + 6), title, 36)
-                wrapped(d, body, 78, y + 65, 30, 925)
-                y += 220
+                put(d, (162, y + 6), title, 40)
+                wrapped(d, body, 78, y + 65, 34, 925)
+                y += 225
         # A separate portrait strip keeps cats clear of the forecast table.
         if art:
             box = (int(art.width * .25), int(art.height * .40), art.width, int(art.height * .87))
             portrait = ImageOps.fit(art.crop(box), (240, 280))
             im.paste(portrait, (840, 1070))
-        put(d, (58, 1080), '天空負責變天，貓負責碎念。' if zh else 'Forecast first. Nap later.', 30)
-        put(d, (58, 1130), '喜歡請按愛心、追蹤，每天早晚收看！' if zh else 'Like + follow for daily morning & evening pawcasts.', 23)
-        put(d, (58, 1180), '越後面的日期變動可能越大。' if zh else 'Later dates may change more.', 24, MUTED)
-        put(d, (58, 1215), '出門前請看每日喵報。' if zh else 'Check the daily pawcast before heading out.', 24, MUTED)
-        put(d, (58, 1270), 'Open-Meteo | ' + fetched, 17, MUTED)
+        put(d, (58, 1080), '天空負責變天，貓負責碎念。' if zh else 'Forecast first. Nap later.', 34)
+        wrapped(d, '喜歡請按愛心、追蹤，每天早晚收看！' if zh else 'Like + follow for daily morning & evening pawcasts.', 58, 1130, 26, 760)
+        put(d, (58, 1210), '越後面的日期變動可能越大。' if zh else 'Later dates may change more.', 24, MUTED)
+        put(d, (58, 1250), '出門前請看每日喵報。' if zh else 'Check the daily pawcast before heading out.', 24, MUTED)
+        put(d, (58, 1300), 'Open-Meteo | ' + fetched, 17, MUTED)
         path = out / f'{city["id"]}-weekly-{page}.png'
         im.save(path)
         if not preview:
