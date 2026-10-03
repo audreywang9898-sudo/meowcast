@@ -264,11 +264,12 @@ def render(rows, city, fetched, art_path, font_file, out, preview=True):
                 y += 225
         # A separate portrait strip keeps cats clear of the forecast table.
         if art:
-            box = (int(art.width * .25), int(art.height * .40), art.width, int(art.height * .87))
-            portrait = ImageOps.fit(art.crop(box), (240, 280))
-            im.paste(portrait, (840, 1070))
+            left, right = (.43, 1.0) if zh else (.18, .88)
+            box = (int(art.width * left), int(art.height * .40), int(art.width * right), int(art.height * .87))
+            portrait = ImageOps.fit(art.crop(box), (360, 320), centering=(.5, .0))
+            im.paste(portrait, (720, 1030))
         put(d, (58, 1080), '天空負責變天，貓負責碎念。' if zh else 'Forecast first. Nap later.', 34)
-        wrapped(d, '喜歡請按愛心、追蹤，每天早晚收看！' if zh else 'Like + follow for daily morning & evening pawcasts.', 58, 1130, 26, 760)
+        wrapped(d, '喜歡請按愛心、追蹤，每天早晚收看！' if zh else 'Like + follow for daily morning & evening pawcasts.', 58, 1130, 26, 630)
         put(d, (58, 1210), '越後面的日期變動可能越大。' if zh else 'Later dates may change more.', 24, MUTED)
         put(d, (58, 1250), '出門前請看每日喵報。' if zh else 'Check the daily pawcast before heading out.', 24, MUTED)
         put(d, (58, 1300), 'Open-Meteo | ' + fetched, 17, MUTED)
