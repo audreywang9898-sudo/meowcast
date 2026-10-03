@@ -15,8 +15,8 @@ def resolve(event, manual_date='', manual_publish=False, now=None):
     elif event in ('workflow_dispatch', 'push'):
         issue = date.fromisoformat(manual_date) if manual_date else today + timedelta(days=(6 - today.weekday()) % 7)
         publish = event == 'workflow_dispatch' and manual_publish
-        if publish and (issue != today or today.weekday() != 6 or now.hour < 8):
-            raise ValueError('Manual production publish must target today, Sunday after 08:00 Taiwan time')
+        if publish and (issue != today or today.weekday() != 6):
+            raise ValueError('Manual production publish must target today, Sunday in Taiwan time')
     else:
         raise ValueError('Unexpected weekly trigger')
     if issue.weekday() != 6: raise ValueError('Weekly issue must be Sunday')

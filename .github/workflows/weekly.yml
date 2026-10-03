@@ -76,7 +76,9 @@ jobs:
           else
             export IG_USER_ID="$MELBOURNE_IG_USER_ID" IG_ACCESS_TOKEN="$MELBOURNE_IG_ACCESS_TOKEN"
           fi
-          python weekly_publish.py --city "$CITY" --issue-date "$ISSUE_DATE" --publish
+          EXTRA=()
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then EXTRA+=(--manual-early); fi
+          python weekly_publish.py --city "$CITY" --issue-date "$ISSUE_DATE" --publish "${EXTRA[@]}"
       - name: Upload weekly images, captions and result
         if: always() && steps.slot.outputs.run == 'true'
         uses: actions/upload-artifact@v4

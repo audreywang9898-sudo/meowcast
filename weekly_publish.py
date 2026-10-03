@@ -28,10 +28,10 @@ def now_text():
     return datetime.now(timezone.utc).isoformat(timespec='seconds')
 
 
-def publication_window(issue, now=None):
+def publication_window(issue, now=None, allow_early=False):
     now = now or datetime.now(ZoneInfo('Asia/Taipei'))
     now = now.astimezone(ZoneInfo('Asia/Taipei'))
-    if issue.weekday() != 6 or now.date() != issue or now.hour < 8:
+    if issue.weekday() != 6 or now.date() != issue or (now.hour < 8 and not allow_early):
         raise RuntimeError('Production weekly publish is allowed only on its Sunday issue date after 08:00 Asia/Taipei')
 
 
@@ -233,9 +233,12 @@ def main():
     p.add_argument('--issue-date', required=True)
     p.add_argument('--output', default='output/weekly')
     p.add_argument('--publish', action='store_true', required=True)
+    p.add_argument('--manual-early', action='store_true', help='Explicit manual Sunday publish before 08:00')
     a = p.parse_args()
     issue = date.fromisoformat(a.issue_date)
-    publication_window(issue)
+    if a.manual_early and os.environ.get('GITHUB_EVENT_NAME') != 'workflow_dispatch':
+        raise RuntimeError('Early publication requires an explicit manual workflow invocation')
+    publication_window(issue, allow_early=a.manual_early)
     out = Path(a.output) / a.city
     out.mkdir(parents=True, exist_ok=True)
     receipt = out / 'publish-result.json'
