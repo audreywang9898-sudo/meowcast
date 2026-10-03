@@ -24,6 +24,10 @@ API = 'https://graph.instagram.com/v24.0'
 MEDIA_REPO = 'audreywang9898-sudo/meowcast-media'
 
 
+class InstagramObjectUnavailable(RuntimeError):
+    pass
+
+
 def now_text():
     return datetime.now(timezone.utc).isoformat(timespec='seconds')
 
@@ -120,6 +124,8 @@ class Instagram:
                 error = r.json().get('error', {})
                 code, subcode = error.get('code'), error.get('error_subcode')
             except ValueError: code, subcode = None, None
+            if r.status_code == 400 and code == 100 and subcode == 33:
+                raise InstagramObjectUnavailable('Instagram object unavailable (code=100, subcode=33)')
             raise RuntimeError(f'Instagram HTTP {r.status_code}; code={code}, subcode={subcode}')
         return r.json()
 
@@ -146,6 +152,29 @@ class Instagram:
             raise RuntimeError('Published weekly post is not a two-image carousel')
         return media
 
+    def find_week(self, state):
+        # A missing object can also mean insufficient permission. Require a
+        # successful, exhaustive own-feed read before allowing manual recovery.
+        values = {'fields': 'id,caption,media_type', 'limit': 100}
+        span = state['week_start'] + ' – ' + state['week_end']
+        for page in range(20):
+            feed = self.request('GET', self.ig + '/media', **values)
+            if not isinstance(feed.get('data'), list):
+                raise RuntimeError('Instagram feed could not be verified; no replacement published')
+            for item in feed['data']:
+                text = item.get('caption', '')
+                if (str(item.get('id')) == str(state['media_id']) or
+                    text == state['caption'] or
+                    (span in text[:200] and ('pawcast' in text[:200] or '七天喵報' in text[:200]))):
+                    self.verify_media(str(item['id']))
+                    return str(item['id'])
+            paging = feed.get('paging', {})
+            if not paging.get('next'): return None
+            after = paging.get('cursors', {}).get('after')
+            if not after: raise RuntimeError('Instagram feed pagination incomplete; no replacement published')
+            values['after'] = after
+        raise RuntimeError('Instagram feed scan incomplete; no replacement published')
+
     def reconcile(self, state):
         # Exact caption includes year, week range and city. Do not assume a
         # FINISHED container or a successful workflow means it was published.
@@ -158,10 +187,11 @@ class Instagram:
         return None
 
 
-def publish(city, issue, out, store, ig):
+def publish(city, issue, out, store, ig, recover_deleted=False):
     rows = week_dates(issue)
     week_start = rows[0].isoformat()
     state = store.read()
+    previous_publications = []
     if state:
         if state.get('city') != city or state.get('week_start') != week_start:
             raise RuntimeError('Weekly state identity mismatch')
@@ -169,9 +199,21 @@ def publish(city, issue, out, store, ig):
             raise RuntimeError('Weekly state belongs to another Instagram account')
         if state.get('status') == 'published':
             if not state.get('media_id'): raise RuntimeError('Published state has no media ID')
-            ig.verify_media(state['media_id'])
-            print(f"Weekly slot already published: {city} {week_start} media={state['media_id']}")
-            return state
+            try:
+                ig.verify_media(state['media_id'])
+            except InstagramObjectUnavailable:
+                if not recover_deleted:
+                    raise RuntimeError('Stored weekly post is unavailable. Automatic replacement is blocked; use a new manual Run workflow after checking Instagram.') from None
+                found = ig.find_week(state)
+                if found:
+                    state.update(media_id=found, reconciled=True)
+                    store.save(state)
+                    return state
+                state.update(status='deleted', missing_verified_at=now_text())
+                store.save(state)
+            else:
+                print(f"Weekly slot already published: {city} {week_start} media={state['media_id']}")
+                return state
         if state.get('status') == 'publishing':
             for attempt in range(6):
                 found = ig.reconcile(state)
@@ -182,8 +224,19 @@ def publish(city, issue, out, store, ig):
                     return state
                 time.sleep(10)
             raise RuntimeError('Previous weekly publish is unconfirmed. No new carousel was created; inspect Instagram before retrying.')
-        if state.get('status') != 'prepared': raise RuntimeError('Unknown weekly state')
-    else:
+        if state.get('status') == 'deleted':
+            if not recover_deleted:
+                raise RuntimeError('Deleted weekly post requires an explicit manual Run workflow')
+            found = ig.find_week(state)
+            if found:
+                state.update(status='published', media_id=found, reconciled=True)
+                store.save(state)
+                return state
+            previous_publications = state.get('previous_publications', []) + [{
+                key: state.get(key) for key in ('media_id', 'published_at', 'run_id', 'missing_verified_at')}]
+            state = None
+        elif state.get('status') != 'prepared': raise RuntimeError('Unknown weekly state')
+    if state is None:
         metadata = json.loads((out / 'forecast.json').read_text(encoding='utf-8'))
         if metadata.get('mode') != 'production' or metadata.get('city') != city or metadata.get('issue_date') != issue.isoformat():
             raise RuntimeError('Refusing non-production or wrong-week render')
@@ -200,6 +253,7 @@ def publish(city, issue, out, store, ig):
         state = {'city': city, 'issue_date': issue.isoformat(), 'week_start': week_start,
                  'week_end': rows[-1].isoformat(), 'slot': 'weekly-0800', 'ig_user_id': ig.ig,
                  'status': 'prepared', 'caption': text, 'image_urls': urls, 'children': [],
+                 'previous_publications': previous_publications,
                  'run_id': os.environ.get('GITHUB_RUN_ID'), 'prepared_at': now_text()}
         store.save(state)
     while len(state['children']) < 2:
@@ -247,7 +301,7 @@ def main():
     ig.identity()
     with tempfile.TemporaryDirectory(prefix='weekly-media-') as tmp:
         store = MediaStore(Path(tmp) / 'repo', a.city, week_dates(issue)[0].isoformat())
-        state = publish(a.city, issue, out, store, ig)
+        state = publish(a.city, issue, out, store, ig, recover_deleted=a.manual_early)
     receipt.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding='utf-8')
 
 

@@ -32,6 +32,7 @@ class IG:
     def wait(self, cid): pass
     def verify_media(self, media): return {'id': media}
     def reconcile(self, state): return self.found
+    def find_week(self, state): return self.found
 
 
 class WeeklyTests(unittest.TestCase):
@@ -114,6 +115,54 @@ class WeeklyTests(unittest.TestCase):
         store, ig = Store(), IG()
         with self.assertRaises(RuntimeError): publisher.publish('taipei', self.issue, self.out, store, ig)
         self.assertEqual(ig.calls, [])
+    def deleted_slot(self):
+        store, ig = Store(), IG()
+        publisher.publish('taipei', self.issue, self.out, store, ig)
+        ig.calls.clear()
+        def verify(media):
+            if media == 'published-id': raise publisher.InstagramObjectUnavailable('missing')
+            return {'id': media}
+        ig.verify_media = verify
+        return store, ig
+    def test_deleted_week_requires_manual(self):
+        store, ig = self.deleted_slot()
+        with self.assertRaises(RuntimeError): publisher.publish('taipei', self.issue, self.out, store, ig)
+        self.assertEqual(ig.calls, [])
+        self.assertEqual(store.state['status'], 'published')
+    def test_manual_deleted_week_republishes_and_archives(self):
+        store, ig = self.deleted_slot()
+        ig.verify_media = lambda media: (_ for _ in ()).throw(publisher.InstagramObjectUnavailable('missing')) if media == 'published-id' and not ig.calls else {'id': media}
+        result = publisher.publish('taipei', self.issue, self.out, store, ig, recover_deleted=True)
+        self.assertEqual(result['status'], 'published')
+        self.assertEqual(result['previous_publications'][0]['media_id'], 'published-id')
+        self.assertEqual(sum(c[1].endswith('/media_publish') for c in ig.calls), 1)
+    def test_manual_existing_week_never_duplicates(self):
+        store, ig = self.deleted_slot()
+        ig.found = 'existing-new-id'
+        result = publisher.publish('taipei', self.issue, self.out, store, ig, recover_deleted=True)
+        self.assertEqual(result['media_id'], 'existing-new-id')
+        self.assertEqual(ig.calls, [])
+    def test_feed_permission_failure_never_republishes(self):
+        store, ig = self.deleted_slot()
+        def fail(state): raise RuntimeError('feed denied')
+        ig.find_week = fail
+        with self.assertRaises(RuntimeError): publisher.publish('taipei', self.issue, self.out, store, ig, recover_deleted=True)
+        self.assertEqual(ig.calls, [])
+    def test_network_failure_never_republishes(self):
+        store, ig = self.deleted_slot()
+        def fail(media): raise RuntimeError('network timeout')
+        ig.verify_media = fail
+        with self.assertRaises(RuntimeError): publisher.publish('taipei', self.issue, self.out, store, ig, recover_deleted=True)
+        self.assertEqual(ig.calls, [])
+    def test_feed_scan_checks_next_page(self):
+        ig = object.__new__(publisher.Instagram); ig.ig = '123'
+        responses = iter([{'data': [], 'paging': {'next': 'opaque', 'cursors': {'after': 'cursor'}}},
+                          {'data': [{'id': 'existing', 'caption': 'Taipei Meowcast | Next-week pawcast\n2026-10-05 – 2026-10-11'}]}])
+        ig.request = lambda *a, **kw: next(responses)
+        ig.verify_media = lambda media: {'id': media}
+        state = {'media_id': 'old', 'caption': 'old caption', 'week_start': '2026-10-05', 'week_end': '2026-10-11'}
+        self.assertEqual(ig.find_week(state), 'existing')
+
     def test_missing_forecast_aborts(self):
         daily = {'time': [d.isoformat() for d in self.dates]}
         for key in weekly.DAILY_KEYS: daily[key] = [0] * 7
