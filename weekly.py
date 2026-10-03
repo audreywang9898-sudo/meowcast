@@ -134,6 +134,62 @@ def font_path(explicit, zh):
     raise RuntimeError('Install a CJK font or pass --font for Taipei rendering')
 
 
+def weather_style(code):
+    if code == 0: return 'sunny', '#fff1c9', '#e4a321'
+    if code in (1, 2): return 'partly', '#e6f5d9', '#70a65a'
+    if code == 3: return 'cloudy', '#e9eef9', '#8e9ecd'
+    if code in (45, 48): return 'fog', '#eaf1ef', '#819b99'
+    if code in (51, 53, 55): return 'drizzle', '#dff5f5', '#52a6b0'
+    if code in (71, 73, 75, 77, 85, 86): return 'snow', '#f0e7fb', '#a58aca'
+    if code in (95, 96, 99): return 'storm', '#e8e5f8', '#8e7abb'
+    return 'rain', '#e1efff', '#639bda'
+
+
+def weather_icon(code, size=76):
+    """Draw weather-code-specific illustrations without emoji/font dependency."""
+    family, _, accent = weather_style(code)
+    icon = Image.new('RGBA', (160, 160))
+    d = ImageDraw.Draw(icon)
+    if code == -1:
+        d.polygon([(28, 49), (57, 28), (68, 38), (92, 38), (103, 28), (132, 49),
+                   (114, 80), (104, 73), (104, 137), (56, 137), (56, 73), (46, 80)],
+                  fill='#b7a0db', outline='#8a6bb9', width=4)
+        d.arc((66, 25, 94, 49), 0, 180, fill='#725295', width=4)
+        d.line((65, 119, 95, 119), fill='#dcd1ee', width=5)
+        return icon.resize((size, size), Image.Resampling.LANCZOS)
+    if family in ('sunny', 'partly'):
+        cx, cy = (80, 78) if family == 'sunny' else (55, 48)
+        for n in range(8):
+            angle = n * math.pi / 4
+            d.line((cx + 40 * math.cos(angle), cy + 40 * math.sin(angle),
+                    cx + 53 * math.cos(angle), cy + 53 * math.sin(angle)), fill='#f0b134', width=7)
+        d.ellipse((cx-29, cy-29, cx+29, cy+29), fill='#ffd25a', outline='#e9a62c', width=3)
+    if family != 'sunny':
+        cloud = '#bfd3e6' if family in ('rain', 'storm') else '#f9fcff'
+        edge = '#7d9eb7'
+        d.ellipse((25, 61, 81, 109), fill=cloud, outline=edge, width=3)
+        d.ellipse((53, 36, 114, 105), fill=cloud, outline=edge, width=3)
+        d.ellipse((91, 58, 141, 109), fill=cloud, outline=edge, width=3)
+        d.rounded_rectangle((30, 80, 136, 111), radius=15, fill=cloud)
+        d.line((41, 109, 125, 109), fill=edge, width=3)
+    if family == 'drizzle':
+        for x in (43, 68, 93, 118):
+            d.line((x, 122, x-3, 128), fill='#5aafb9', width=4)
+            d.line((x-7, 140, x-10, 146), fill='#5aafb9', width=4)
+    elif family in ('rain', 'storm'):
+        for x in (46, 81, 119):
+            d.polygon([(x, 119), (x-8, 135), (x+6, 135)], fill='#4c99df')
+            d.ellipse((x-8, 128, x+6, 143), fill='#4c99df')
+        if family == 'storm': d.polygon([(87, 80), (67, 113), (82, 111), (74, 139), (107, 99), (91, 100)], fill='#ffd157')
+    elif family == 'snow':
+        for x in (48, 82, 117):
+            for angle in (0, math.pi/3, 2*math.pi/3):
+                d.line((x-9*math.cos(angle), 134-9*math.sin(angle), x+9*math.cos(angle), 134+9*math.sin(angle)), fill=accent, width=3)
+    elif family == 'fog':
+        for y in (119, 133, 147): d.rounded_rectangle((30, y, 134, y+4), radius=2, fill=accent)
+    return icon.resize((size, size), Image.Resampling.LANCZOS)
+
+
 def render(rows, city, fetched, art_path, font_file, out, preview=True):
     zh = city['id'] == 'taipei'
     def ft(size): return ImageFont.truetype(font_file, size)
@@ -161,9 +217,15 @@ def render(rows, city, fetched, art_path, font_file, out, preview=True):
             art = a.convert('RGB')
     paths = []
     for page in [1, 2]:
-        im = Image.new('RGB', (W, H), '#f7f4ed')
+        im = Image.new('RGB', (W, H), '#fff9f0')
         d = ImageDraw.Draw(im)
-        d.rectangle((0, 0, W, 12), fill=GOLD)
+        d.ellipse((850, -125, 1230, 260), fill='#ffe8bc')
+        d.ellipse((-140, 1060, 220, 1480), fill='#e0f2ef')
+        for i, color in enumerate(['#f6c44e', '#91c7b0', '#87b9e7', '#be9bd7']):
+            d.rectangle((i*270, 0, (i+1)*270, 12), fill=color)
+        for code, x, y in [(0, 775, 100), (2, 880, 170), (53, 965, 65)]:
+            icon = weather_icon(code, 86)
+            im.paste(icon, (x, y), icon)
         put(d, (58, 34), 'DRY RUN / PREVIEW' if preview else ('週日週報 SUNDAY EDITION' if zh else 'SUNDAY EDITION'), 23, MUTED)
         put(d, (58, 82), '台北天氣貓' if zh else city['brand'], 46)
         put(d, (58, 147), ('下週七天喵報' if page == 1 else '貓咪幫你畫重點') if zh else ('Next-week pawcast' if page == 1 else "The cat's weekly verdict"), 37)
@@ -171,24 +233,33 @@ def render(rows, city, fetched, art_path, font_file, out, preview=True):
         if zh: put(d, (58, 253), 'Taipei Meowcast | Weekly forecast', 23, MUTED)
         if page == 1:
             put(d, (58, 305), '日期 DAY' if zh else 'DAY / DATE', 23, MUTED)
-            put(d, (290, 305), '天氣 WEATHER' if zh else 'WEATHER', 23, MUTED)
+            put(d, (352, 305), '天氣 WEATHER' if zh else 'WEATHER', 23, MUTED)
             put(d, (628, 305), '高／低 HIGH / LOW' if zh else 'HIGH / LOW', 22, MUTED)
             put(d, (887, 305), '雨 RAIN' if zh else 'RAIN', 22, MUTED)
             for i, r in enumerate(rows):
                 y = 350 + i * 89
-                d.rounded_rectangle((48, y, 1032, y + 80), radius=16, fill='#ffffff' if i % 2 == 0 else '#eceee9')
-                put(d, (68, y + 10), (ZH_DAYS[i] if zh else EN_DAYS[i]) + ' ' + r['date'][5:].replace('-', '/'), 30)
+                _, tint, accent = weather_style(r['code'])
+                d.rounded_rectangle((48, y, 1032, y + 80), radius=20, fill=tint)
+                d.rounded_rectangle((48, y+12, 54, y+68), radius=3, fill=accent)
+                put(d, (68, y + 17), (ZH_DAYS[i] if zh else EN_DAYS[i]) + ' ' + r['date'][5:].replace('-', '/'), 27)
+                icon = weather_icon(r['code'], 76)
+                im.paste(icon, (260, y+2), icon)
                 a, b = condition(r['code'])
-                put(d, (290, y + 5), a if zh else b, 29)
-                if zh: put(d, (290, y + 43), b, 19, MUTED)
-                put(d, (628, y + 16), f"{r['high']} / {r['low']}°C", 31)
+                put(d, (352, y + 5 if zh else y+18), a if zh else b, 27 if zh else 25)
+                if zh: put(d, (352, y + 43), b, 18, MUTED)
+                put(d, (635, y + 16), str(r['high']), 31, '#c96d48')
+                put(d, (688, y + 16), '/', 31, MUTED)
+                put(d, (718, y + 16), f"{r['low']}°C", 31, '#4887b1')
                 put(d, (897, y + 16), f"{r['rain']}%", 31, '#287ba1')
             put(d, (58, 997), '雨＝每日最高降雨機率' if zh else 'Rain = daily maximum precipitation probability', 24, MUTED)
         else:
             y = 335
-            for title, body in highlights(rows, zh):
-                d.rounded_rectangle((48, y - 10, 1032, y + 185), radius=24, fill='white')
-                put(d, (78, y + 6), title, 36)
+            for index, (title, body) in enumerate(highlights(rows, zh)):
+                tint, accent, code = [('#e0f3ff', '#619bd0', 61), ('#fff0ce', '#d69b2e', 0), ('#ede7fb', '#a48bc9', -1)][index]
+                d.rounded_rectangle((48, y - 10, 1032, y + 185), radius=28, fill=tint)
+                icon = weather_icon(code, 76)
+                im.paste(icon, (70, y-1), icon)
+                put(d, (162, y + 6), title, 36)
                 wrapped(d, body, 78, y + 65, 30, 925)
                 y += 220
         # A separate portrait strip keeps cats clear of the forecast table.
