@@ -89,7 +89,7 @@ def highlights(rows, zh):
         return [
             ('雨傘值班表', ('、'.join(wet_zh) + '降雨機率達 50% 以上，記得帶傘。') if wet else '各天最高降雨機率均低於 50%；仍不保證無雨。'),
             ('出遊候選日', f"{ZH_DAYS[best_i]}降雨機率相對最低（{best['rain']}%）。先列候選，出門前再確認。"),
-            ('衣櫃備忘錄', f"全週最高溫 {hottest['high']}°C，最低溫 {coldest['low']}°C。穿搭看每日預報，貓的毛外套不外借。")]
+            ('衣櫃備忘錄', f"全週最高 {hottest['high']}°C、最低 {coldest['low']}°C。穿搭看每日預報；貓的毛外套不外借。")]
     return [
         ('Brolly roster', (', '.join(wet) + ': rain chance reaches 50% or more. Pack a brolly.') if wet else 'Daily peak rain chances stay below 50%. That is not a dry-weather guarantee.'),
         ('Outdoor shortlist', f"{EN_DAYS[best_i]} has the lowest rain chance ({best['rain']}%). A candidate, not a promise; check again before heading out."),
@@ -164,7 +164,7 @@ def render(rows, city, fetched, art_path, font_file, out):
             put(d, (58, 305), '日期 DAY' if zh else 'DAY / DATE', 23, MUTED)
             put(d, (290, 305), '天氣 WEATHER' if zh else 'WEATHER', 23, MUTED)
             put(d, (628, 305), '高／低 HIGH / LOW' if zh else 'HIGH / LOW', 22, MUTED)
-            put(d, (887, 305), '雨 RAIN', 22, MUTED)
+            put(d, (887, 305), '雨 RAIN' if zh else 'RAIN', 22, MUTED)
             for i, r in enumerate(rows):
                 y = 350 + i * 89
                 d.rounded_rectangle((48, y, 1032, y + 80), radius=16, fill='#ffffff' if i % 2 == 0 else '#eceee9')
