@@ -1,4 +1,4 @@
-"""Sunday weekly pawcast preview. Intentionally contains no publishing code.
+"""Render Sunday weekly pawcasts. Publishing is handled by weekly_publish.py.
 
 Example: python weekly.py --city taipei --issue-date 2026-10-04 --dry-run
 Daily data uses the city's local timezone. Missing days abort the preview.
@@ -7,6 +7,8 @@ import argparse
 import json
 import math
 import os
+import time
+from urllib.error import URLError
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
@@ -48,8 +50,15 @@ def fetch_forecast(city):
     params = {'latitude': city['latitude'], 'longitude': city['longitude'],
               'timezone': city['timezone'], 'daily': ','.join(DAILY_KEYS), 'forecast_days': 16}
     url = 'https://api.open-meteo.com/v1/forecast?' + urlencode(params)
-    with urlopen(url, timeout=45) as r:
-        return json.load(r)
+    for attempt in range(3):
+        try:
+            with urlopen(url, timeout=45) as r:
+                data = json.load(r)
+            data['_retrieved_at'] = datetime.now(ZoneInfo(city['timezone'])).isoformat(timespec='minutes')
+            return data
+        except (URLError, TimeoutError, ValueError):
+            if attempt == 2: raise
+            time.sleep(2 * (attempt + 1))
 
 
 def select_week(data, dates, city):
@@ -125,7 +134,7 @@ def font_path(explicit, zh):
     raise RuntimeError('Install a CJK font or pass --font for Taipei rendering')
 
 
-def render(rows, city, fetched, art_path, font_file, out):
+def render(rows, city, fetched, art_path, font_file, out, preview=True):
     zh = city['id'] == 'taipei'
     def ft(size): return ImageFont.truetype(font_file, size)
     def put(d, xy, text, size, fill=INK):
@@ -155,7 +164,7 @@ def render(rows, city, fetched, art_path, font_file, out):
         im = Image.new('RGB', (W, H), '#f7f4ed')
         d = ImageDraw.Draw(im)
         d.rectangle((0, 0, W, 12), fill=GOLD)
-        put(d, (58, 34), 'DRY RUN / PREVIEW', 23, MUTED)
+        put(d, (58, 34), 'DRY RUN / PREVIEW' if preview else ('週日週報 SUNDAY EDITION' if zh else 'SUNDAY EDITION'), 23, MUTED)
         put(d, (58, 82), '台北天氣貓' if zh else city['brand'], 46)
         put(d, (58, 147), ('下週七天喵報' if page == 1 else '貓咪幫你畫重點') if zh else ('Next-week pawcast' if page == 1 else "The cat's weekly verdict"), 37)
         put(d, (58, 205), f"{rows[0]['date']} — {rows[-1]['date']}  |  {page}/2", 29, MUTED)
@@ -194,6 +203,8 @@ def render(rows, city, fetched, art_path, font_file, out):
         put(d, (58, 1270), 'Open-Meteo | ' + fetched, 17, MUTED)
         path = out / f'{city["id"]}-weekly-{page}.png'
         im.save(path)
+        if not preview:
+            im.save(path.with_suffix('.jpg'), quality=95, subsampling=0)
         paths.append(path)
     return paths
 
@@ -202,7 +213,9 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--city', choices=['taipei', 'melbourne'], required=True)
     p.add_argument('--issue-date', help='Sunday date; defaults to today in Asia/Taipei')
-    p.add_argument('--dry-run', action='store_true', required=True)
+    mode = p.add_mutually_exclusive_group(required=True)
+    mode.add_argument('--dry-run', action='store_true')
+    mode.add_argument('--production', action='store_true', help='Render JPEG carousel slides; does not publish')
     p.add_argument('--forecast-json', help='Replay a saved real API response')
     p.add_argument('--artwork')
     p.add_argument('--font')
@@ -212,18 +225,21 @@ def main():
     issue = date.fromisoformat(args.issue_date) if args.issue_date else datetime.now(ZoneInfo('Asia/Taipei')).date()
     dates = week_dates(issue)
     data = json.loads(Path(args.forecast_json).read_text()) if args.forecast_json else fetch_forecast(city)
-    fetched = datetime.now(ZoneInfo(city['timezone'])).isoformat(timespec='minutes')
+    fetched = data.get('_retrieved_at', 'Replay: time unknown')
     rows = select_week(data, dates, city)
     out = Path(args.output) / city['id']
     out.mkdir(parents=True, exist_ok=True)
     (out / 'forecast-source.json').write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
     (out / 'forecast.json').write_text(json.dumps({'city': city['id'], 'issue_date': issue.isoformat(),
         'timezone': city['timezone'], 'retrieved_at': fetched, 'source': 'Open-Meteo', 'days': rows,
-        'mode': 'dry_run', 'published': False}, ensure_ascii=False, indent=2), encoding='utf-8')
-    (out / 'caption.txt').write_text(caption(rows, city, fetched), encoding='utf-8')
+        'mode': 'dry_run' if args.dry_run else 'production', 'published': False}, ensure_ascii=False, indent=2), encoding='utf-8')
+    text = caption(rows, city, fetched)
+    if len(text) > 2200: raise ValueError('Caption exceeds Instagram limit')
+    (out / 'caption.txt').write_text(text, encoding='utf-8')
     default_art = Path(city['asset_prefix']) / 'sunny-2.png'
     art = args.artwork or (str(default_art) if default_art.is_file() else None)
-    images = render(rows, city, fetched, art, font_path(args.font, city['id'] == 'taipei'), out)
+    if args.production and not art: raise RuntimeError('Production weekly artwork is missing')
+    images = render(rows, city, fetched, art, font_path(args.font, city['id'] == 'taipei'), out, preview=args.dry_run)
     print(json.dumps({'city': city['id'], 'dates': [r['date'] for r in rows],
         'images': [str(x) for x in images], 'caption': str(out / 'caption.txt'), 'published': False}))
 
