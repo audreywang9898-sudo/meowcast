@@ -282,6 +282,10 @@ def _seasonal_copy(event):
     return en, zh, (" " + " ".join(tags)) if tags else ""
 
 
+ENGAGEMENT_ZH = "喜歡這隻愛碎念的天氣貓，就幫我點個愛心 ❤️、追蹤台北天氣貓！每天早晚一起看天氣，出門帶傘還是帶墨鏡，先問貓再出門。🐾"
+ENGAGEMENT_EN = "Enjoy your daily pawcast? Tap the heart ❤️ and follow for weather with a side of cat attitude, every morning and evening. Forecast first, nap later. 🐾"
+
+
 def _simple_english_caption(w, city, event=None):
     t = theme(w)
     en_condition, _ = LINES[t]
@@ -312,7 +316,7 @@ def _simple_english_caption(w, city, event=None):
         )
         hello = f"{cat} here. Forecast first, highly important nap second. 🐱"
         closing = "Go easy on yourself. Even cats take a break from taking breaks. 🐾"
-    return t, f"{hello}\n\n{title}\n📍 {name}, {country}\n{weather}\n\n{seasonal}🐾 The cat’s verdict\n{note}\n\n{closing}\n\n{_tags(city, extra_tags)}"
+    return t, f"{hello}\n\n{title}\n📍 {name}, {country}\n{weather}\n\n{seasonal}🐾 The cat’s verdict\n{note}\n\n{closing}\n\n{ENGAGEMENT_EN}\n\n{_tags(city, extra_tags)}"
 
 
 def _simple_taipei_caption(w, city, event=None):
@@ -323,7 +327,7 @@ def _simple_taipei_caption(w, city, event=None):
     en_note, zh_note = _voice_lines(w, city)
     seasonal_en, seasonal_zh, extra_tags = _seasonal_copy(event)
     if evening:
-        title = f"{date} Taipei Meowcast | 晚班喵報 🌙"
+        title = f"{date} 台北天氣貓｜晚班喵報 | Taipei Meowcast 🌙"
         temp = w.get("temperature", w["high"])
         weather_zh = (
             f"🌡️ 17:00 約 {temp}°C / 今晚低溫 {w['low']}°C\n"
@@ -341,7 +345,7 @@ def _simple_taipei_caption(w, city, event=None):
         close_en = "You've done enough for today. The sofa won't sit on itself. 🐾"
         extra_tags += " #TaipeiEvening #台北夜晚"
     else:
-        title = f"{date} Taipei Meowcast | 早班喵報 ☀️"
+        title = f"{date} 台北天氣貓｜早班喵報 | Taipei Meowcast ☀️"
         weather_zh = (
             f"🌡️ 最高 {w['high']}°C / 最低 {w['low']}°C\n"
             f"🌧️ 降雨機率：{w['rain']}%\n"
@@ -358,9 +362,9 @@ def _simple_taipei_caption(w, city, event=None):
         close_en = "Take today at your own pace. Even cats take breaks from taking breaks. 🐾"
     return t, (
         f"{hello_zh}\n\n{title}\n📍 台北，台灣\n{weather_zh}\n\n"
-        f"{seasonal_zh}🐱 台北貓的碎念\n{zh_note}\n\n{close_zh}\n\n"
+        f"{seasonal_zh}🐱 台北貓的碎念\n{zh_note}\n\n{close_zh}\n\n{ENGAGEMENT_ZH}\n\n"
         f"— English pawcast —\n{hello_en}\n📍 Taipei, Taiwan\n{weather_en}\n\n"
-        f"{seasonal_en}🐾 The cat’s verdict\n{en_note}\n\n{close_en}\n\n"
+        f"{seasonal_en}🐾 The cat’s verdict\n{en_note}\n\n{close_en}\n\n{ENGAGEMENT_EN}\n\n"
         f"{_tags(city, extra_tags)}"
     )
 
@@ -387,7 +391,7 @@ def make_ai_caption(w,simple_caption,config,city=None):
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY is not configured")
     language_instruction=(
-        "Use English + Traditional Chinese."
+        "Use Traditional Chinese first, then English. All Chinese content, including the like-and-follow reminder, must precede the English section."
         if city.get("language")=="bilingual"
         else "Use English only."
     )
@@ -401,7 +405,9 @@ Make the cat the butt of the joke. Keep morning and evening distinct. Avoid repe
 Never invent current rain, wind, humidity, UV, transport disruption, or a guaranteed dry period from probabilities.
 Keep the date (including year), city, brand, temperatures, rain chance and its time window. No invented percentages.
 Preserve any named calendar event and its meaning. Treat remembrance days and Qingming respectfully, without jokes.
-Keep the {city.get('cat_name')} voice warm, witty and not childish. End with relevant hashtags.
+Keep the {city.get('cat_name')} voice warm, witty and not childish.
+Every caption must ask readers to tap the heart, follow the account, and return for weather every morning and evening. Preserve the engagement reminder from the factual caption verbatim in each language. Place reminders before relevant hashtags.
+For Taipei, put Chinese before English in titles and every paired label as well as the full language sections. End with relevant hashtags.
 
 FACTUAL CAPTION:
 {simple_caption}"""
