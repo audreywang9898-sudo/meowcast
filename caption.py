@@ -241,15 +241,62 @@ HUMOR_LINES = {
     }
 }
 
+WEEKDAY_LINES = {
+    "taipei": {
+        "morning": [
+            ["太陽今天有打卡，我也有，只是打完就想躺回去。週一先求生存，不求完美。", "The sun clocked in. So did I. Monday is for survival, not perfection."],
+            ["週二沒有週一那麼可怕，但離週五也沒有你想像中那麼近。", "Tuesday is less scary than Monday, but Friday is not as close as you think."],
+            ["撐過今天就過一半了。連本貓都已經連續上班三天。", "Halfway day. Even this cat has clocked in three days in a row."],
+            ["週末已經出現在雷達邊緣。衣服穿對、雨傘帶對，剩下的人生問題本貓不負責。", "The weekend is on the radar. Dress right, pack smart; the rest is above my pay grade."],
+            ["星期五到了。本貓今天播天氣的速度都比較快，靈魂已經先進入週末模式。", "Friday has arrived. Even this forecast feels faster; my soul is already on weekend mode."],
+            ["今天唯一合理的早起理由：早餐、旅行，或被貓踩醒。睡到自然醒也是一種安排。", "Valid reasons to wake early on Saturday: breakfast, travel, or a cat. Sleeping in is also a plan."],
+            ["今天請慢慢來。因為明天的事情，本貓決定明天再想。", "Take Sunday slowly. Tomorrow's problems have been officially postponed until tomorrow."]
+        ],
+        "evening": [
+            ["恭喜，今天最困難的任務已完成：活過星期一。回家、吃飯、洗澡、躺平。", "Monday survived. Go home, eat, shower, flop. Tomorrow belongs to tomorrow's cat."],
+            ["本貓已完成今日第二次氣象勤務，現在準備進入沙發值勤模式。你也可以下班了。", "Second weather shift complete. I'm transferring to sofa duty. You may clock off too."],
+            ["這個星期已經走完一半。如果你現在很累，非常合理。剩下的一半明天再處理。", "Half the week is done. If you're tired, that's reasonable. The other half can wait until tomorrow."],
+            ["本貓精密計算：再睡一次，醒來就是星期五。請保存體力。", "Precise cat maths: one more sleep and it's Friday. Conserve your energy."],
+            ["星期五晚間模式啟動。工作訊息：不接受。週末正式開始。", "Friday night mode: on. Work messages: declined. The weekend is officially open."],
+            ["沒有鬧鐘，沒有 Monday meeting，沒有理由太早睡。這就是本貓理解的自由。", "No alarm, no Monday meeting, no reason to rush. This is my definition of freedom."],
+            ["如果你突然想起明天是星期一，請不要驚慌。先睡好，明早本貓會先去上班。", "If you suddenly remember tomorrow is Monday, don't panic. Sleep first; I'll clock in before you."]
+        ]
+    },
+    "melbourne": {
+        "morning": [
+            ["Monday loading: coffee first, weather second, existential questions after lunch.", ""],
+            ["Good news: it's not Monday. Bad news: it's somehow only Tuesday.", ""],
+            ["Happy halfway day. We've made it through half the week; even this cat is impressed.", ""],
+            ["Thursday detected. Weekend proximity: increasing. Motivation: questionable. Dress in layers—because Melbourne.", ""],
+            ["Friday has arrived. Today's forecast includes a strong chance of mentally checking out after 3 PM.", ""],
+            ["Saturday priorities: coffee, brunch, perhaps another coffee. Take your time.", ""],
+            ["Sunday schedule: do less, eat something nice, pretend Monday doesn't exist. Excellent plan.", ""]
+        ],
+        "evening": [
+            ["Monday survived. Go home, eat something, become horizontal. You've earned it.", ""],
+            ["Tuesday weather shift complete: humans informed, couch calling. Good night, Melbourne.", ""],
+            ["Wednesday done. Three days survived, two workdays remaining. Cat mathematics never lies.", ""],
+            ["Important Thursday announcement: when you wake up, it's Friday. Rest accordingly.", ""],
+            ["Friday night: work emails absolutely not. This cat now accepts payment exclusively in snacks.", ""],
+            ["Saturday night: stay out late, stay home early, order dessert. There are no wrong answers.", ""],
+            ["Yes, tomorrow is Monday. No, we don't need to discuss it yet. I'll clock in again at 7 AM.", ""]
+        ]
+    }
+}
+
 def _voice_lines(w, city):
-    """Rotate paired lines by forecast date; retries keep the same copy."""
+    """Choose deterministic copy by each city's local forecast date weekday."""
     from datetime import date
     period = "evening" if w.get("period") == "evening" else "morning"
     voice = "taipei" if city.get("id") == "taipei" else "melbourne"
-    lines = HUMOR_LINES[voice][period][theme(w)]
-    first, second = lines[date.fromisoformat(w["date"]).toordinal() % len(lines)]
+    local_date = date.fromisoformat(w["date"])
+    weekday = local_date.weekday()  # Monday=0 ... Sunday=6
+    first, second = WEEKDAY_LINES[voice][period][weekday]
+    weekday_name = local_date.strftime("%A")
+    template_id = f"{voice}-{period}-{weekday_name.lower()}"
+    print(f"Caption template: {voice} / {w['date']} / {weekday_name} / {period} / template={template_id}")
     en, zh = (second, first) if voice == "taipei" else (first, "")
-    # Evening advice uses the evening temperature, not a daytime high.
+    # Keep useful weather-dependent reminders on top of the weekday personality.
     temp = w.get("temperature", w["high"]) if period == "evening" else w["high"]
     if temp >= 32:
         en += " Drink water and take breaks in the shade. Being fluffy is not a cooling strategy."
@@ -261,7 +308,6 @@ def _voice_lines(w, city):
         en += " The rain chance still calls for an umbrella in your bag. The sky has options."
         zh += " 降雨機率仍偏高，包包放把傘。天空也有備案。"
     return en, zh
-
 
 def _seasonal_copy(event):
     if not event:
