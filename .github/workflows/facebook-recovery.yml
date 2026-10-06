@@ -1,0 +1,121 @@
+name: Taipei Facebook Recovery
+
+on:
+  schedule:
+    # Run after the final Instagram recovery windows.
+    - cron: '20 0 * * *'   # 08:20 Taipei
+    - cron: '20 9 * * *'   # 17:20 Taipei
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Taipei edition to recover'
+        required: true
+        default: '0700'
+        type: choice
+        options:
+          - '0700'
+          - '1630'
+      publish_date:
+        description: 'YYYY-MM-DD; blank means today in Asia/Taipei'
+        required: false
+        type: string
+      source_run_id:
+        description: 'Optional original Instagram GitHub run ID'
+        required: false
+        type: string
+      check_only:
+        description: 'Only verify Facebook Page identity; do not publish'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  facebook:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: taipei-facebook-${{ github.event_name }}-${{ github.event.schedule || inputs.slot }}
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install -r requirements.txt
+
+      - name: Resolve Taipei publication source
+        id: source
+        env:
+          TRIGGER_SCHEDULE: ${{ github.event.schedule }}
+          MANUAL_SLOT: ${{ inputs.slot }}
+          MANUAL_DATE: ${{ inputs.publish_date }}
+          MANUAL_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          python - <<'PY'
+          import os, re
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+          trigger = (os.environ.get("TRIGGER_SCHEDULE") or "").strip()
+          manual_slot = (os.environ.get("MANUAL_SLOT") or "").strip()
+          manual_date = (os.environ.get("MANUAL_DATE") or "").strip()
+          run_id = (os.environ.get("MANUAL_RUN_ID") or "").strip()
+
+          if trigger == "20 0 * * *":
+              slot = "0700"
+          elif trigger == "20 9 * * *":
+              slot = "1630"
+          elif os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
+              slot = manual_slot
+          else:
+              raise SystemExit(f"Unknown Facebook recovery trigger: {trigger!r}")
+
+          if slot not in {"0700", "1630"}:
+              raise SystemExit("Invalid slot")
+          if run_id and not run_id.isdigit():
+              raise SystemExit("source_run_id must be numeric")
+
+          today = datetime.now(ZoneInfo("Asia/Taipei")).date().isoformat()
+          day = manual_date or today
+          if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", day):
+              raise SystemExit("publish_date must be YYYY-MM-DD")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+              out.write(f"date={day}\n")
+              out.write(f"slot={slot}\n")
+              out.write(f"run_id={run_id}\n")
+          print(f"Facebook recovery source: {day} {slot}" + (f" run {run_id}" if run_id else ""))
+          PY
+
+      - name: Require Facebook publishing secrets
+        env:
+          FB_PAGE_ID: ${{ secrets.TAIPEI_FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.TAIPEI_FB_PAGE_ACCESS_TOKEN }}
+          MEDIA_REPO_TOKEN: ${{ secrets.MEDIA_REPO_TOKEN }}
+        run: |
+          test -n "$MEDIA_REPO_TOKEN" || (echo "::error::MEDIA_REPO_TOKEN missing" && exit 1)
+          test -n "$FB_PAGE_ID" || (echo "::error::TAIPEI_FB_PAGE_ID missing" && exit 1)
+          test -n "$FB_PAGE_TOKEN" || (echo "::error::TAIPEI_FB_PAGE_ACCESS_TOKEN missing" && exit 1)
+
+      - name: Verify Facebook Page identity
+        if: github.event_name == 'workflow_dispatch' && inputs.check_only == true
+        env:
+          TAIPEI_FB_PAGE_ID: ${{ secrets.TAIPEI_FB_PAGE_ID }}
+          TAIPEI_FB_PAGE_ACCESS_TOKEN: ${{ secrets.TAIPEI_FB_PAGE_ACCESS_TOKEN }}
+        run: python publish_facebook.py --check-config
+
+      - name: Recover Facebook Reel only
+        if: github.event_name != 'workflow_dispatch' || inputs.check_only != true
+        env:
+          MEDIA_REPO_TOKEN: ${{ secrets.MEDIA_REPO_TOKEN }}
+          TAIPEI_FB_PAGE_ID: ${{ secrets.TAIPEI_FB_PAGE_ID }}
+          TAIPEI_FB_PAGE_ACCESS_TOKEN: ${{ secrets.TAIPEI_FB_PAGE_ACCESS_TOKEN }}
+          PUBLISH_DATE: ${{ steps.source.outputs.date }}
+          SLOT: ${{ steps.source.outputs.slot }}
+          SOURCE_RUN_ID: ${{ steps.source.outputs.run_id }}
+        run: python publish_facebook.py
