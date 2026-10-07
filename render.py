@@ -146,7 +146,9 @@ def add_weather_overlay(im,w,theme,event=None,city=None):
     """Draw a compact, high-legibility weather card entirely in code."""
     city=city or load_city_config()
     english_only=city.get("language")=="english"
-    d=ImageDraw.Draw(im,"RGBA")
+    overlay_offset=int(city.get("weather_overlay_offset_y",0))
+    target=Image.new("RGBA",im.size) if overlay_offset else im
+    d=ImageDraw.Draw(target,"RGBA")
     condition={"sunny":"Sunny","rainy":"Rainy","cloudy":"Cloudy"}[theme]
     temp_label=temperature_label(w)
     # Avoid emoji glyphs in the rendered card: the CI font stack can render them as tofu/boxes.
@@ -197,7 +199,8 @@ def add_weather_overlay(im,w,theme,event=None,city=None):
 
     main_temp=w.get("temperature",w["high"])
     # Bilingual high/low labels above each temperature.
-    put(485,795,"HIGH" if english_only else "最高溫  HIGH",25,muted)
+    high_label="EVENING" if english_only and city.get("id")=="matala" and w.get("period")=="evening" else ("HIGH" if english_only else "最高溫  HIGH")
+    put(485,795,high_label,25,muted)
     put(485,855,f"{main_temp}°C",82)
     d.line((645,805,645,890),fill=line,width=2)
     if english_only:
@@ -250,6 +253,8 @@ def add_weather_overlay(im,w,theme,event=None,city=None):
     d.text((x,1025),pct_text,font=pct_ft,anchor="lm",fill=(58,67,80,255))
     x += pct_w+gap
     d.text((x,1025),rain_en,font=en_ft,anchor="lm",fill=(58,67,80,255))
+    if overlay_offset:
+        im.paste(target,(0,overlay_offset),target)
 
 
 def main(period=None):

@@ -26,7 +26,7 @@ on:
         default: false
         type: boolean
   schedule:
-    # Keep Matala wall-clock times stable across AEST/AEDT.
+    # Keep Matala wall-clock times stable across Greek daylight-saving changes.
     # Avoid :00/:01 and use multiple deduped recovery triggers.
     - cron: '7 7 * * *'
       timezone: 'Europe/Athens'
@@ -133,6 +133,9 @@ jobs:
                       run=False; valid=False
                       reason=f"unknown Matala schedule trigger: {trigger!r}"
                   if run:
+                      if period=="morning" and now.hour>=12:
+                          run=False; publish=False
+                          reason="Matala morning delivery arrived outside the morning window"
                       # Resolve the intended local cron date when a runner starts after midnight.
                       minute,hour=map(int,trigger.split()[:2])
                       intended=now.replace(hour=hour,minute=minute,second=0,microsecond=0)
@@ -178,15 +181,8 @@ jobs:
         if: steps.slot.outputs.run == 'true'
         run: |
           python - <<'PY'
-          from render import _available_artwork_indices
-          missing = [
-              theme + suffix
-              for theme in ("sunny", "cloudy", "rainy")
-              for suffix in ("", "_evening")
-              if not _available_artwork_indices("asset/matala", theme, suffix)
-          ]
-          if missing:
-              raise SystemExit("Missing Matala artwork: " + ", ".join(missing))
+          from matala import validate_artwork
+          validate_artwork()
           PY
 
       - name: Check Matala publication evidence
@@ -214,6 +210,8 @@ jobs:
           from zoneinfo import ZoneInfo
           try:
               e=json.load(open("/tmp/evidence.json",encoding="utf-8"))
+              if e.get("city")!="matala" or e.get("status")!="published" or not e.get("media_id") or not e.get("container_id"):
+                  raise ValueError("missing confirmed Matala receipt")
               if e.get("date")!=os.environ["PUBLISH_DATE"] or e.get("slot")!=os.environ["SLOT"]:
                   raise ValueError("date/slot mismatch")
               published=datetime.fromisoformat(e["published_at"].replace("Z","+00:00")).astimezone(ZoneInfo("Europe/Athens"))
@@ -246,11 +244,20 @@ jobs:
 
       - name: Verify generated files
         if: steps.slot.outputs.run == 'true' && (steps.slot.outputs.publish != 'true' || steps.dedupe.outputs.skip != 'true')
+        env:
+          PUBLISH_DATE: ${{ steps.slot.outputs.date }}
+          EXPECTED_PERIOD: ${{ steps.slot.outputs.period }}
         run: |
           test -s output/card.jpg
           test -s output/meowcast.mp4
           test -s output/caption.txt
           test -s output/weather-state.json
+          python - <<'PY'
+          import json, os
+          state=json.load(open("output/weather-state.json",encoding="utf-8"))
+          if state.get("city")!="matala" or state.get("date")!=os.environ["PUBLISH_DATE"] or state.get("period")!=os.environ["EXPECTED_PERIOD"]:
+              raise SystemExit("Matala forecast city, date or edition mismatch")
+          PY
           ffprobe -v error -show_entries stream=codec_type,codec_name -of compact output/meowcast.mp4
 
       - name: Upload Matala preview artifact

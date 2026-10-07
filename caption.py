@@ -475,6 +475,8 @@ FACTUAL CAPTION:
 def make_caption(w,event=None,city=None):
     city=city or load_city_config()
     config=load_config()
+    if "isAI" in city:
+        config={**config,"isAI":city["isAI"]}
     t,simple_caption=make_simple_caption(w,event=event,city=city)
     if not config.get("isAI",False):
         print("Caption mode: SIMPLE (isAI=false)")

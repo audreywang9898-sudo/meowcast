@@ -8,6 +8,8 @@
   "longitude": 24.749,
   "timezone": "Europe/Athens",
   "language": "english",
+  "isAI": false,
+  "weather_overlay_offset_y": -220,
   "asset_prefix": "asset/matala",
   "media_state_prefix": "latest/matala",
   "holiday_mode": false,
