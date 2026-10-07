@@ -1,3 +1,0 @@
-requests==2.32.3
-Pillow==11.1.0
-lunar_python==1.4.8
