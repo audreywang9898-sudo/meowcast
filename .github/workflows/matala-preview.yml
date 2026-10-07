@@ -1,0 +1,70 @@
+name: Matala deployment preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'matala.py'
+      - 'matala_render.py'
+      - 'matala_caption.py'
+      - 'cities/matala.json'
+      - 'tests/test_matala.py'
+      - '.github/workflows/matala-preview.yml'
+      - '.github/workflows/matala.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: matala-deployment-preview
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        period: [morning, evening]
+    env:
+      CITY: matala
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+          pip install -r requirements.txt
+      - name: Download isolated artwork
+        uses: actions/checkout@v4
+        with:
+          ref: c6c9295be0b36396f2ac0a18f4362ca3786f8ccb
+          path: .matala-assets
+          persist-credentials: false
+      - name: Validate and render live forecast preview
+        run: |
+          mkdir -p asset/matala
+          cp .matala-assets/asset/matala/*.png asset/matala/
+          python -m unittest discover -s tests -p test_matala.py -v
+          python matala.py --period ${{ matrix.period }}
+          ffprobe -v error -show_entries stream=codec_name,width,height -of compact output/meowcast.mp4
+      - name: Report dedicated credential readiness
+        env:
+          MATALA_ID_PRESENT: ${{ secrets.MATALA_IG_USER_ID != '' }}
+          MATALA_TOKEN_PRESENT: ${{ secrets.MATALA_IG_ACCESS_TOKEN != '' }}
+        run: |
+          echo "Matala user ID configured: $MATALA_ID_PRESENT" >> "$GITHUB_STEP_SUMMARY"
+          echo "Matala access token configured: $MATALA_TOKEN_PRESENT" >> "$GITHUB_STEP_SUMMARY"
+          echo "Preview only; no Instagram or Facebook publication." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: matala-live-preview-${{ matrix.period }}-${{ github.run_id }}
+          path: output/
+          if-no-files-found: warn
