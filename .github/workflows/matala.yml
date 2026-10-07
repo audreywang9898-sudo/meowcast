@@ -177,6 +177,20 @@ jobs:
           sudo apt-get install -y ffmpeg fonts-noto-cjk
           pip install -r requirements.txt
 
+      - name: Download isolated Matala artwork
+        if: steps.slot.outputs.run == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: c6c9295be0b36396f2ac0a18f4362ca3786f8ccb
+          path: .matala-assets
+          persist-credentials: false
+
+      - name: Install Matala artwork
+        if: steps.slot.outputs.run == 'true'
+        run: |
+          mkdir -p asset/matala
+          cp .matala-assets/asset/matala/*.png asset/matala/
+
       - name: Require Matala artwork for every weather and edition
         if: steps.slot.outputs.run == 'true'
         run: |
@@ -240,7 +254,7 @@ jobs:
         env:
           MEOWCAST_PERIOD: ${{ steps.slot.outputs.period }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python render.py
+        run: python matala_render.py
 
       - name: Verify generated files
         if: steps.slot.outputs.run == 'true' && (steps.slot.outputs.publish != 'true' || steps.dedupe.outputs.skip != 'true')

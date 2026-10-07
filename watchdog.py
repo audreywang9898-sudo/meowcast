@@ -31,18 +31,6 @@ CITIES={
    }},
 }
 
-# Keep Matala opt-in until its dedicated account and artwork are verified.
-if os.environ.get("MATALA_PRODUCTION_ENABLED", "false").lower() == "true":
-    CITIES["matala"] = {
-        "tz": "Europe/Athens", "workflow": "matala.yml", "prefix": "latest/matala",
-        "slots": {
-            "0700": {"not_before": time(7,20), "not_after": time(8,30),
-                     "inputs": {"period": "morning", "publish": True, "republish": False}},
-            "1630": {"not_before": time(16,55), "not_after": time(18,30),
-                     "inputs": {"period": "evening", "publish": True, "republish": False}},
-        },
-    }
-
 def get_json(url, headers=None):
     req=request.Request(url,headers=headers or {})
     try:

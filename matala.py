@@ -62,7 +62,7 @@ def main():
         validate_artwork()
     if args.period:
         os.environ["CITY"] = "matala"
-        from render import main as render_edition
+        from matala_render import main as render_edition
         render_edition(args.period)
     if not (args.import_assets or args.check_assets or args.period):
         parser.print_help()

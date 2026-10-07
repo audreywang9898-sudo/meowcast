@@ -288,12 +288,10 @@ def _voice_lines(w, city):
     """Choose deterministic copy by each city's local forecast date weekday."""
     from datetime import date
     period = "evening" if w.get("period") == "evening" else "morning"
-    custom_lines = city.get("weekday_lines")
-    voice = city["id"] if custom_lines else ("taipei" if city.get("id") == "taipei" else "melbourne")
+    voice = "taipei" if city.get("id") == "taipei" else "melbourne"
     local_date = date.fromisoformat(w["date"])
     weekday = local_date.weekday()  # Monday=0 ... Sunday=6
-    templates = custom_lines if custom_lines else WEEKDAY_LINES[voice]
-    first, second = templates[period][weekday]
+    first, second = WEEKDAY_LINES[voice][period][weekday]
     weekday_name = local_date.strftime("%A")
     template_id = f"{voice}-{period}-{weekday_name.lower()}"
     print(f"Caption template: {voice} / {w['date']} / {weekday_name} / {period} / template={template_id}")
@@ -475,8 +473,6 @@ FACTUAL CAPTION:
 def make_caption(w,event=None,city=None):
     city=city or load_city_config()
     config=load_config()
-    if "isAI" in city:
-        config={**config,"isAI":city["isAI"]}
     t,simple_caption=make_simple_caption(w,event=event,city=city)
     if not config.get("isAI",False):
         print("Caption mode: SIMPLE (isAI=false)")

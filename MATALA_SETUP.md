@@ -1,10 +1,10 @@
 # Matala Meowcast setup
 
-Matala is a third, independent English-language weather cat. It uses Europe/Athens for forecast dates, weekdays and schedules, with daylight-saving transitions handled by the timezone. Its state lives under latest/matala; its videos under matala/reels.
+Matala is a third, independent English-language weather cat. It uses matala_render.py and matala_caption.py; render.py, caption.py, watchdog.py and all existing workflows remain unchanged. It uses Europe/Athens for forecast dates, weekdays and schedules, with daylight-saving transitions handled by the timezone. Its state lives under latest/matala; its videos under matala/reels.
 
 ## Current status
 
-City config, 14 weekday captions, Instagram workflow and an opt-in external watchdog are prepared. Production remains disabled. The 42 images have been generated; import the bundle below. Dedicated credentials and live publication checks are still required. Facebook is not connected: the existing Facebook publisher is Taipei-specific and must not be pointed at Matala.
+City config, 14 weekday captions, Instagram workflow and isolated renderer and deployment previews are installed. Production remains disabled. The 42 images are deployed on the isolated matala-artwork branch. Matala workflows download the pinned asset commit; existing cities do not download these images. Dedicated credentials and live publication checks are still required. Facebook is not connected: the existing Facebook publisher is Taipei-specific and must not be pointed at Matala.
 
 ## Artwork
 
@@ -17,7 +17,7 @@ CITY=matala python matala.py --period morning
 CITY=matala python matala.py --period evening
 ```
 
-This produces previews only. Commit `asset/matala/*.png` to this branch before using GitHub previews. Required naming:
+This produces local previews only. GitHub workflows already download all images from the isolated asset branch. Required naming:
 - sunny-1.png, cloudy-1.png, rainy-1.png
 - sunny_evening-1.png, cloudy_evening-1.png, rainy_evening-1.png
 
@@ -34,14 +34,14 @@ Reuse MEDIA_REPO_TOKEN only for the existing media repository. Never paste token
 ## Preview and launch
 
 1. Merge this preparation only after code review.
-2. Import and commit all 42 images and run Matala Meowcast manually with publish=false, once for morning and once for evening.
+2. Run Matala Meowcast manually with publish=false, once for morning and once for evening.
 3. Inspect both preview artifacts, local dates, weather, captions and cat placement.
 4. Add the dedicated credentials and set repository variable MATALA_PRODUCTION_ENABLED=true.
 5. Run a single controlled publish=true test. Verify the Reel on the correct account and its latest/matala receipt.
 6. Repeat the same slot with republish=false and verify it is skipped.
-7. Set MATALA_PRODUCTION_ENABLED=true on the Render watchdog environment only after GitHub production is ready.
+7. External Matala watchdog integration is deferred; the existing Taipei/Melbourne watchdog is unchanged.
 
-The first scheduled morning trigger is 07:07 local time, matching the existing Melbourne recovery pattern; evening starts at 16:30. Extra cron triggers recover the same slot. GitHub scheduling and processing can delay actual publication. Slot 0700 is the internal morning identifier, not an exact publish-time promise. If the schedule is disabled, manual previews remain available but publication is blocked.
+The first scheduled morning trigger is 07:07 local time, matching the existing Melbourne recovery pattern; evening starts at 16:30. Extra Matala cron triggers recover the same slot. GitHub scheduling and processing can delay actual publication. Slot 0700 is the internal morning identifier, not an exact publish-time promise. If the schedule is disabled, manual previews remain available but publication is blocked.
 
 The Matala workflow has a separate publisher concurrency group. Keep republish=false for routine recovery. Do not enable native IG-to-FB sharing and API Facebook publication simultaneously without choosing one route.
 
