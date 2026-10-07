@@ -244,7 +244,7 @@ HUMOR_LINES = {
 WEEKDAY_LINES = {
     "taipei": {
         "morning": [
-            ["太陽今天有打卡，我也有，只是打完就想躺回去。週一先求生存，不求完美。", "The sun clocked in. So did I. Monday is for survival, not perfection."],
+            ["本貓今天有打卡，只是打完就想躺回去。週一先求生存，不求完美。", "This cat clocked in, then wanted to lie down again. Monday is for survival, not perfection."],
             ["週二沒有週一那麼可怕，但離週五也沒有你想像中那麼近。", "Tuesday is less scary than Monday, but Friday is not as close as you think."],
             ["撐過今天就過一半了。連本貓都已經連續上班三天。", "Halfway day. Even this cat has clocked in three days in a row."],
             ["週末已經出現在雷達邊緣。衣服穿對、雨傘帶對，剩下的人生問題本貓不負責。", "The weekend is on the radar. Dress right, pack smart; the rest is above my pay grade."],
@@ -283,6 +283,52 @@ WEEKDAY_LINES = {
         ]
     }
 }
+
+
+# Weekday and forecast hooks are separate from the longer cat commentary.
+OPENING_WEEKDAYS = {
+    "morning": [
+        ("星期一，靈魂還在棉被裡。", "Monday: my soul is still under the duvet."),
+        ("星期二，本貓開機速度依然很慢。", "Tuesday: this cat is still booting up."),
+        ("星期三，先看天氣，再撐過半週。", "Wednesday: forecast first, halfway through the week next."),
+        ("星期四，貓耳已經收到週末的訊號。", "Thursday: my ears have picked up a weekend signal."),
+        ("星期五，貓貓的週末模式正在載入。", "Friday: weekend mode is loading."),
+        ("星期六，出門玩之前先問貓。", "Saturday: check with the cat before heading out."),
+        ("星期日，今天的行程可以慢慢決定。", "Sunday: there's time to decide today's plans."),
+    ],
+    "evening": [
+        ("星期一晚班，辛苦了，貓貓陪你收尾。", "Monday evening: a long day deserves some cat company."),
+        ("星期二晚班，本貓準備把工作交給沙發。", "Tuesday evening: I'm handing my duties over to the sofa."),
+        ("星期三晚班，半週的疲累先放下。", "Wednesday evening: put down that half-week of worries."),
+        ("星期四晚班，再睡一次就到星期五。", "Thursday evening: one more sleep until Friday."),
+        ("星期五晚班，貓貓準備收工，飯碗準備開工。", "Friday evening: the cat clocks off, the food bowl clocks on."),
+        ("星期六晚班，續攤或回家，先看這份喵報。", "Saturday evening: heading out or heading home? Check the pawcast."),
+        ("星期日晚班，明天的待辦先別搬進被窩。", "Sunday evening: leave tomorrow's to-do list outside the duvet."),
+    ],
+}
+OPENING_WEATHER = {
+    "morning": {
+        "sunny": ("預報偏晴，窗邊好位置本貓先預約。", "Sunshine in the forecast; I've reserved the window seat."),
+        "cloudy": ("預報多雲，天空和本貓一起走低調路線。", "Clouds in the forecast; the sky and I are keeping things low-key."),
+        "rainy": ("預報有雨，傘要帶，鞋子沒有報名游泳。", "Rain in the forecast: pack a brolly. Your shoes didn't sign up for swimming."),
+    },
+    "evening": {
+        "sunny": ("晚間預報偏晴，我的下一站是飯碗。", "A clear evening forecast; my next stop is the food bowl."),
+        "cloudy": ("晚間預報多雲，天空蓋雲被，本貓找棉被。", "A cloudy evening forecast: a blanket for the sky, a duvet for me."),
+        "rainy": ("晚間預報有雨，回家帶傘，貓貓在乾的地方等你。", "Rain in the evening forecast: bring a brolly. I'll wait somewhere dry."),
+    },
+}
+
+
+def _opening_lines(w):
+    """Use the city's forecast date, edition and condition, never runner time."""
+    from datetime import date
+    period = "evening" if w.get("period") == "evening" else "morning"
+    weekday = date.fromisoformat(w["date"]).weekday()
+    zh_day, en_day = OPENING_WEEKDAYS[period][weekday]
+    zh_weather, en_weather = OPENING_WEATHER[period][theme(w)]
+    return f"{en_day} {en_weather} 🐱", f"{zh_day}{zh_weather} 🐱"
+
 
 def _voice_lines(w, city):
     """Choose deterministic copy by each city's local forecast date weekday."""
@@ -350,7 +396,7 @@ def _simple_english_caption(w, city, event=None):
             f"🌧️ Highest rain chance this evening: {w['rain']}%\n"
             f"Evening forecast: {en_condition}."
         )
-        hello = f"{cat} reporting for the evening shift. Dinner negotiations are next. 🐱"
+        hello, _ = _opening_lines(w)
         closing = "Clock off when you can. The sofa won't sit on itself. 🐾"
         extra_tags += f" #{name}Evening"
     else:
@@ -360,7 +406,7 @@ def _simple_english_caption(w, city, event=None):
             f"🌧️ Rain chance: {w['rain']}%\n"
             f"Morning forecast: {en_condition}."
         )
-        hello = f"{cat} here. Forecast first, highly important nap second. 🐱"
+        hello, _ = _opening_lines(w)
         closing = "Go easy on yourself. Even cats take a break from taking breaks. 🐾"
     return t, f"{hello}\n\n{title}\n📍 {name}, {country}\n{weather}\n\n{seasonal}🐾 The cat’s verdict\n{note}\n\n{closing}\n\n{ENGAGEMENT_EN}\n\n{_tags(city, extra_tags)}"
 
@@ -385,8 +431,7 @@ def _simple_taipei_caption(w, city, event=None):
             f"🌧️ Highest rain chance this evening: {w['rain']}%\n"
             f"Evening forecast: {en_condition}."
         )
-        hello_zh = "台北貓晚班打卡！先報天氣，再跟飯碗開會。🐱"
-        hello_en = "Taipei Cat, evening shift. Forecast first, dinner meeting next. 🐱"
+        hello_en, hello_zh = _opening_lines(w)
         close_zh = "今天辛苦了。能收工就收工，沙發不會自己坐。🐾"
         close_en = "You've done enough for today. The sofa won't sit on itself. 🐾"
         extra_tags += " #TaipeiEvening #台北夜晚"
@@ -402,8 +447,7 @@ def _simple_taipei_caption(w, city, event=None):
             f"🌧️ Rain chance: {w['rain']}%\n"
             f"Morning forecast: {en_condition}."
         )
-        hello_zh = "台北貓早班打卡！眼睛睜開了，靈魂還在棉被裡。🐱"
-        hello_en = "Taipei Cat clocking in. Eyes open, soul still under the duvet. 🐱"
+        hello_en, hello_zh = _opening_lines(w)
         close_zh = "今天照自己的步調走。貓都會休息，你也可以。🐾"
         close_en = "Take today at your own pace. Even cats take breaks from taking breaks. 🐾"
     return t, (
@@ -445,6 +489,7 @@ def make_ai_caption(w,simple_caption,config,city=None):
 Rewrite the caption below with concise, observational cat humour: one strong joke and a useful weather reminder. {language_instruction}
 Keep every weather number exactly unchanged. Do not invent weather facts.
 Preserve the time-of-day framing. Keep it concise enough for Instagram/Facebook.
+Preserve the first opening line verbatim, including its weekday and forecast condition. For Taipei also preserve the English opening line verbatim in the English section.
 Taipei voice: Traditional Chinese first, then natural English; an affectionate, mildly grumbling neighbourhood cat. Use Taiwanese everyday phrasing, not forced slang.
 Melbourne voice: natural Australian English, dry wit, brollies, commutes and sofa ownership; no caricature or forced puns.
 Make the cat the butt of the joke. Keep morning and evening distinct. Avoid repetitive motivational platitudes.
@@ -467,6 +512,11 @@ FACTUAL CAPTION:
     text=_extract_response_text(response.json())
     if not text:
         raise RuntimeError("AI returned an empty caption")
+    opening_en, opening_zh = _opening_lines(w)
+    bilingual = city.get("id") == "taipei" and city.get("language") == "bilingual"
+    expected_opening = opening_zh if bilingual else opening_en
+    if not text.startswith(expected_opening) or (bilingual and opening_en not in text):
+        raise RuntimeError("AI changed the weekday/weather opening; use the factual caption")
     return text
 
 
