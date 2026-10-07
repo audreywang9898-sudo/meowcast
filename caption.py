@@ -328,8 +328,8 @@ def _seasonal_copy(event):
     return en, zh, (" " + " ".join(tags)) if tags else ""
 
 
-ENGAGEMENT_ZH = "喜歡這隻愛碎念的天氣貓，就幫我點個愛心 ❤️、追蹤台北天氣貓！每天早晚一起看天氣，出門帶傘還是帶墨鏡，先問貓再出門。🐾"
-ENGAGEMENT_EN = "Enjoy your daily pawcast? Tap the heart ❤️ and follow for weather with a side of cat attitude, every morning and evening. Forecast first, nap later. 🐾"
+ENGAGEMENT_ZH = "你負責出門，我負責看天氣喵 🐾\n追蹤台北天氣貓，每天早晚，用一點天氣提醒和貓式幽默陪你出門、回家。\n如果今天的貓貓讓你笑了一下，或幫你想起要帶傘，按個愛心 ❤️，給幕後用心創作的人一點鼓勵。謝謝你陪貓貓一起上班！"
+ENGAGEMENT_EN = "You head out. I’ll handle the pawcast. 🐾\nFollow for morning and evening weather reminders with a little cat humour.\nIf today’s cat made you smile or reminded you to pack a brolly, tap the heart ❤️ to encourage the creator behind the whiskers. Thanks for keeping this cat company!"
 
 
 def _simple_english_caption(w, city, event=None):
