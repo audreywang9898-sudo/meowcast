@@ -320,12 +320,25 @@ OPENING_WEATHER = {
 }
 
 
-def _opening_lines(w):
+def _caption_override(w, city):
+    """Date-specific Taipei copy lives in the shared calendar."""
+    if city.get("id") != "taipei":
+        return {}
+    with open("calendar.json", encoding="utf-8") as f:
+        calendar = json.load(f)
+    period = "evening" if w.get("period") == "evening" else "morning"
+    return calendar.get("caption_overrides", {}).get(w["date"], {}).get(period, {})
+
+
+def _opening_lines(w, city=None):
     """Use the city's forecast date, edition and condition, never runner time."""
     from datetime import date
     period = "evening" if w.get("period") == "evening" else "morning"
     weekday = date.fromisoformat(w["date"]).weekday()
     zh_day, en_day = OPENING_WEEKDAYS[period][weekday]
+    override = _caption_override(w, city or load_city_config())
+    zh_day = override.get("opening_zh", zh_day)
+    en_day = override.get("opening_en", en_day)
     zh_weather, en_weather = OPENING_WEATHER[period][theme(w)]
     return f"{en_day} {en_weather} 🐱", f"{zh_day}{zh_weather} 🐱"
 
@@ -342,6 +355,9 @@ def _voice_lines(w, city):
     template_id = f"{voice}-{period}-{weekday_name.lower()}"
     print(f"Caption template: {voice} / {w['date']} / {weekday_name} / {period} / template={template_id}")
     en, zh = (second, first) if voice == "taipei" else (first, "")
+    override = _caption_override(w, city)
+    en = override.get("caption_en", en)
+    zh = override.get("caption_zh", zh)
     # Keep useful weather-dependent reminders on top of the weekday personality.
     temp = w.get("temperature", w["high"]) if period == "evening" else w["high"]
     if temp >= 32:
@@ -396,7 +412,7 @@ def _simple_english_caption(w, city, event=None):
             f"🌧️ Highest rain chance this evening: {w['rain']}%\n"
             f"Evening forecast: {en_condition}."
         )
-        hello, _ = _opening_lines(w)
+        hello, _ = _opening_lines(w, city)
         closing = "Clock off when you can. The sofa won't sit on itself. 🐾"
         extra_tags += f" #{name}Evening"
     else:
@@ -406,7 +422,7 @@ def _simple_english_caption(w, city, event=None):
             f"🌧️ Rain chance: {w['rain']}%\n"
             f"Morning forecast: {en_condition}."
         )
-        hello, _ = _opening_lines(w)
+        hello, _ = _opening_lines(w, city)
         closing = "Go easy on yourself. Even cats take a break from taking breaks. 🐾"
     return t, f"{hello}\n\n{title}\n📍 {name}, {country}\n{weather}\n\n{seasonal}🐾 The cat’s verdict\n{note}\n\n{closing}\n\n{ENGAGEMENT_EN}\n\n{_tags(city, extra_tags)}"
 
@@ -431,7 +447,7 @@ def _simple_taipei_caption(w, city, event=None):
             f"🌧️ Highest rain chance this evening: {w['rain']}%\n"
             f"Evening forecast: {en_condition}."
         )
-        hello_en, hello_zh = _opening_lines(w)
+        hello_en, hello_zh = _opening_lines(w, city)
         close_zh = "今天辛苦了。能收工就收工，沙發不會自己坐。🐾"
         close_en = "You've done enough for today. The sofa won't sit on itself. 🐾"
         extra_tags += " #TaipeiEvening #台北夜晚"
@@ -447,12 +463,18 @@ def _simple_taipei_caption(w, city, event=None):
             f"🌧️ Rain chance: {w['rain']}%\n"
             f"Morning forecast: {en_condition}."
         )
-        hello_en, hello_zh = _opening_lines(w)
+        hello_en, hello_zh = _opening_lines(w, city)
         close_zh = "今天照自己的步調走。貓都會休息，你也可以。🐾"
         close_en = "Take today at your own pace. Even cats take breaks from taking breaks. 🐾"
+    override = _caption_override(w, city)
+    close_zh = override.get("closing_zh", close_zh)
+    close_en = override.get("closing_en", close_en)
+    engagement_zh = ENGAGEMENT_ZH
+    if override:
+        engagement_zh = engagement_zh.replace("謝謝你陪貓貓一起上班！", "謝謝你讓貓貓陪你一起過連假！")
     return t, (
         f"{hello_zh}\n\n{title}\n📍 台北，台灣\n{weather_zh}\n\n"
-        f"{seasonal_zh}🐱 台北貓的碎念\n{zh_note}\n\n{close_zh}\n\n{ENGAGEMENT_ZH}\n\n"
+        f"{seasonal_zh}🐱 台北貓的碎念\n{zh_note}\n\n{close_zh}\n\n{engagement_zh}\n\n"
         f"— English pawcast —\n{hello_en}\n📍 Taipei, Taiwan\n{weather_en}\n\n"
         f"{seasonal_en}🐾 The cat’s verdict\n{en_note}\n\n{close_en}\n\n{ENGAGEMENT_EN}\n\n"
         f"{_tags(city, extra_tags)}"
@@ -512,7 +534,7 @@ FACTUAL CAPTION:
     text=_extract_response_text(response.json())
     if not text:
         raise RuntimeError("AI returned an empty caption")
-    opening_en, opening_zh = _opening_lines(w)
+    opening_en, opening_zh = _opening_lines(w, city)
     bilingual = city.get("id") == "taipei" and city.get("language") == "bilingual"
     expected_opening = opening_zh if bilingual else opening_en
     if not text.startswith(expected_opening) or (bilingual and opening_en not in text):
