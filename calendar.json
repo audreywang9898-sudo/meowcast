@@ -531,5 +531,25 @@
       "caption_en": "New Year's Eve: you needn't chase every unfinished task to midnight. Give yourself some credit. The cat approves an early night.",
       "caption_zh": "跨年夜，沒完成的事不必全部追到午夜。先對自己說聲辛苦了，貓批准你提早休息。"
     }
+  },
+  "caption_overrides": {
+    "2026-10-09": {
+      "morning": {
+        "opening_zh": "星期五，國慶補假，連假模式直接啟動！",
+        "opening_en": "Friday is Taiwan's National Day substitute holiday. Long-weekend mode: on!",
+        "caption_zh": "今天國慶補假，不用等下班，連假已經開始。本貓取消通勤，改走飯碗到沙發路線。放假的慢慢來，仍要上班的朋友辛苦了，貓貓陪你看天氣。",
+        "caption_en": "It's the National Day substitute holiday: the long weekend starts now. I've replaced my commute with a bowl-to-sofa route. Take your time if you're off; if you're working, this cat is keeping you company.",
+        "closing_zh": "出遊先看天氣，宅家也很合理。今天的鬧鐘，貓批准休假。🐾",
+        "closing_en": "Check the forecast before heading out. Staying home is a fine plan too; the alarm has the day off. 🐾"
+      },
+      "evening": {
+        "opening_zh": "星期五晚班，國慶連假第一天，貓貓陪你繼續放鬆。",
+        "opening_en": "Friday evening: day one of Taiwan's National Day long weekend. Keep relaxing with the cat.",
+        "caption_zh": "國慶連假第一天，今天最忙的工作是決定下一餐吃什麼。本貓的假期進度：吃飽、躺好、再吃一點。出遊的慢慢玩，今天值班的朋友也別忘了休息。",
+        "caption_en": "Day one of the National Day long weekend. My busiest task is deciding what to eat next: dinner, sofa, perhaps more dinner. Enjoy your evening out or in; if you're on duty, make room for a break too.",
+        "closing_zh": "連假還有兩天，今晚不用急著收心。回家或續攤，先看天氣喵。🐾",
+        "closing_en": "Two more days of the long weekend ahead. Heading home or staying out? Check the pawcast first. 🐾"
+      }
+    }
   }
 }
