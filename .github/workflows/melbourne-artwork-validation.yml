@@ -1,0 +1,28 @@
+name: Validate Melbourne artwork rotation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'asset/melbourne/**'
+      - 'validate_melbourne_artwork.py'
+      - '.github/workflows/melbourne-artwork-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install Pillow requests
+      - run: python validate_melbourne_artwork.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: melbourne-artwork-validation
+          path: output/melbourne-artwork-validation/

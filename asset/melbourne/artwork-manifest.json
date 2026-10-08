@@ -1,0 +1,375 @@
+{
+  "version": 1,
+  "added": "2026-10-08",
+  "existing_indices": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "new_indices": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "groups": {
+    "8": "Flinders Street station",
+    "9": "Laneway cafe",
+    "10": "Yarra riverside",
+    "11": "Tram stop",
+    "12": "Window reading",
+    "13": "Rooftop garden",
+    "14": "Market shopping"
+  },
+  "new_artwork": [
+    {
+      "path": "asset/melbourne/sunny-8.png",
+      "source": "陽光下的墨爾本喵播.png",
+      "index": 8,
+      "theme": "sunny",
+      "sha256": "ba764976951f95e5bbccfb424edf344418eca28f661ceb589b80f18e23eb42d5",
+      "git_blob_sha": "752670a96af46a85b8feaa711f533a63ad2ae26f"
+    },
+    {
+      "path": "asset/melbourne/cloudy-8.png",
+      "source": "弗林德斯街站的陰天喵播報.png",
+      "index": 8,
+      "theme": "cloudy",
+      "sha256": "e9b49e8e8f55672ffb13a92b73589c9f1159310270c59b083856b028ff8d8795",
+      "git_blob_sha": "1ad62c1d9a36c982d9bcb81c85722cc7f8a31038"
+    },
+    {
+      "path": "asset/melbourne/rainy-8.png",
+      "source": "雨中墨爾本暖心虎斑貓.png",
+      "index": 8,
+      "theme": "rainy",
+      "sha256": "e897c5b59a7f25cb64feadfa5a7ef55555d09f257333a15a3d63ac57590e8f97",
+      "git_blob_sha": "fa3b5de0bd119c9420ea337f947ac7026488df36"
+    },
+    {
+      "path": "asset/melbourne/sunny_evening-8.png",
+      "source": "暮色中的弗林德斯車站喵咪.png",
+      "index": 8,
+      "theme": "sunny_evening",
+      "sha256": "eb8e9d48abfd7a4767fbb603ae8cbce3cc310872ebfa65c47323b087d916a352",
+      "git_blob_sha": "bbae4a4da5b1e5bc7c56de35a3c043be6cb275b7"
+    },
+    {
+      "path": "asset/melbourne/cloudy_evening-8.png",
+      "source": "弗林德斯街站的陰雲喵主播.png",
+      "index": 8,
+      "theme": "cloudy_evening",
+      "sha256": "7086b0695ae546f7e057b2ebbc95a01cab17f95807630e89a3fc61b4ae9f7d62",
+      "git_blob_sha": "41d3b26379d3f57db103e66eeee919bdc5012c20"
+    },
+    {
+      "path": "asset/melbourne/rainy_evening-8.png",
+      "source": "墨爾本雨夜的暖心虎斑貓.png",
+      "index": 8,
+      "theme": "rainy_evening",
+      "sha256": "91022a30a2c352f2ca757a820c069791d8260e6d94108781c6d4d01d1f519025",
+      "git_blob_sha": "9d2efcd2802f44f944f5eb7ebcea6828bb826558"
+    },
+    {
+      "path": "asset/melbourne/sunny-9.png",
+      "source": "晴日墨爾本巷弄橘貓.png",
+      "index": 9,
+      "theme": "sunny",
+      "sha256": "2165630d36bfb3733806662355edde74b48781de42892003173ae2b9199e1a03",
+      "git_blob_sha": "e771a38b3ce568ca43c26d13f6f539688ab62f8c"
+    },
+    {
+      "path": "asset/melbourne/cloudy-9.png",
+      "source": "墨爾本陰天貓咪咖啡時光.png",
+      "index": 9,
+      "theme": "cloudy",
+      "sha256": "dbc09c2ee27eea5ef2315a8265a67103f982e54a9911f09fe47f6fa930e1d69a",
+      "git_blob_sha": "48493a4cdda634a96f018bf6886855653e50435e"
+    },
+    {
+      "path": "asset/melbourne/rainy-9.png",
+      "source": "墨爾本雨巷咖啡薑貓.png",
+      "index": 9,
+      "theme": "rainy",
+      "sha256": "b3cbb5a3f73aede9d2f67a4a886e94ef20f80590dc041244395cab5c4c94161f",
+      "git_blob_sha": "6191115199d01dbb54c4d30a7c864fb460e5410a"
+    },
+    {
+      "path": "asset/melbourne/sunny_evening-9.png",
+      "source": "墨爾本晴朗暮色喵咖啡.png",
+      "index": 9,
+      "theme": "sunny_evening",
+      "sha256": "4391462faf4810f0acab42e0aa606f0ac53bee42f519890b01caf2057cc3dd34",
+      "git_blob_sha": "200757661a41523db0e3b33b1d7f0bded7f3cc4f"
+    },
+    {
+      "path": "asset/melbourne/cloudy_evening-9.png",
+      "source": "墨爾本雲夜咖啡貓.png",
+      "index": 9,
+      "theme": "cloudy_evening",
+      "sha256": "bbd26153057b645d218a1bc1c355c6e7110b79266caebfa070a24821ba8a894c",
+      "git_blob_sha": "27d3da7045f8de3c047dbb46de8951827d1b4123"
+    },
+    {
+      "path": "asset/melbourne/rainy_evening-9.png",
+      "source": "墨爾本雨夜咖啡貓.png",
+      "index": 9,
+      "theme": "rainy_evening",
+      "sha256": "3d0aedc43423257e9aa8718e82d3dfe433dc5f1a3a4f161da9f6482f11e47ffb",
+      "git_blob_sha": "f7b6ec0b54583125b00bb8dff82ce953e3f9e255"
+    },
+    {
+      "path": "asset/melbourne/sunny-10.png",
+      "source": "陽光下的亞拉河貓咪.png",
+      "index": 10,
+      "theme": "sunny",
+      "sha256": "1ad4555ac92c3621763cf507ed1a60e43cf128d902aaddd7fc810ed92330cb90",
+      "git_blob_sha": "7f21555b813b2e7fd670541e5aeb80a31b13ef43"
+    },
+    {
+      "path": "asset/melbourne/cloudy-10.png",
+      "source": "墨爾本陰天河畔姜貓.png",
+      "index": 10,
+      "theme": "cloudy",
+      "sha256": "b0d7f4cee13deb300df93f497326894fa3e5b62ca176f3aefbbd6d07725689c7",
+      "git_blob_sha": "6473dcf390145a3881eae8646694f19591a98c58"
+    },
+    {
+      "path": "asset/melbourne/rainy-10.png",
+      "source": "雨中亞拉河畔的姜貓.png",
+      "index": 10,
+      "theme": "rainy",
+      "sha256": "e943d3b7c4cedc00b6f7c6cb43fbb51f0aeaad1907f46b0bf7fde8682ab33589",
+      "git_blob_sha": "0cde1c0a994da2982d96228158b5cab502315cd7"
+    },
+    {
+      "path": "asset/melbourne/sunny_evening-10.png",
+      "source": "雅拉河畔的黃昏貓咪.png",
+      "index": 10,
+      "theme": "sunny_evening",
+      "sha256": "5c0fa2f3ac9f7abbc55beba8c79258f99bd375f92b0f6c021beba3b8dca08492",
+      "git_blob_sha": "c3d570bf04c6b2a16c75bc5e3eb8bc5f26c9de2f"
+    },
+    {
+      "path": "asset/melbourne/cloudy_evening-10.png",
+      "source": "墨爾本雅拉河畔的雲夜貓.png",
+      "index": 10,
+      "theme": "cloudy_evening",
+      "sha256": "cc025254c43c421aad1fec25b83939c52356deea55b7c2e8844518353c19183d",
+      "git_blob_sha": "26a31cc2722191a7d707d8cbeb1eacd1d8c1104b"
+    },
+    {
+      "path": "asset/melbourne/rainy_evening-10.png",
+      "source": "墨爾本雨夜河畔暖貓.png",
+      "index": 10,
+      "theme": "rainy_evening",
+      "sha256": "b28b4bb296d616607c2c0e43ce5ae85a5a4a1d4082f7e865ad39ab91670b8133",
+      "git_blob_sha": "db3bbcba1f904bf50adb70b6d289f80323249389"
+    },
+    {
+      "path": "asset/melbourne/sunny-11.png",
+      "source": "墨爾本晴日喵站.png",
+      "index": 11,
+      "theme": "sunny",
+      "sha256": "c54d4216cabc02ea368306ce3ba30dd7a699b155588bae2db7209853366c4b5a",
+      "git_blob_sha": "b1daae047fb06e98b4a3462c5ba9b3e9624c63f2"
+    },
+    {
+      "path": "asset/melbourne/cloudy-11.png",
+      "source": "墨爾本陰天電車站虎斑貓.png",
+      "index": 11,
+      "theme": "cloudy",
+      "sha256": "df1c3739db6228774aa52e80da218d8d91e36cb82bdbb37de6334522b57c128f",
+      "git_blob_sha": "f7b00cbaca54982af75072a7fef3725a81623eea"
+    },
+    {
+      "path": "asset/melbourne/rainy-11.png",
+      "source": "雨中墨爾本電車薑貓.png",
+      "index": 11,
+      "theme": "rainy",
+      "sha256": "fe2e1f4ee47fabbf6b2386c239769d85b2fa6bb4d04e472dd95b3571a8ebfc1f",
+      "git_blob_sha": "338dd02e1d08c5710e6f46e4fdadb28c346389e7"
+    },
+    {
+      "path": "asset/melbourne/sunny_evening-11.png",
+      "source": "墨爾本黃昏電車站喵客.png",
+      "index": 11,
+      "theme": "sunny_evening",
+      "sha256": "71a9de007df9a98992c8af4202f34e645ff15f07a1945f93a07cda4ea499875e",
+      "git_blob_sha": "7096f3a6052e06dbe4cf9b28fdded659ad99cfe5"
+    },
+    {
+      "path": "asset/melbourne/cloudy_evening-11.png",
+      "source": "墨爾本雲夜的電車貓.png",
+      "index": 11,
+      "theme": "cloudy_evening",
+      "sha256": "7cc51c13b9b26926aec82116c19aad18a3b8456bd8f17de0465765a6470d7b5b",
+      "git_blob_sha": "89c41305eddb4b91d3f59ab48597960c63e4373c"
+    },
+    {
+      "path": "asset/melbourne/rainy_evening-11.png",
+      "source": "墨爾本雨夜候車橘貓.png",
+      "index": 11,
+      "theme": "rainy_evening",
+      "sha256": "b4f2803dbdb99b5af8a75fe226b60186f795fa3be1898039e399ff66fa8199fa",
+      "git_blob_sha": "b4fd655e5e721d69ca656354222ff21fe5bd0de0"
+    },
+    {
+      "path": "asset/melbourne/sunny-12.png",
+      "source": "墨爾本晴日讀書貓.png",
+      "index": 12,
+      "theme": "sunny",
+      "sha256": "3f0ba9712bf123f0efce2b78259de1e1057bfaf4d07d0990d18e424f413d2f30",
+      "git_blob_sha": "cd366462c9cd30f5ce0622ae0588a3d645d60c5e"
+    },
+    {
+      "path": "asset/melbourne/cloudy-12.png",
+      "source": "陰天窗畔的墨爾本讀書貓.png",
+      "index": 12,
+      "theme": "cloudy",
+      "sha256": "2459b1f87b06de637139c4b14b329fa3f64fc8e967f34dcf625200e61b649c11",
+      "git_blob_sha": "a4f70d3930a6c9894a8191caa3c021b94f18b0f5"
+    },
+    {
+      "path": "asset/melbourne/rainy-12.png",
+      "source": "雨日墨爾本讀書貓.png",
+      "index": 12,
+      "theme": "rainy",
+      "sha256": "ab42d7e3ea4595121b6c30d1338418dccf715eecc75e7d9766ff9e6abf6ce9e4",
+      "git_blob_sha": "84fabb07b74c40bee6623e5a182c66b27931aa15"
+    },
+    {
+      "path": "asset/melbourne/sunny_evening-12.png",
+      "source": "墨爾本暮色讀書貓.png",
+      "index": 12,
+      "theme": "sunny_evening",
+      "sha256": "4020a550e6607358c83d4e5bcc85dc61832f7413c1fc6aacb6872ad46a617404",
+      "git_blob_sha": "6e0f8e6cc0d34ae860ee732cf2a8d641ce52c1c8"
+    },
+    {
+      "path": "asset/melbourne/cloudy_evening-12.png",
+      "source": "墨爾本暮雲閱讀貓.png",
+      "index": 12,
+      "theme": "cloudy_evening",
+      "sha256": "56d751db4efffd8c943109068bd0807d3913917cb1e229b4cefc5e8a2f91e5ea",
+      "git_blob_sha": "bd9b45c77b841c4af380b81b6cce1822b21918ad"
+    },
+    {
+      "path": "asset/melbourne/rainy_evening-12.png",
+      "source": "雨夜窗邊的墨爾本閱讀貓.png",
+      "index": 12,
+      "theme": "rainy_evening",
+      "sha256": "3f18925b16ceda9fa00dff512599351e5d08bc5a83369990bf49e778b5dae60c",
+      "git_blob_sha": "71ae2a1079668514ccaedc71f32bfd4296b23b2e"
+    },
+    {
+      "path": "asset/melbourne/sunny-13.png",
+      "source": "墨爾本陽光貓園丁.png",
+      "index": 13,
+      "theme": "sunny",
+      "sha256": "ad538ffced8f9ffac94e5bae3a11117dcef5d400abc2160dae6148ab04dcfd94",
+      "git_blob_sha": "9f525143b4cec08ae793c91c4368727e523f2eaa"
+    },
+    {
+      "path": "asset/melbourne/cloudy-13.png",
+      "source": "陰天墨爾本屋頂園丁貓.png",
+      "index": 13,
+      "theme": "cloudy",
+      "sha256": "728d4be1d9b7e1ae0578b0764050f595639144432a54ae942a40b1f05b33b934",
+      "git_blob_sha": "2538379319526654913c87ed8451a8218394816d"
+    },
+    {
+      "path": "asset/melbourne/rainy-13.png",
+      "source": "雨中墨爾本屋頂花園貓.png",
+      "index": 13,
+      "theme": "rainy",
+      "sha256": "761afc139b1f730b537397bc8f639f4106f2726fbf4524153272ee8cd0bdacda",
+      "git_blob_sha": "c44793937af95509c7ffaedcc47612528c5907a7"
+    },
+    {
+      "path": "asset/melbourne/sunny_evening-13.png",
+      "source": "墨爾本暮色屋頂花園貓.png",
+      "index": 13,
+      "theme": "sunny_evening",
+      "sha256": "3298397f592cb9ca6398564dc77dbeff1d98a3667c00135b5598df391dfdf89a",
+      "git_blob_sha": "b7918bb12a678f2839d68cab79bd50153ef148d0"
+    },
+    {
+      "path": "asset/melbourne/cloudy_evening-13.png",
+      "source": "陰雲傍晚的墨爾本屋頂花園貓.png",
+      "index": 13,
+      "theme": "cloudy_evening",
+      "sha256": "dab0a15accf5f624b033e09bfcdecdd417ce44350bcb8e1927ec5b903edacab8",
+      "git_blob_sha": "f08012f26716b9d03ae4ddc82ff4715dbd2b82f1"
+    },
+    {
+      "path": "asset/melbourne/rainy_evening-13.png",
+      "source": "墨爾本雨夜花園貓.png",
+      "index": 13,
+      "theme": "rainy_evening",
+      "sha256": "1f7a62c68db44fe11364319b73ec366c2bd8b175f2b29f7b8484a62e7d0d3adb",
+      "git_blob_sha": "3b5d2041cefb13a2dac0350fc4f9fb137d584126"
+    },
+    {
+      "path": "asset/melbourne/sunny-14.png",
+      "source": "陽光下的墨爾本市集虎斑貓.png",
+      "index": 14,
+      "theme": "sunny",
+      "sha256": "64d10600549019f0abe425905ca7833518a440233ef1596a84ff0861e84e5e86",
+      "git_blob_sha": "17ca3acb56735edd77a9c507dbe561c5320b5015",
+      "repair": "Market sunny image edited: coherent paws, jacket, basket; preserved brand and lower cat placement."
+    },
+    {
+      "path": "asset/melbourne/cloudy-14.png",
+      "source": "墨爾本陰天市集的暖心貓咪.png",
+      "index": 14,
+      "theme": "cloudy",
+      "sha256": "90310717cbc25824cb0aaf9f8bfd854c06c8da62c3363e090dbbf9698acfcfff",
+      "git_blob_sha": "d9dd76066e9eb8c9ae5284e562bd267523bddc02"
+    },
+    {
+      "path": "asset/melbourne/rainy-14.png",
+      "source": "雨日墨爾本市集貓咪.png",
+      "index": 14,
+      "theme": "rainy",
+      "sha256": "d1a4bac1f8d1c4b0fc781edbdeab564e5189a24d0b3b0864ac66c27c00d719fc",
+      "git_blob_sha": "36a5009a649e24df2a70dd8997e4861e88d6d424"
+    },
+    {
+      "path": "asset/melbourne/sunny_evening-14.png",
+      "source": "墨爾本喵播：暮色市集.png",
+      "index": 14,
+      "theme": "sunny_evening",
+      "sha256": "e28d4fa26b940f7e654dfb0f34eed986a35b7f939182027a190121d75c562d1e",
+      "git_blob_sha": "da8bd5e3e5da8a65da97fb406187ccb24e03ccfa"
+    },
+    {
+      "path": "asset/melbourne/cloudy_evening-14.png",
+      "source": "墨爾本喵播：雲夜市集.png",
+      "index": 14,
+      "theme": "cloudy_evening",
+      "sha256": "99e61d6593cf1ab16f75fa3f827e3c9ae7cea6ef9bc24e2a6fdb3c6d47792236",
+      "git_blob_sha": "ed63aa745eb1c03761fb62ed55fbb14dc308d59b"
+    },
+    {
+      "path": "asset/melbourne/rainy_evening-14.png",
+      "source": "雨夜墨爾本市集貓.png",
+      "index": 14,
+      "theme": "rainy_evening",
+      "sha256": "bc98b8f97be4697b5efa9c2c1bda0085a9ca37ea315798ac447977736df69390",
+      "git_blob_sha": "8deaa670305278928488aad8ec2bd58d21a4aab8"
+    }
+  ],
+  "market_sunny_repair": {
+    "file": "asset/melbourne/sunny-14.png",
+    "method": "Built-in image editor",
+    "request": "Repair paws, jacket sleeves and produce basket; preserve orange cat, clothing, sunny market, exact Melbourne Meowcast heading, and lower cat position."
+  }
+}
