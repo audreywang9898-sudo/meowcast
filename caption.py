@@ -354,7 +354,14 @@ def _voice_lines(w, city):
     weekday_name = local_date.strftime("%A")
     template_id = f"{voice}-{period}-{weekday_name.lower()}"
     print(f"Caption template: {voice} / {w['date']} / {weekday_name} / {period} / template={template_id}")
-    en, zh = (second, first) if voice == "taipei" else (first, "")
+    if voice == "taipei":
+        # Use the forecast date to rotate weather scenes across weeks.
+        # Morning and evening have separate copy pools.
+        scenes = HUMOR_LINES["taipei"][period][theme(w)]
+        scene_index = (local_date.toordinal() + (1 if period == "evening" else 0)) % len(scenes)
+        zh, en = scenes[scene_index]
+    else:
+        en, zh = first, ""
     override = _caption_override(w, city)
     en = override.get("caption_en", en)
     zh = override.get("caption_zh", zh)
