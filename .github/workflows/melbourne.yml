@@ -161,13 +161,18 @@ jobs:
         if: steps.slot.outputs.run == 'true'
         with:
           python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
 
       - name: Install dependencies
         if: steps.slot.outputs.run == 'true'
+        timeout-minutes: 12
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg fonts-noto-cjk
-          pip install -r requirements.txt
+          set -euxo pipefail
+          export DEBIAN_FRONTEND=noninteractive
+          sudo timeout 240s apt-get update -o Acquire::Retries=2 -o Acquire::http::Timeout=30
+          sudo timeout 300s apt-get install -y --no-install-recommends ffmpeg fonts-noto-cjk
+          python -m pip install --disable-pip-version-check --timeout 30 --retries 2 -r requirements.txt
 
       - name: Check Melbourne publication evidence
         if: steps.slot.outputs.run == 'true' && steps.slot.outputs.publish == 'true'
