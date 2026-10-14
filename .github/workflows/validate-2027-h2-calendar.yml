@@ -1,0 +1,23 @@
+name: Validate Taipei 2027 H2 Calendar
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'calendar/2027.json'
+      - 'calendar_events.py'
+      - 'render.py'
+      - 'asset/taipei/2027-h2/**'
+      - 'validate_2027_h2_calendar.py'
+      - '.github/workflows/validate-2027-h2-calendar.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python validate_2027_h2_calendar.py
