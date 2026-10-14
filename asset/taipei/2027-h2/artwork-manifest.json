@@ -5,8 +5,8 @@
   "period": "2027-h2-pre-mid-autumn",
   "theme_count": 8,
   "unique_date_count": 6,
-  "status": "artwork_generation_pending",
-  "note": "New PNG images do not exist yet. Calendar entries intentionally point to planned paths; production falls back to weather images until supplied.",
+  "status": "complete_uploaded",
+  "note": "Eight original 1080x1920 PNG files uploaded to GitHub. Filenames and Git blob SHA validated against source files. Actions validation is independent.",
   "images": [
     {
       "date": "2027-07-07",
@@ -16,8 +16,13 @@
       "name_en": "Minor Heat",
       "filename": "2027-07-07_minor_heat.png",
       "asset": "2027-h2/2027-07-07_minor_heat.png",
-      "status": "pending_generation",
-      "slot": "morning"
+      "status": "uploaded",
+      "slot": "morning",
+      "brand_status": "branded",
+      "git_blob_sha": "bcb4bf42425dd8abd1e168e576631f96a75c153e",
+      "size_bytes": 1722163,
+      "width": 1080,
+      "height": 1920
     },
     {
       "date": "2027-07-23",
@@ -27,8 +32,13 @@
       "name_en": "Major Heat",
       "filename": "2027-07-23_major_heat.png",
       "asset": "2027-h2/2027-07-23_major_heat.png",
-      "status": "pending_generation",
-      "slot": "morning"
+      "status": "uploaded",
+      "slot": "morning",
+      "brand_status": "branded",
+      "git_blob_sha": "52dfd220e51f5bf8f182352a2a5a54a090742cfe",
+      "size_bytes": 1788674,
+      "width": 1080,
+      "height": 1920
     },
     {
       "date": "2027-08-08",
@@ -38,8 +48,13 @@
       "name_en": "Beginning of Autumn",
       "filename": "2027-08-08_beginning_of_autumn.png",
       "asset": "2027-h2/2027-08-08_beginning_of_autumn.png",
-      "status": "pending_generation",
-      "slot": "standby"
+      "status": "uploaded",
+      "slot": "standby",
+      "brand_status": "branded",
+      "git_blob_sha": "906f9f2499a0f1b4d88b63b9d519f39453e0baff",
+      "size_bytes": 1564110,
+      "width": 1080,
+      "height": 1920
     },
     {
       "date": "2027-08-08",
@@ -49,8 +64,13 @@
       "name_en": "Father's Day",
       "filename": "2027-08-08_fathers_day.png",
       "asset": "2027-h2/2027-08-08_fathers_day.png",
-      "status": "pending_generation",
-      "slot": "morning"
+      "status": "uploaded",
+      "slot": "morning",
+      "brand_status": "branded",
+      "git_blob_sha": "cf7387d3afe76346710ec824821430b6376da438",
+      "size_bytes": 1491252,
+      "width": 1080,
+      "height": 1920
     },
     {
       "date": "2027-08-08",
@@ -60,8 +80,13 @@
       "name_en": "Qixi Festival",
       "filename": "2027-08-08_qixi_festival.png",
       "asset": "2027-h2/2027-08-08_qixi_festival.png",
-      "status": "pending_generation",
-      "slot": "evening"
+      "status": "uploaded",
+      "slot": "evening",
+      "brand_status": "branded",
+      "git_blob_sha": "5c52dba9f621490bd165a52d28357616d922b886",
+      "size_bytes": 1632092,
+      "width": 1080,
+      "height": 1920
     },
     {
       "date": "2027-08-16",
@@ -71,8 +96,13 @@
       "name_en": "Ghost Festival",
       "filename": "2027-08-16_ghost_festival.png",
       "asset": "2027-h2/2027-08-16_ghost_festival.png",
-      "status": "pending_generation",
-      "slot": "morning"
+      "status": "uploaded",
+      "slot": "morning",
+      "brand_status": "branded",
+      "git_blob_sha": "5d540f1d4fd764dafa281c9095df193bf9920eea",
+      "size_bytes": 1685741,
+      "width": 1080,
+      "height": 1920
     },
     {
       "date": "2027-08-23",
@@ -82,8 +112,13 @@
       "name_en": "End of Heat",
       "filename": "2027-08-23_end_of_heat.png",
       "asset": "2027-h2/2027-08-23_end_of_heat.png",
-      "status": "pending_generation",
-      "slot": "morning"
+      "status": "uploaded",
+      "slot": "morning",
+      "brand_status": "branded",
+      "git_blob_sha": "2bfd6c97610eaad9d88ddbf1729fcfd16f0536c7",
+      "size_bytes": 1664299,
+      "width": 1080,
+      "height": 1920
     },
     {
       "date": "2027-09-08",
@@ -93,8 +128,13 @@
       "name_en": "White Dew",
       "filename": "2027-09-08_white_dew.png",
       "asset": "2027-h2/2027-09-08_white_dew.png",
-      "status": "pending_generation",
-      "slot": "morning"
+      "status": "uploaded",
+      "slot": "morning",
+      "brand_status": "branded",
+      "git_blob_sha": "bdcbcf98d1f6cf6f075b062dfbc185b1d6e87c34",
+      "size_bytes": 1497830,
+      "width": 1080,
+      "height": 1920
     }
   ],
   "reuse": [
