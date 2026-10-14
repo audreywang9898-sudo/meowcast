@@ -1,39 +1,52 @@
-# Taipei Meowcast — 2027 上半年圖片
+# Taipei Meowcast — 2027 上半年節日圖片對照
 
-共 31 張圖片，分四批上傳（10 + 10 + 10 + 1）。
+31 張圖片、31 個獨立主題、30 個日期。檔名統一使用 `YYYY-MM-DD_english_theme.png`。
 
-目前 10 張已更新為大字 TAIPEI MEOWCAST 品牌樣式；其餘 21 張保留原始品牌樣式，仍待換版。立春與春節假期開始保留獨立圖片，母親節亦保留獨立圖片。本次僅上傳素材，尚未新增自動發布日期或修改現有發布設定。音樂沿用既有公版，本次未新增音樂。
+本次依原中文描述檔名與既定主題清單建立對照，沿用相同圖片檔案內容；未重新生成或逐張驗證像素。品牌換版狀態沿用既有紀錄：10 張新版、21 張待更新。
 
-| 圖片 | 品牌樣式 |
-| --- | --- |
-| [台北窗邊的暖毯橘貓.png](%E5%8F%B0%E5%8C%97%E7%AA%97%E9%82%8A%E7%9A%84%E6%9A%96%E6%AF%AF%E6%A9%98%E8%B2%93.png) | 新版 |
-| [台北101前，橘貓迎新曙光.png](%E5%8F%B0%E5%8C%97101%E5%89%8D%EF%BC%8C%E6%A9%98%E8%B2%93%E8%BF%8E%E6%96%B0%E6%9B%99%E5%85%89.png) | 新版 |
-| [台北冬日街角橘貓.png](%E5%8F%B0%E5%8C%97%E5%86%AC%E6%97%A5%E8%A1%97%E8%A7%92%E6%A9%98%E8%B2%93.png) | 新版 |
-| [台北春日橘貓花園.png](%E5%8F%B0%E5%8C%97%E6%98%A5%E6%97%A5%E6%A9%98%E8%B2%93%E8%8A%B1%E5%9C%92.png) | 新版 |
-| [紅燈籠下的購物橘貓.png](%E7%B4%85%E7%87%88%E7%B1%A0%E4%B8%8B%E7%9A%84%E8%B3%BC%E7%89%A9%E6%A9%98%E8%B2%93.png) | 新版 |
-| [台北薑貓團圓夜.png](%E5%8F%B0%E5%8C%97%E8%96%91%E8%B2%93%E5%9C%98%E5%9C%93%E5%A4%9C.png) | 新版 |
-| [橘貓帶禮回家.png](%E6%A9%98%E8%B2%93%E5%B8%B6%E7%A6%AE%E5%9B%9E%E5%AE%B6.png) | 新版 |
-| [台北窗景慵懶橘貓.png](%E5%8F%B0%E5%8C%97%E7%AA%97%E6%99%AF%E6%85%B5%E6%87%B6%E6%A9%98%E8%B2%93.png) | 新版 |
-| [台北喵羊迎春時光.png](%E5%8F%B0%E5%8C%97%E5%96%B5%E7%BE%8A%E8%BF%8E%E6%98%A5%E6%99%82%E5%85%89.png) | 新版 |
-| [紅圍巾橘貓漫步台北.png](%E7%B4%85%E5%9C%8D%E5%B7%BE%E6%A9%98%E8%B2%93%E6%BC%AB%E6%AD%A5%E5%8F%B0%E5%8C%97.png) | 新版 |
-| [台北橘貓與金元寶.png](%E5%8F%B0%E5%8C%97%E6%A9%98%E8%B2%93%E8%88%87%E9%87%91%E5%85%83%E5%AF%B6.png) | 原始版，待更新 |
-| [台北捷運口的橘貓通勤.png](%E5%8F%B0%E5%8C%97%E6%8D%B7%E9%81%8B%E5%8F%A3%E7%9A%84%E6%A9%98%E8%B2%93%E9%80%9A%E5%8B%A4.png) | 原始版，待更新 |
-| [台北公園白花旁的橘貓.png](%E5%8F%B0%E5%8C%97%E5%85%AC%E5%9C%92%E7%99%BD%E8%8A%B1%E6%97%81%E7%9A%84%E6%A9%98%E8%B2%93.png) | 原始版，待更新 |
-| [雨中台北橘貓.png](%E9%9B%A8%E4%B8%AD%E5%8F%B0%E5%8C%97%E6%A9%98%E8%B2%93.png) | 原始版，待更新 |
-| [台北窗邊的暖橘貓.png](%E5%8F%B0%E5%8C%97%E7%AA%97%E9%82%8A%E7%9A%84%E6%9A%96%E6%A9%98%E8%B2%93.png) | 原始版，待更新 |
-| [抱玫瑰的台北橘貓.png](%E6%8A%B1%E7%8E%AB%E7%91%B0%E7%9A%84%E5%8F%B0%E5%8C%97%E6%A9%98%E8%B2%93.png) | 原始版，待更新 |
-| [橘貓一家桌遊時光.png](%E6%A9%98%E8%B2%93%E4%B8%80%E5%AE%B6%E6%A1%8C%E9%81%8A%E6%99%82%E5%85%89.png) | 原始版，待更新 |
-| [台北春日橘貓.png](%E5%8F%B0%E5%8C%97%E6%98%A5%E6%97%A5%E6%A9%98%E8%B2%93.png) | 原始版，待更新 |
-| [台北春日橘貓遇見瓢蟲.png](%E5%8F%B0%E5%8C%97%E6%98%A5%E6%97%A5%E6%A9%98%E8%B2%93%E9%81%87%E8%A6%8B%E7%93%A2%E8%9F%B2.png) | 原始版，待更新 |
-| [台北春日兔耳橘貓彩蛋.png](%E5%8F%B0%E5%8C%97%E6%98%A5%E6%97%A5%E5%85%94%E8%80%B3%E6%A9%98%E8%B2%93%E5%BD%A9%E8%9B%8B.png) | 原始版，待更新 |
-| [台北橘貓泡泡親子樂.png](%E5%8F%B0%E5%8C%97%E6%A9%98%E8%B2%93%E6%B3%A1%E6%B3%A1%E8%A6%AA%E5%AD%90%E6%A8%82.png) | 原始版，待更新 |
-| [台北山徑上的橘貓抱花.png](%E5%8F%B0%E5%8C%97%E5%B1%B1%E5%BE%91%E4%B8%8A%E7%9A%84%E6%A9%98%E8%B2%93%E6%8A%B1%E8%8A%B1.png) | 原始版，待更新 |
-| [雨後台北的橘貓花園.png](%E9%9B%A8%E5%BE%8C%E5%8F%B0%E5%8C%97%E7%9A%84%E6%A9%98%E8%B2%93%E8%8A%B1%E5%9C%92.png) | 原始版，待更新 |
-| [台北午後，沙發上的橘貓.png](%E5%8F%B0%E5%8C%97%E5%8D%88%E5%BE%8C%EF%BC%8C%E6%B2%99%E7%99%BC%E4%B8%8A%E7%9A%84%E6%A9%98%E8%B2%93.png) | 原始版，待更新 |
-| [台北長椅上的橘貓與便當盒.png](%E5%8F%B0%E5%8C%97%E9%95%B7%E6%A4%85%E4%B8%8A%E7%9A%84%E6%A9%98%E8%B2%93%E8%88%87%E4%BE%BF%E7%95%B6%E7%9B%92.png) | 原始版，待更新 |
-| [台北橘貓母子晨間獻花.png](%E5%8F%B0%E5%8C%97%E6%A9%98%E8%B2%93%E6%AF%8D%E5%AD%90%E6%99%A8%E9%96%93%E7%8D%BB%E8%8A%B1.png) | 原始版，待更新 |
-| [台北陽台的愜意橘貓.png](%E5%8F%B0%E5%8C%97%E9%99%BD%E5%8F%B0%E7%9A%84%E6%84%9C%E6%84%8F%E6%A9%98%E8%B2%93.png) | 原始版，待更新 |
-| [台北樹蔭下的橘貓.png](%E5%8F%B0%E5%8C%97%E6%A8%B9%E8%94%AD%E4%B8%8B%E7%9A%84%E6%A9%98%E8%B2%93.png) | 原始版，待更新 |
-| [台北花園裡的金色貓咪.png](%E5%8F%B0%E5%8C%97%E8%8A%B1%E5%9C%92%E8%A3%A1%E7%9A%84%E9%87%91%E8%89%B2%E8%B2%93%E5%92%AA.png) | 原始版，待更新 |
-| [台北河畔橘貓與龍舟.png](%E5%8F%B0%E5%8C%97%E6%B2%B3%E7%95%94%E6%A9%98%E8%B2%93%E8%88%87%E9%BE%8D%E8%88%9F.png) | 原始版，待更新 |
-| [台北黃昏橘貓.png](%E5%8F%B0%E5%8C%97%E9%BB%83%E6%98%8F%E6%A9%98%E8%B2%93.png) | 原始版，待更新 |
+日期設定已接入 `calendar/2027.json`，圖片路徑相對於 `asset/taipei`。2027-02-04 的春節假期開始為早班主題；立春保留獨立圖片與 `also` 設定，不新增第二次發文。母親節獨立對應。音樂全部使用既有 `music/daily_gentle.mp3`。
+
+此處涵蓋先前指定的 2027 上半年主題，不代表全部民俗節日或下半年均已製圖；春節後上班屬生活主題，不是國定假日。
+
+| 日期 | 節日／節氣／主題 | 英文圖片檔名 | 原檔名 | 品牌狀態 |
+| --- | --- | --- | --- | --- |
+| 2027-01-01 | 元旦 | [2027-01-01_new_year.png](2027-01-01_new_year.png) | 台北101前，橘貓迎新曙光.png | 新版 |
+| 2027-01-05 | 小寒 | [2027-01-05_minor_cold.png](2027-01-05_minor_cold.png) | 台北窗邊的暖毯橘貓.png | 新版 |
+| 2027-01-20 | 大寒 | [2027-01-20_major_cold.png](2027-01-20_major_cold.png) | 台北冬日街角橘貓.png | 新版 |
+| 2027-02-04 | 立春 | [2027-02-04_beginning_of_spring.png](2027-02-04_beginning_of_spring.png) | 台北春日橘貓花園.png | 新版 |
+| 2027-02-04 | 春節假期開始 | [2027-02-04_lunar_new_year_holiday_start.png](2027-02-04_lunar_new_year_holiday_start.png) | 紅燈籠下的購物橘貓.png | 新版 |
+| 2027-02-05 | 除夕 | [2027-02-05_lunar_new_year_eve.png](2027-02-05_lunar_new_year_eve.png) | 台北薑貓團圓夜.png | 新版 |
+| 2027-02-06 | 春節初一 | [2027-02-06_lunar_new_year_day_1.png](2027-02-06_lunar_new_year_day_1.png) | 台北喵羊迎春時光.png | 新版 |
+| 2027-02-07 | 春節初二 | [2027-02-07_lunar_new_year_day_2.png](2027-02-07_lunar_new_year_day_2.png) | 橘貓帶禮回家.png | 新版 |
+| 2027-02-08 | 春節初三 | [2027-02-08_lunar_new_year_day_3.png](2027-02-08_lunar_new_year_day_3.png) | 台北窗景慵懶橘貓.png | 新版 |
+| 2027-02-09 | 春節初四／初一補假 | [2027-02-09_lunar_new_year_day_4_observed.png](2027-02-09_lunar_new_year_day_4_observed.png) | 紅圍巾橘貓漫步台北.png | 新版 |
+| 2027-02-10 | 春節初五／初二補假 | [2027-02-10_lunar_new_year_day_5_observed.png](2027-02-10_lunar_new_year_day_5_observed.png) | 台北橘貓與金元寶.png | 待更新 |
+| 2027-02-11 | 春節後上班 | [2027-02-11_back_to_work.png](2027-02-11_back_to_work.png) | 台北捷運口的橘貓通勤.png | 待更新 |
+| 2027-02-14 | 西洋情人節 | [2027-02-14_valentines_day.png](2027-02-14_valentines_day.png) | 抱玫瑰的台北橘貓.png | 待更新 |
+| 2027-02-19 | 雨水 | [2027-02-19_rain_water.png](2027-02-19_rain_water.png) | 雨中台北橘貓.png | 待更新 |
+| 2027-02-28 | 和平紀念日 | [2027-02-28_peace_memorial_day.png](2027-02-28_peace_memorial_day.png) | 台北公園白花旁的橘貓.png | 待更新 |
+| 2027-03-01 | 和平紀念日補假 | [2027-03-01_peace_memorial_day_observed.png](2027-03-01_peace_memorial_day_observed.png) | 台北窗邊的暖橘貓.png | 待更新 |
+| 2027-03-06 | 驚蟄 | [2027-03-06_awakening_of_insects.png](2027-03-06_awakening_of_insects.png) | 台北春日橘貓遇見瓢蟲.png | 待更新 |
+| 2027-03-21 | 春分 | [2027-03-21_spring_equinox.png](2027-03-21_spring_equinox.png) | 台北春日橘貓.png | 待更新 |
+| 2027-03-28 | 復活節 | [2027-03-28_easter.png](2027-03-28_easter.png) | 台北春日兔耳橘貓彩蛋.png | 待更新 |
+| 2027-04-04 | 兒童節 | [2027-04-04_childrens_day.png](2027-04-04_childrens_day.png) | 台北橘貓泡泡親子樂.png | 待更新 |
+| 2027-04-05 | 清明節／清明 | [2027-04-05_qingming.png](2027-04-05_qingming.png) | 台北山徑上的橘貓抱花.png | 待更新 |
+| 2027-04-06 | 兒童節補假 | [2027-04-06_childrens_day_observed.png](2027-04-06_childrens_day_observed.png) | 橘貓一家桌遊時光.png | 待更新 |
+| 2027-04-20 | 穀雨 | [2027-04-20_grain_rain.png](2027-04-20_grain_rain.png) | 雨後台北的橘貓花園.png | 待更新 |
+| 2027-04-30 | 勞動節補假 | [2027-04-30_labour_day_observed.png](2027-04-30_labour_day_observed.png) | 台北午後，沙發上的橘貓.png | 待更新 |
+| 2027-05-01 | 勞動節 | [2027-05-01_labour_day.png](2027-05-01_labour_day.png) | 台北長椅上的橘貓與便當盒.png | 待更新 |
+| 2027-05-06 | 立夏 | [2027-05-06_beginning_of_summer.png](2027-05-06_beginning_of_summer.png) | 台北陽台的愜意橘貓.png | 待更新 |
+| 2027-05-09 | 母親節 | [2027-05-09_mothers_day.png](2027-05-09_mothers_day.png) | 台北橘貓母子晨間獻花.png | 待更新 |
+| 2027-05-21 | 小滿 | [2027-05-21_grain_buds.png](2027-05-21_grain_buds.png) | 台北樹蔭下的橘貓.png | 待更新 |
+| 2027-06-06 | 芒種 | [2027-06-06_grain_in_ear.png](2027-06-06_grain_in_ear.png) | 台北花園裡的金色貓咪.png | 待更新 |
+| 2027-06-09 | 端午節 | [2027-06-09_dragon_boat_festival.png](2027-06-09_dragon_boat_festival.png) | 台北河畔橘貓與龍舟.png | 待更新 |
+| 2027-06-21 | 夏至 | [2027-06-21_summer_solstice.png](2027-06-21_summer_solstice.png) | 台北黃昏橘貓.png | 待更新 |
+
+完整機器可讀對照：[artwork-manifest.json](artwork-manifest.json)。
+
+日期來源：
+
+- [人事行政總處 116 年官方行事曆](https://www.dgpa.gov.tw/information?pid=13114&uid=55)
+- [人事行政總處補假說明](https://www.dgpa.gov.tw/information?pid=12983&uid=82)
+- [國立天文台 2027 節氣表](https://eco.mtk.nao.ac.jp/koyomi/yoko/2027/rekiyou272.html)（日本時間減一小時為台北時間，上半年日期不變）
+- [USCCB 2027 復活節日期](https://www.usccb.org/resources/2027cal.pdf)

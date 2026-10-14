@@ -1,0 +1,342 @@
+{
+  "version": 2,
+  "timezone": "Asia/Taipei",
+  "year": 2027,
+  "coverage": {
+    "start": "2027-01-01",
+    "end": "2027-06-30"
+  },
+  "description": "Taipei Meowcast 2027 H1: 31 independent artwork themes on 30 dates. On Feb 4 the holiday-start artwork is primary and Beginning of Spring remains a separate secondary artwork. All H1 themes use the existing daily_gentle track.",
+  "sources": [
+    {
+      "name": "DGPA official 2027 calendar",
+      "url": "https://www.dgpa.gov.tw/information?pid=13114&uid=55"
+    },
+    {
+      "name": "DGPA official holiday announcement",
+      "url": "https://www.dgpa.gov.tw/information?pid=12983&uid=82"
+    },
+    {
+      "name": "NAOJ 2027 solar terms; JST converted to Asia/Taipei (same H1 dates)",
+      "url": "https://eco.mtk.nao.ac.jp/koyomi/yoko/2027/rekiyou272.html"
+    },
+    {
+      "name": "USCCB 2027 Easter calendar",
+      "url": "https://www.usccb.org/resources/2027cal.pdf"
+    }
+  ],
+  "events": {
+    "2027-01-01": {
+      "type": "holiday",
+      "key": "new_year",
+      "name_en": "New Year's Day",
+      "name_zh": "元旦",
+      "asset": "2027-h1/2027-01-01_new_year.png",
+      "music": "daily_gentle",
+      "caption_en": "New-year goal: less worry, more sleep. I'll demonstrate the sleep part.",
+      "caption_zh": "新年目標：少一點焦慮，多一點睡眠。後半句我先示範。"
+    },
+    "2027-01-05": {
+      "type": "solar_term",
+      "key": "xiaohan",
+      "name_en": "Minor Cold",
+      "name_zh": "小寒",
+      "asset": "2027-h1/2027-01-05_minor_cold.png",
+      "music": "daily_gentle",
+      "caption_en": "Minor Cold is on the calendar: another excuse for a cosy lie-in. Let the forecast choose your layers.",
+      "caption_zh": "小寒到了，衣服多一件，賴床的理由也多一個。實際穿多少，記得看預報。"
+    },
+    "2027-01-20": {
+      "type": "solar_term",
+      "key": "dahan",
+      "name_en": "Major Cold",
+      "name_zh": "大寒",
+      "asset": "2027-h1/2027-01-20_major_cold.png",
+      "music": "daily_gentle",
+      "caption_en": "Major Cold has arrived on the calendar. The duvet is now essential infrastructure; check the temperature before dressing.",
+      "caption_zh": "大寒登場，我宣布棉被升格為重要生活設施。穿搭還是請看今天的氣溫。"
+    },
+    "2027-02-04": {
+      "type": "holiday",
+      "key": "lunar_new_year_holiday_start",
+      "name_en": "Start of Lunar New Year Holiday",
+      "name_zh": "春節假期開始",
+      "asset": "2027-h1/2027-02-04_lunar_new_year_holiday_start.png",
+      "music": "daily_gentle",
+      "caption_en": "The Lunar New Year break begins. Pack the essentials and leave room for rest.",
+      "caption_zh": "春節假期開始，把必需品帶好，也替休息留個位置。",
+      "also": [
+        {
+          "type": "solar_term",
+          "key": "lichun",
+          "name_en": "Beginning of Spring",
+          "name_zh": "立春",
+          "asset": "2027-h1/2027-02-04_beginning_of_spring.png",
+          "music": "daily_gentle",
+          "caption_en": "Beginning of Spring: the annual stretching programme is open. First, a preparatory nap.",
+          "caption_zh": "立春了，年度伸懶腰計畫正式啟動。進度：先睡一下。"
+        }
+      ]
+    },
+    "2027-02-05": {
+      "type": "lunar_festival",
+      "key": "lunar_new_year_eve",
+      "name_en": "Lunar New Year's Eve",
+      "name_zh": "除夕",
+      "asset": "2027-h1/2027-02-05_lunar_new_year_eve.png",
+      "music": "daily_gentle",
+      "caption_en": "Lunar New Year's Eve: good company, a welcoming table, and no annual performance review for the cat. I'll inspect the empty boxes.",
+      "caption_zh": "除夕團圓，願大家吃得開心、聊得自在。我負責巡視空紙箱，不負責回答年終問題。"
+    },
+    "2027-02-06": {
+      "type": "lunar_festival",
+      "key": "lunar_new_year",
+      "name_en": "Lunar New Year: Day 1",
+      "name_zh": "春節初一",
+      "asset": "2027-h1/2027-02-06_lunar_new_year_day_1.png",
+      "music": "daily_gentle",
+      "caption_en": "Happy Lunar New Year! Wishing you peace and good luck. You keep the red envelopes; I'll take the empty box.",
+      "caption_zh": "新年快樂！祝你平安順心。我不搶紅包，只搶紅包袋旁邊的空盒。"
+    },
+    "2027-02-07": {
+      "type": "lunar_festival",
+      "key": "lunar_new_year_day_2",
+      "name_en": "Lunar New Year: Day 2",
+      "name_zh": "春節初二",
+      "asset": "2027-h1/2027-02-07_lunar_new_year_day_2.png",
+      "music": "daily_gentle",
+      "caption_en": "Day two: bring your good wishes when visiting loved ones.",
+      "caption_zh": "初二走春，帶上祝福，也記得留意交通與天氣。"
+    },
+    "2027-02-08": {
+      "type": "lunar_festival",
+      "key": "lunar_new_year_day_3",
+      "name_en": "Lunar New Year: Day 3",
+      "name_zh": "春節初三",
+      "asset": "2027-h1/2027-02-08_lunar_new_year_day_3.png",
+      "music": "daily_gentle",
+      "caption_en": "Day three: a slow morning and a comfortable window seat.",
+      "caption_zh": "初三放慢腳步，窗邊的好位置先讓貓坐一下。"
+    },
+    "2027-02-09": {
+      "type": "holiday",
+      "key": "lunar_new_year_day_4_observed",
+      "name_en": "Lunar New Year: Day 4 / Day 1 Observed",
+      "name_zh": "春節初四／初一補假",
+      "asset": "2027-h1/2027-02-09_lunar_new_year_day_4_observed.png",
+      "music": "daily_gentle",
+      "caption_en": "Day four and the observed holiday for day one: enjoy a gentle stroll.",
+      "caption_zh": "初四，也是初一補假日。散個步，讓年假再慢一點。"
+    },
+    "2027-02-10": {
+      "type": "holiday",
+      "key": "lunar_new_year_day_5_observed",
+      "name_en": "Lunar New Year: Day 5 / Day 2 Observed",
+      "name_zh": "春節初五／初二補假",
+      "asset": "2027-h1/2027-02-10_lunar_new_year_day_5_observed.png",
+      "music": "daily_gentle",
+      "caption_en": "Day five and the observed holiday for day two: wishing you a peaceful, prosperous year.",
+      "caption_zh": "初五，也是初二補假日。祝你新的一年平安順心。"
+    },
+    "2027-02-11": {
+      "type": "seasonal",
+      "key": "back_to_work",
+      "name_en": "Back to Work after Lunar New Year",
+      "name_zh": "春節後上班",
+      "asset": "2027-h1/2027-02-11_back_to_work.png",
+      "music": "daily_gentle",
+      "caption_en": "Back to work after the break. Start with one small task and check the forecast before commuting.",
+      "caption_zh": "春節後上班，先完成一件小事。通勤前也記得看看天氣。"
+    },
+    "2027-02-14": {
+      "type": "festival",
+      "key": "valentines_day",
+      "name_en": "Valentine's Day",
+      "name_zh": "西洋情人節",
+      "asset": "2027-h1/2027-02-14_valentines_day.png",
+      "music": "daily_gentle",
+      "caption_en": "Valentine's Day: save some kindness for your favourite people and yourself. The cat on the sofa has already collected its share.",
+      "caption_zh": "情人節，把溫柔留給喜歡的人。也留一點給自己，沙發上的貓已經自行領取。"
+    },
+    "2027-02-19": {
+      "type": "solar_term",
+      "key": "yushui",
+      "name_en": "Rain Water",
+      "name_zh": "雨水",
+      "asset": "2027-h1/2027-02-19_rain_water.png",
+      "music": "daily_gentle",
+      "caption_en": "Rain Water is a solar term, not a promise of rain. Check the forecast; a calendar makes a terrible umbrella.",
+      "caption_zh": "今天是雨水，節氣名稱不是降雨保證。出門看預報，別拿日曆當雨傘。"
+    },
+    "2027-02-28": {
+      "type": "holiday",
+      "key": "peace_memorial_day",
+      "name_en": "Peace Memorial Day",
+      "name_zh": "和平紀念日",
+      "asset": "2027-h1/2027-02-28_peace_memorial_day.png",
+      "music": "daily_gentle",
+      "caption_en": "A quiet day to remember history, value peace, and care for the people around us.",
+      "caption_zh": "今天留一點安靜，記得歷史、珍惜和平，也好好照顧身邊的人。"
+    },
+    "2027-03-01": {
+      "type": "holiday",
+      "key": "peace_memorial_day_observed",
+      "name_en": "Peace Memorial Day Observed",
+      "name_zh": "和平紀念日補假",
+      "asset": "2027-h1/2027-03-01_peace_memorial_day_observed.png",
+      "music": "daily_gentle",
+      "caption_en": "An observed holiday for Peace Memorial Day. Take time to rest and value peace.",
+      "caption_zh": "和平紀念日補假，留些時間休息，也珍惜平安的日常。"
+    },
+    "2027-03-06": {
+      "type": "solar_term",
+      "key": "jingzhe",
+      "name_en": "Awakening of Insects",
+      "name_zh": "驚蟄",
+      "asset": "2027-h1/2027-03-06_awakening_of_insects.png",
+      "music": "daily_gentle",
+      "caption_en": "Awakening of Insects: the calendar calls for waking up. I've stretched; full consciousness is still under review.",
+      "caption_zh": "驚蟄到了，日曆提醒萬物甦醒。我已經伸過懶腰，醒來這件事再議。"
+    },
+    "2027-03-21": {
+      "type": "solar_term",
+      "key": "chunfen",
+      "name_en": "Spring Equinox",
+      "name_zh": "春分",
+      "asset": "2027-h1/2027-03-21_spring_equinox.png",
+      "music": "daily_gentle",
+      "caption_en": "Spring Equinox is about balance. My version: a nap on the left, then one on the right.",
+      "caption_zh": "春分講究平衡。我的版本是左邊躺一下，右邊也不能漏掉。"
+    },
+    "2027-03-28": {
+      "type": "festival",
+      "key": "easter",
+      "name_en": "Easter",
+      "name_zh": "復活節",
+      "asset": "2027-h1/2027-03-28_easter.png",
+      "music": "daily_gentle",
+      "caption_en": "Happy Easter! Make room for play and new beginnings.",
+      "caption_zh": "復活節快樂！留點時間玩耍，也迎接新的開始。"
+    },
+    "2027-04-04": {
+      "type": "holiday",
+      "key": "childrens_day",
+      "name_en": "Children's Day",
+      "name_zh": "兒童節",
+      "asset": "2027-h1/2027-04-04_childrens_day.png",
+      "music": "daily_gentle",
+      "caption_en": "Children's Day: room to play, ask questions, and be heard. Grown-ups may let their playful side out too.",
+      "caption_zh": "兒童節，祝小朋友有得玩、有得問，也有人好好聽。大人今天也可以把玩心放出來透透氣。"
+    },
+    "2027-04-05": {
+      "type": "solar_term",
+      "key": "qingming",
+      "name_en": "Qingming Festival / Pure Brightness",
+      "name_zh": "清明節／清明",
+      "asset": "2027-h1/2027-04-05_qingming.png",
+      "music": "daily_gentle",
+      "caption_en": "Qingming: a gentle moment for remembrance. Check the weather and your route when visiting family or paying respects.",
+      "caption_zh": "清明，把思念輕輕留在心裡。出門祭祖或探親，記得留意路況與天氣。"
+    },
+    "2027-04-06": {
+      "type": "holiday",
+      "key": "childrens_day_observed",
+      "name_en": "Children's Day Observed",
+      "name_zh": "兒童節補假",
+      "asset": "2027-h1/2027-04-06_childrens_day_observed.png",
+      "music": "daily_gentle",
+      "caption_en": "Children's Day observed: one more chance to play together.",
+      "caption_zh": "兒童節補假，多一點陪伴，也多一點一起玩的時間。"
+    },
+    "2027-04-20": {
+      "type": "solar_term",
+      "key": "guyu",
+      "name_en": "Grain Rain",
+      "name_zh": "穀雨",
+      "asset": "2027-h1/2027-04-20_grain_rain.png",
+      "music": "daily_gentle",
+      "caption_en": "Grain Rain marks spring's handover. My seasonal transitions are simpler: find a different nap spot.",
+      "caption_zh": "穀雨到了，春天準備交班。貓的四季交班比較簡單：換個地方睡。"
+    },
+    "2027-04-30": {
+      "type": "holiday",
+      "key": "labour_day_observed",
+      "name_en": "Labour Day Observed",
+      "name_zh": "勞動節補假",
+      "asset": "2027-h1/2027-04-30_labour_day_observed.png",
+      "music": "daily_gentle",
+      "caption_en": "Labour Day observed: thank you for your work. Enjoy a well-earned pause.",
+      "caption_zh": "勞動節補假，謝謝每一份努力。今天也替自己留個休息的位置。"
+    },
+    "2027-05-01": {
+      "type": "holiday",
+      "key": "labour_day",
+      "name_en": "Labour Day",
+      "name_zh": "勞動節",
+      "asset": "2027-h1/2027-05-01_labour_day.png",
+      "music": "daily_gentle",
+      "caption_en": "Labour Day: thank you for all the work you do. Make room for rest; the cat has extensive experience.",
+      "caption_zh": "勞動節，謝謝每一份努力，也別忘了休息。貓的休息資歷很深，歡迎參考。"
+    },
+    "2027-05-06": {
+      "type": "solar_term",
+      "key": "lixia",
+      "name_en": "Beginning of Summer",
+      "name_zh": "立夏",
+      "asset": "2027-h1/2027-05-06_beginning_of_summer.png",
+      "music": "daily_gentle",
+      "caption_en": "Beginning of Summer: the calendar changes mode. Let the temperature decide the air conditioning, not my dramatic flopping.",
+      "caption_zh": "立夏，日曆進入夏季模式。冷氣要不要開，請看溫度，不要看我演得多累。"
+    },
+    "2027-05-09": {
+      "type": "festival",
+      "key": "mothers_day",
+      "name_en": "Mother's Day",
+      "name_zh": "母親節",
+      "asset": "2027-h1/2027-05-09_mothers_day.png",
+      "music": "daily_gentle",
+      "caption_en": "Mother's Day: thank you for the everyday care. Don't just suggest a break; take over a chore. The cat will supervise.",
+      "caption_zh": "母親節，謝謝那些被當成理所當然的小事。今天別只說『妳休息』，也把家事接過去。貓會監工。"
+    },
+    "2027-05-21": {
+      "type": "solar_term",
+      "key": "xiaoman",
+      "name_en": "Grain Buds",
+      "name_zh": "小滿",
+      "asset": "2027-h1/2027-05-21_grain_buds.png",
+      "music": "daily_gentle",
+      "caption_en": "Grain Buds: life needn't be full to the brim. Fewer tasks, fewer appointments. The food bowl is still under negotiation.",
+      "caption_zh": "小滿提醒我們，不必事事全滿。待辦不用滿，行程不用滿，飯碗這題我保留意見。"
+    },
+    "2027-06-06": {
+      "type": "solar_term",
+      "key": "mangzhong",
+      "name_en": "Grain in Ear",
+      "name_zh": "芒種",
+      "asset": "2027-h1/2027-06-06_grain_in_ear.png",
+      "music": "daily_gentle",
+      "caption_en": "Grain in Ear: plant a small intention and take a small step. Don't just plant yourself on the sofa like me.",
+      "caption_zh": "芒種，適合把想做的事種下去。先做一小步，別像我只把自己種在沙發裡。"
+    },
+    "2027-06-09": {
+      "type": "lunar_festival",
+      "key": "dragon_boat",
+      "name_en": "Dragon Boat Festival",
+      "name_zh": "端午節",
+      "asset": "2027-h1/2027-06-09_dragon_boat_festival.png",
+      "music": "daily_gentle",
+      "caption_en": "Dragon Boat Festival: enjoy your zongzi; I'll inspect the packaging. Keep your schedule less tightly packed than lunch.",
+      "caption_zh": "端午節，粽子你吃，包裝我看。祝你過節開心，別讓行程塞得比粽子還滿。"
+    },
+    "2027-06-21": {
+      "type": "solar_term",
+      "key": "xiazhi",
+      "name_en": "Summer Solstice",
+      "name_zh": "夏至",
+      "asset": "2027-h1/2027-06-21_summer_solstice.png",
+      "music": "daily_gentle",
+      "caption_en": "Summer Solstice brings long Northern Hemisphere days. You don't have to fill every extra moment with work. Stretching is an option.",
+      "caption_zh": "夏至，北半球白晝很長。長出來的時間不用全拿來忙，也可以拿來伸個懶腰。"
+    }
+  }
+}
