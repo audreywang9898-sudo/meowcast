@@ -80,8 +80,9 @@ def _rotation_state(theme, date_str, period, city=None, available_indices=None):
 def asset_for(theme,event=None,period="morning",date_str=None,city=None):
     city=city or load_city_config()
     asset_prefix=city.get("asset_prefix","asset").rstrip("/")
-    # Evening edition always uses weather artwork; holidays stay morning-only.
-    if period != "evening" and event:
+    # A secondary same-day calendar event may explicitly supply evening artwork.
+    # Other evening editions continue rotating weather artwork as before.
+    if event and (period != "evening" or event.get("_use_evening_artwork")):
         configured=event.get("asset")
         key=event.get("key")
         special=[]
@@ -260,8 +261,15 @@ def main(period=None):
         raise ValueError(f"Unsupported MEOWCAST_PERIOD: {period}")
     w=get_evening_weather(city) if period=="evening" else get_weather(city)
     print("Weather input:", w)
-    # Holidays affect morning artwork/copy only. Evening is weather-only.
-    event=None if period=="evening" or not city.get("holiday_mode",False) else event_for_date(w["date"])
+    event=event_for_date(w["date"]) if city.get("holiday_mode",False) else None
+    if period=="evening":
+        # Where two independently illustrated observances share one date,
+        # publish the primary artwork in the morning and secondary in the evening.
+        # This preserves the existing two daily publication slots.
+        secondary=next((item for item in (event or {}).get("also", [])
+                        if isinstance(item,dict) and item.get("asset")
+                        and _valid_artwork_file(f"{city.get('asset_prefix', 'asset').rstrip('/')}/{item['asset']}")),None)
+        event={**secondary,"_use_evening_artwork":True} if secondary else None
     t,cap=make_caption(w,event=event,city=city)
     src,rotation_index=asset_for(t,event,period=period,date_str=w["date"],city=city)
     if src:
