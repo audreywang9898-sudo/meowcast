@@ -35,6 +35,8 @@ def apply_banner(path):
     bottom = round(height * .155)
     overlay = Image.new("RGBA", image.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
+    # Hide previous clipped-at-top logo before drawing the new, lower masthead.
+    draw.rectangle((0, 0, width, bottom), fill=(34, 48, 65, 245))
     margin = round(width * .06)
     radius = round(width * .035)
     draw.rounded_rectangle(
