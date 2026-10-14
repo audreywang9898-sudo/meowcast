@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "city": "taipei",
+  "year": 2027,
+  "period": "2027-h2-pre-mid-autumn",
+  "theme_count": 8,
+  "unique_date_count": 6,
+  "status": "artwork_generation_pending",
+  "note": "New PNG images do not exist yet. Calendar entries intentionally point to planned paths; production falls back to weather images until supplied.",
+  "images": [
+    {
+      "date": "2027-07-07",
+      "key": "xiaoshu",
+      "type": "solar_term",
+      "name_zh": "小暑",
+      "name_en": "Minor Heat",
+      "filename": "2027-07-07_minor_heat.png",
+      "asset": "2027-h2/2027-07-07_minor_heat.png",
+      "status": "pending_generation",
+      "slot": "morning"
+    },
+    {
+      "date": "2027-07-23",
+      "key": "dashu",
+      "type": "solar_term",
+      "name_zh": "大暑",
+      "name_en": "Major Heat",
+      "filename": "2027-07-23_major_heat.png",
+      "asset": "2027-h2/2027-07-23_major_heat.png",
+      "status": "pending_generation",
+      "slot": "morning"
+    },
+    {
+      "date": "2027-08-08",
+      "key": "liqiu",
+      "type": "solar_term",
+      "name_zh": "立秋",
+      "name_en": "Beginning of Autumn",
+      "filename": "2027-08-08_beginning_of_autumn.png",
+      "asset": "2027-h2/2027-08-08_beginning_of_autumn.png",
+      "status": "pending_generation",
+      "slot": "standby"
+    },
+    {
+      "date": "2027-08-08",
+      "key": "fathers_day",
+      "type": "festival",
+      "name_zh": "父親節",
+      "name_en": "Father's Day",
+      "filename": "2027-08-08_fathers_day.png",
+      "asset": "2027-h2/2027-08-08_fathers_day.png",
+      "status": "pending_generation",
+      "slot": "morning"
+    },
+    {
+      "date": "2027-08-08",
+      "key": "qixi",
+      "type": "lunar_festival",
+      "name_zh": "七夕",
+      "name_en": "Qixi Festival",
+      "filename": "2027-08-08_qixi_festival.png",
+      "asset": "2027-h2/2027-08-08_qixi_festival.png",
+      "status": "pending_generation",
+      "slot": "evening"
+    },
+    {
+      "date": "2027-08-16",
+      "key": "ghost_festival",
+      "type": "lunar_festival",
+      "name_zh": "中元節",
+      "name_en": "Ghost Festival",
+      "filename": "2027-08-16_ghost_festival.png",
+      "asset": "2027-h2/2027-08-16_ghost_festival.png",
+      "status": "pending_generation",
+      "slot": "morning"
+    },
+    {
+      "date": "2027-08-23",
+      "key": "chushu",
+      "type": "solar_term",
+      "name_zh": "處暑",
+      "name_en": "End of Heat",
+      "filename": "2027-08-23_end_of_heat.png",
+      "asset": "2027-h2/2027-08-23_end_of_heat.png",
+      "status": "pending_generation",
+      "slot": "morning"
+    },
+    {
+      "date": "2027-09-08",
+      "key": "bailu",
+      "type": "solar_term",
+      "name_zh": "白露",
+      "name_en": "White Dew",
+      "filename": "2027-09-08_white_dew.png",
+      "asset": "2027-h2/2027-09-08_white_dew.png",
+      "status": "pending_generation",
+      "slot": "morning"
+    }
+  ],
+  "reuse": [
+    {
+      "date": "2027-09-15",
+      "key": "mid_autumn",
+      "asset": "mid_autumn.png"
+    },
+    {
+      "date": "2027-09-23",
+      "key": "autumn_equinox",
+      "asset": "autumn_equinox.png"
+    },
+    {
+      "date": "2027-09-28",
+      "key": "teachers_day",
+      "asset": "teachers_day.png"
+    },
+    {
+      "date": "2027-10-08",
+      "key": "hanlu",
+      "asset": "hanlu.png"
+    },
+    {
+      "date": "2027-10-10",
+      "key": "national_day",
+      "asset": "national_day.png"
+    },
+    {
+      "date": "2027-10-11",
+      "key": "national_day_observed",
+      "asset": "national_day.png"
+    },
+    {
+      "date": "2027-10-23",
+      "key": "shuangjiang",
+      "asset": "shuangjiang.png"
+    },
+    {
+      "date": "2027-10-25",
+      "key": "taiwan_retrocession_day",
+      "asset": "taiwan_retrocession_day.png"
+    },
+    {
+      "date": "2027-10-31",
+      "key": "halloween",
+      "asset": "halloween.png"
+    },
+    {
+      "date": "2027-11-07",
+      "key": "lidong",
+      "asset": "lidong.png"
+    },
+    {
+      "date": "2027-11-22",
+      "key": "xiaoxue",
+      "asset": "xiaoxue.png"
+    },
+    {
+      "date": "2027-11-25",
+      "key": "thanksgiving",
+      "asset": "thanksgiving.png"
+    },
+    {
+      "date": "2027-12-07",
+      "key": "daxue",
+      "asset": "daxue.png"
+    },
+    {
+      "date": "2027-12-22",
+      "key": "dongzhi",
+      "asset": "dongzhi.png"
+    },
+    {
+      "date": "2027-12-24",
+      "key": "christmas_eve",
+      "asset": "christmas_eve.png"
+    },
+    {
+      "date": "2027-12-25",
+      "key": "christmas",
+      "asset": "christmas.png"
+    },
+    {
+      "date": "2027-12-31",
+      "key": "new_years_eve",
+      "asset": "new_years_eve.png"
+    }
+  ]
+}
