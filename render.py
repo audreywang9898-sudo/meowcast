@@ -4,7 +4,7 @@ from PIL import Image,ImageDraw,ImageFont
 from weather import get_weather, get_evening_weather
 from caption import make_caption, temperature_label
 from music import music_for_event
-from calendar_events import event_for_date
+from calendar_events import event_for_slot
 from city_config import load_city_config
 
 W,H=1080,1920
@@ -261,15 +261,9 @@ def main(period=None):
         raise ValueError(f"Unsupported MEOWCAST_PERIOD: {period}")
     w=get_evening_weather(city) if period=="evening" else get_weather(city)
     print("Weather input:", w)
-    event=event_for_date(w["date"]) if city.get("holiday_mode",False) else None
-    if period=="evening":
-        # Where two independently illustrated observances share one date,
-        # publish the primary artwork in the morning and secondary in the evening.
-        # This preserves the existing two daily publication slots.
-        secondary=next((item for item in (event or {}).get("also", [])
-                        if isinstance(item,dict) and item.get("asset")
-                        and _valid_artwork_file(f"{city.get('asset_prefix', 'asset').rstrip('/')}/{item['asset']}")),None)
-        event={**secondary,"_use_evening_artwork":True} if secondary else None
+    # A missing scheduled artwork keeps the event caption and weather fallback.
+    # Standby events are never selected by the normal morning/evening schedule.
+    event=event_for_slot(w["date"],period) if city.get("holiday_mode",False) else None
     t,cap=make_caption(w,event=event,city=city)
     src,rotation_index=asset_for(t,event,period=period,date_str=w["date"],city=city)
     if src:
@@ -283,7 +277,7 @@ def main(period=None):
     with open("output/weather-state.json","w",encoding="utf-8") as sf:
         json.dump({"date":w["date"],"city":city["id"],"theme":t,"index":rotation_index or 1,"period":period},sf,ensure_ascii=False)
     # Evening uses the normal/default BGM; no holiday-specific music.
-    bgm=music_for_event(None if period=="evening" else event)
+    bgm=music_for_event(event)
     subprocess.run(["ffmpeg","-y","-loop","1","-i","output/card.jpg","-i",bgm,"-vf","scale=1200:2134,zoompan=z='min(zoom+0.0005,1.08)':d=200:s=1080x1920:fps=25","-t","8","-c:v","libx264","-c:a","aac","-b:a","128k","-shortest","-pix_fmt","yuv420p","-movflags","+faststart","output/meowcast.mp4"],check=True)
     open("output/caption.txt","w",encoding="utf-8").write(cap)
 
