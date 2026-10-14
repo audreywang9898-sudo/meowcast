@@ -4,9 +4,9 @@
   "year": 2027,
   "coverage": {
     "start": "2027-01-01",
-    "end": "2027-06-30"
+    "end": "2027-12-31"
   },
-  "description": "Taipei Meowcast 2027 H1: 31 independent artwork themes on 30 dates. On Feb 4 the holiday-start artwork is primary and Beginning of Spring remains a separate secondary artwork. All H1 themes use the existing daily_gentle track.",
+  "description": "Taipei Meowcast full-year 2027 calendar; eight planned H2 artworks, all 2026 autumn/winter artwork reused from mid-autumn, explicit evening events on overlapping dates.",
   "sources": [
     {
       "name": "DGPA official 2027 calendar",
@@ -337,6 +337,282 @@
       "music": "daily_gentle",
       "caption_en": "Summer Solstice brings long Northern Hemisphere days. You don't have to fill every extra moment with work. Stretching is an option.",
       "caption_zh": "夏至，北半球白晝很長。長出來的時間不用全拿來忙，也可以拿來伸個懶腰。"
+    },
+    "2027-07-07": {
+      "type": "solar_term",
+      "key": "xiaoshu",
+      "name_en": "Minor Heat",
+      "name_zh": "小暑",
+      "asset": "2027-h2/2027-07-07_minor_heat.png",
+      "music": "daily_gentle",
+      "caption_en": "Minor Heat: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "小暑到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-07-23": {
+      "type": "solar_term",
+      "key": "dashu",
+      "name_en": "Major Heat",
+      "name_zh": "大暑",
+      "asset": "2027-h2/2027-07-23_major_heat.png",
+      "music": "daily_gentle",
+      "caption_en": "Major Heat: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "大暑到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-08-08": {
+      "type": "festival",
+      "key": "fathers_day",
+      "name_en": "Father's Day",
+      "name_zh": "父親節",
+      "asset": "2027-h2/2027-08-08_fathers_day.png",
+      "music": "daily_gentle",
+      "caption_en": "Father's Day: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "父親節到了，出門記得看台北天氣預報。本貓照常值班。",
+      "slot": "morning",
+      "also": [
+        {
+          "type": "solar_term",
+          "key": "liqiu",
+          "name_en": "Beginning of Autumn",
+          "name_zh": "立秋",
+          "asset": "2027-h2/2027-08-08_beginning_of_autumn.png",
+          "music": "daily_gentle",
+          "slot": "standby",
+          "caption_en": "Beginning of Autumn: the cat wishes you a gentle day.",
+          "caption_zh": "立秋，台北天氣貓祝你有美好的一天。"
+        },
+        {
+          "type": "lunar_festival",
+          "key": "qixi",
+          "name_en": "Qixi Festival",
+          "name_zh": "七夕",
+          "asset": "2027-h2/2027-08-08_qixi_festival.png",
+          "music": "daily_gentle",
+          "slot": "evening",
+          "caption_en": "Qixi Festival: the cat wishes you a gentle day.",
+          "caption_zh": "七夕，台北天氣貓祝你有美好的一天。"
+        }
+      ]
+    },
+    "2027-08-16": {
+      "type": "lunar_festival",
+      "key": "ghost_festival",
+      "name_en": "Ghost Festival",
+      "name_zh": "中元節",
+      "asset": "2027-h2/2027-08-16_ghost_festival.png",
+      "music": "daily_gentle",
+      "caption_en": "Ghost Festival: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "中元節到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-08-23": {
+      "type": "solar_term",
+      "key": "chushu",
+      "name_en": "End of Heat",
+      "name_zh": "處暑",
+      "asset": "2027-h2/2027-08-23_end_of_heat.png",
+      "music": "daily_gentle",
+      "caption_en": "End of Heat: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "處暑到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-09-08": {
+      "type": "solar_term",
+      "key": "bailu",
+      "name_en": "White Dew",
+      "name_zh": "白露",
+      "asset": "2027-h2/2027-09-08_white_dew.png",
+      "music": "daily_gentle",
+      "caption_en": "White Dew: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "白露到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-09-15": {
+      "type": "lunar_festival",
+      "key": "mid_autumn",
+      "name_en": "Mid-Autumn Festival",
+      "name_zh": "中秋節",
+      "asset": "mid_autumn.png",
+      "music": "daily_gentle",
+      "caption_en": "Mid-Autumn Festival: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "中秋節到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-09-23": {
+      "type": "solar_term",
+      "key": "autumn_equinox",
+      "name_en": "Autumn Equinox",
+      "name_zh": "秋分",
+      "asset": "autumn_equinox.png",
+      "music": "daily_gentle",
+      "caption_en": "Autumn Equinox: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "秋分到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-09-28": {
+      "type": "holiday",
+      "key": "teachers_day",
+      "name_en": "Teachers' Day",
+      "name_zh": "教師節",
+      "asset": "teachers_day.png",
+      "music": "daily_gentle",
+      "caption_en": "Teachers' Day: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "教師節到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-10-08": {
+      "type": "solar_term",
+      "key": "hanlu",
+      "name_en": "Cold Dew",
+      "name_zh": "寒露",
+      "asset": "hanlu.png",
+      "music": "daily_gentle",
+      "caption_en": "Cold Dew: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "寒露到了，出門記得看台北天氣預報。本貓照常值班。",
+      "also": [
+        {
+          "type": "lunar_festival",
+          "key": "double_ninth",
+          "name_zh": "重陽節",
+          "name_en": "Double Ninth Festival",
+          "asset": "double_ninth.png",
+          "slot": "evening",
+          "music": "daily_gentle",
+          "caption_zh": "重陽節，記得關心長輩，也好好照顧自己。",
+          "caption_en": "Double Ninth Festival: a good day to care for elders and each other."
+        }
+      ]
+    },
+    "2027-10-10": {
+      "type": "holiday",
+      "key": "national_day",
+      "name_en": "National Day",
+      "name_zh": "國慶日",
+      "asset": "national_day.png",
+      "music": "daily_gentle",
+      "caption_en": "National Day: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "國慶日到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-10-11": {
+      "type": "holiday",
+      "key": "national_day_observed",
+      "name_en": "National Day Observed",
+      "name_zh": "國慶日補假",
+      "asset": "national_day.png",
+      "music": "daily_gentle",
+      "caption_en": "National Day Observed: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "國慶日補假到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-10-23": {
+      "type": "solar_term",
+      "key": "shuangjiang",
+      "name_en": "Frost's Descent",
+      "name_zh": "霜降",
+      "asset": "shuangjiang.png",
+      "music": "daily_gentle",
+      "caption_en": "Frost's Descent: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "霜降到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-10-25": {
+      "type": "holiday",
+      "key": "taiwan_retrocession_day",
+      "name_en": "Taiwan Retrocession Day and Battle of Guningtou Commemoration",
+      "name_zh": "臺灣光復暨金門古寧頭大捷紀念日",
+      "asset": "taiwan_retrocession_day.png",
+      "music": "daily_gentle",
+      "caption_en": "Taiwan Retrocession Day and Battle of Guningtou Commemoration: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "臺灣光復暨金門古寧頭大捷紀念日到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-10-31": {
+      "type": "festival",
+      "key": "halloween",
+      "name_en": "Halloween",
+      "name_zh": "萬聖節",
+      "asset": "halloween.png",
+      "music": "daily_gentle",
+      "caption_en": "Halloween: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "萬聖節到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-11-07": {
+      "type": "solar_term",
+      "key": "lidong",
+      "name_en": "Beginning of Winter",
+      "name_zh": "立冬",
+      "asset": "lidong.png",
+      "music": "daily_gentle",
+      "caption_en": "Beginning of Winter: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "立冬到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-11-22": {
+      "type": "solar_term",
+      "key": "xiaoxue",
+      "name_en": "Minor Snow",
+      "name_zh": "小雪",
+      "asset": "xiaoxue.png",
+      "music": "daily_gentle",
+      "caption_en": "Minor Snow: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "小雪到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-11-25": {
+      "type": "festival",
+      "key": "thanksgiving",
+      "name_en": "Thanksgiving",
+      "name_zh": "感恩節",
+      "asset": "thanksgiving.png",
+      "music": "daily_gentle",
+      "caption_en": "Thanksgiving: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "感恩節到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-12-07": {
+      "type": "solar_term",
+      "key": "daxue",
+      "name_en": "Major Snow",
+      "name_zh": "大雪",
+      "asset": "daxue.png",
+      "music": "daily_gentle",
+      "caption_en": "Major Snow: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "大雪到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-12-22": {
+      "type": "solar_term",
+      "key": "dongzhi",
+      "name_en": "Winter Solstice",
+      "name_zh": "冬至",
+      "asset": "dongzhi.png",
+      "music": "daily_gentle",
+      "caption_en": "Winter Solstice: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "冬至到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-12-24": {
+      "type": "festival",
+      "key": "christmas_eve",
+      "name_en": "Christmas Eve",
+      "name_zh": "平安夜",
+      "asset": "christmas_eve.png",
+      "music": "daily_gentle",
+      "caption_en": "Christmas Eve: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "平安夜到了，出門記得看台北天氣預報。本貓照常值班。",
+      "also": [
+        {
+          "type": "holiday",
+          "key": "constitution_day_observed",
+          "name_zh": "行憲紀念日補假",
+          "name_en": "Constitution Day Observed"
+        }
+      ]
+    },
+    "2027-12-25": {
+      "type": "festival",
+      "key": "christmas",
+      "name_en": "Christmas Day",
+      "name_zh": "聖誕節",
+      "asset": "christmas.png",
+      "music": "daily_gentle",
+      "caption_en": "Christmas Day: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "聖誕節到了，出門記得看台北天氣預報。本貓照常值班。"
+    },
+    "2027-12-31": {
+      "type": "festival",
+      "key": "new_years_eve",
+      "name_en": "New Year's Eve",
+      "name_zh": "跨年夜",
+      "asset": "new_years_eve.png",
+      "music": "daily_gentle",
+      "caption_en": "New Year's Eve: check today's Taipei weather and take good care of yourself. The cat is on forecast duty.",
+      "caption_zh": "跨年夜到了，出門記得看台北天氣預報。本貓照常值班。"
     }
   }
 }
