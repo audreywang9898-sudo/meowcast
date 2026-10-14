@@ -48,7 +48,7 @@ def main():
         t = theme(weather)
         resolved, _ = render.asset_for(t, selected, period=period, date_str=day, city=city)
         expected = str(candidate)
-        assert Path(resolved).as_posix() == candidate.as_posix(), (
+        assert Path(resolved).resolve() == candidate.resolve(), (
             f"Wrong artwork on {day}/{period}: {resolved} != {expected}"
         )
         # Match the production crop/overlay composition, without publishing.
