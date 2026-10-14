@@ -34,3 +34,24 @@ def event_for_date(date_text, calendar=None):
     data = load_calendar(year)
     event = data.get("events", {}).get(date_text)
     return event if isinstance(event, dict) else None
+
+
+def event_for_slot(date_text, period="morning", calendar=None):
+    """Select primary morning or explicitly scheduled secondary evening event.
+
+    Compatibility: a single asset-bearing legacy 'also' without a slot is
+    treated as an evening event (2027-02-04 Beginning of Spring).
+    Standby and unassigned secondary entries never pre-empt evening weather.
+    """
+    event = event_for_date(date_text, calendar=calendar)
+    if not event:
+        return None
+    if period != "evening":
+        return event
+    extras = [e for e in event.get("also", []) if isinstance(e, dict) and e.get("asset")]
+    explicit = [e for e in extras if e.get("slot") == "evening"]
+    legacy = [e for e in extras if "slot" not in e]
+    selected = explicit[0] if len(explicit) == 1 else (
+        legacy[0] if not explicit and len(extras) == 1 and len(legacy) == 1 else None
+    )
+    return {**selected, "_use_evening_artwork": True} if selected else None
