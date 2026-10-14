@@ -1,0 +1,54 @@
+name: Refresh Taipei 2027 H1 Branding
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/refresh-2027-h1-branding.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: taipei-2027-h1-branding
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+      - run: pip install Pillow
+      - name: Refresh remaining 21 images and manifest
+        run: python refresh_2027_h1_branding.py
+      - name: Verify 31 files and generate local previews
+        run: |
+          pip install -r requirements.txt
+          CITY=taipei python validate_2027_h1_artwork.py
+      - name: Commit updated artwork and manifest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add asset/taipei/2027-h1/
+          if git diff --cached --quiet; then
+            echo "No pending branding updates"
+          else
+            git commit -m "Apply legible Taipei Meowcast branding to 21 holiday artworks"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Save 31 JPG previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: taipei-2027-h1-branded-previews
+          path: dry-run/2027-h1/*.jpg
+          if-no-files-found: warn
+          retention-days: 30
