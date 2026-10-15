@@ -64,6 +64,23 @@ class WeeklyTests(unittest.TestCase):
         publisher.publication_window(self.issue, due)
         monday = datetime(2026, 10, 5, 8, tzinfo=ZoneInfo('Asia/Taipei'))
         self.assertFalse(resolve('schedule', now=monday)['run'])
+    def test_oct_18_2026_sunday_issue_resolves_next_week(self):
+        """Read-only preview on Thursday must target Sunday 10/18 and forecast 10/19-10/25."""
+        thursday = datetime(2026, 10, 15, 12, 0, tzinfo=ZoneInfo('Asia/Taipei'))
+        sunday = datetime(2026, 10, 18, 8, 5, tzinfo=ZoneInfo('Asia/Taipei'))
+        preview = resolve('push', now=thursday)
+        self.assertTrue(preview['run'])
+        self.assertFalse(preview['publish'])
+        self.assertEqual(preview['issue_date'], '2026-10-18')
+        scheduled = resolve('schedule', now=sunday)
+        self.assertTrue(scheduled['run'])
+        self.assertTrue(scheduled['publish'])
+        self.assertEqual(scheduled['issue_date'], '2026-10-18')
+        self.assertEqual(
+            [d.isoformat() for d in weekly.week_dates(date(2026, 10, 18))],
+            ['2026-10-19', '2026-10-20', '2026-10-21', '2026-10-22',
+             '2026-10-23', '2026-10-24', '2026-10-25'])
+
     def test_two_children_then_parent(self):
         store, ig = Store(), IG()
         result = publisher.publish('taipei', self.issue, self.out, store, ig)
