@@ -488,9 +488,52 @@ def _simple_taipei_caption(w, city, event=None):
     )
 
 
+
+def _typhoon_taipei_caption(w, city, override):
+    """Use dated, reviewed safety copy without implying a live storm observation."""
+    period = "晚班" if w.get("period") == "evening" else "早班"
+    date = w["date"].replace("-", "/")
+    title = f"{date} 台北天氣貓｜{period}防颱特別版"
+    if w.get("period") == "evening":
+        weather_zh = (
+            f"🌡️ 17:00 約 {w.get('temperature', w['high'])}°C / 今晚低溫 {w['low']}°C\n"
+            f"🌧️ 傍晚至今晚最高降雨機率：{w['rain']}%"
+        )
+        weather_en = (
+            f"🌡️ Around 17:00: {w.get('temperature', w['high'])}°C / Tonight's low {w['low']}°C\n"
+            f"🌧️ Highest rain chance this evening: {w['rain']}%"
+        )
+    else:
+        weather_zh = f"🌡️ 最高 {w['high']}°C / 最低 {w['low']}°C\n🌧️ 降雨機率：{w['rain']}%"
+        weather_en = f"🌡️ High {w['high']}°C / Low {w['low']}°C\n🌧️ Rain chance: {w['rain']}%"
+    version_zh = (
+        f"📌 颱風預報參考：{override['reference_time']}；非即時颱風定位。\n"
+        "上述降雨機率是一般天氣預報，不代表颱風侵襲機率或風雨強度。\n"
+        f"最新風雨與警戒範圍：{override['source_url']}\n"
+        "停班停課：https://www.dgpa.gov.tw/typh/daily/nds.html"
+    )
+    version_en = (
+        f"Typhoon outlook reference: {override['reference_time']}; not a live storm position.\n"
+        "The rain chance above is a routine forecast, not a typhoon-impact probability or severity estimate.\n"
+        f"Latest warnings and forecasts: {override['source_url']}"
+    )
+    return theme(w), (
+        f"{override['opening_zh']}\n\n{title}\n📍 台北，台灣\n{weather_zh}\n\n"
+        f"{override['caption_zh']}\n\n{override['safety_zh']}\n\n{override['closing_zh']}\n\n"
+        f"{version_zh}\n\n追蹤台北天氣貓，早晚一起看天氣；按個愛心或分享，把防颱提醒送給需要的喵友。❤️\n\n"
+        f"— English pawcast —\n{override['opening_en']}\n📍 Taipei, Taiwan\n{weather_en}\n\n"
+        f"{override['caption_en']}\n\n{override['safety_en']}\n\n{override['closing_en']}\n\n"
+        f"{version_en}\n\nFollow for morning and evening weather reminders. Tap the heart or share this safety reminder. ❤️\n\n"
+        f"{_tags(city, ' #薔琵颱風 #防颱提醒 #喵友平安 #TyphoonChampi')}"
+    )
+
+
 def make_simple_caption(w,event=None,city=None):
     city=city or load_city_config()
     if city.get("language")=="bilingual" and city.get("id")=="taipei":
+        override = _caption_override(w, city)
+        if override.get("kind") == "typhoon":
+            return _typhoon_taipei_caption(w, city, override)
         return _simple_taipei_caption(w,city,event=event)
     return _simple_english_caption(w,city,event=event)
 
@@ -553,6 +596,9 @@ def make_caption(w,event=None,city=None):
     city=city or load_city_config()
     config=load_config()
     t,simple_caption=make_simple_caption(w,event=event,city=city)
+    if city.get("id") == "taipei" and _caption_override(w, city).get("kind") == "typhoon":
+        print("Caption mode: reviewed typhoon safety override (AI rewrite bypassed)")
+        return t, simple_caption
     if not config.get("isAI",False):
         print("Caption mode: SIMPLE (isAI=false)")
         return t,simple_caption

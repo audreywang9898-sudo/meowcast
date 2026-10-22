@@ -550,6 +550,62 @@
         "closing_zh": "連假還有兩天，今晚不用急著收心。回家或續攤，先看天氣喵。🐾",
         "closing_en": "Two more days of the long weekend ahead. Heading home or staying out? Check the pawcast first. 🐾"
       }
+    },
+    "2026-10-22": {
+      "morning": {
+        "kind": "typhoon",
+        "reference_time": "2026/10/22 午間（Asia/Taipei）",
+        "source_url": "https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_WARN.html",
+        "safety_zh": "🐾 趁風雨尚未增強，收妥陽台盆栽與易掉落物品，檢查門窗。\n🐾 備好飲水、手電筒，手機與行動電源先充電，毛孩糧食也別漏掉。\n🐾 風雨期間避免非必要外出；不去海邊觀浪，不到溪邊與山區冒險。必要外出留意路樹、招牌與積水。\n🐾 停班停課以政府公告為準；若接獲疏散通知，請配合撤離。",
+        "safety_en": "🐾 Before winds strengthen, secure loose balcony items and check doors and windows.\n🐾 Prepare drinking water and a torch, charge your phone and power bank, and include pet food.\n🐾 Avoid unnecessary trips during severe weather. Stay away from coasts, rivers and mountains; watch for falling objects and flooding if travel is essential.\n🐾 Follow official work/school and evacuation announcements.",
+        "closing_zh": "我負責喵，你負責平安。曬太陽的約，等風雨過去再赴。💛",
+        "closing_en": "I'll bring the meows. You stay safe. Our sunny-window date can wait. 💛",
+        "opening_zh": "薔琵接近，台北貓切換防颱值班！🐾🌀",
+        "opening_en": "Champi is approaching: Taipei Cat is on typhoon duty. 🐾",
+        "caption_zh": "依 10/22 午間氣象說明，今晚起北台灣雨勢漸趨明顯，10/23 至 24 日清晨須特別留意風雨，北部與宜蘭山區慎防豪雨以上降雨。先把防颱準備做好，別等風雨到門口才開始找手電筒；本貓已先清點罐罐。",
+        "caption_en": "The Oct 22 midday outlook calls for increasing rain in northern Taiwan tonight. Pay particular attention to wind and rain from Oct 23 to early Oct 24, with a heavy-rain risk in northern and Yilan mountain areas. Prepare before conditions worsen; this cat has already counted the food pouches."
+      },
+      "evening": {
+        "kind": "typhoon",
+        "reference_time": "2026/10/22 午間（Asia/Taipei）",
+        "source_url": "https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_WARN.html",
+        "safety_zh": "🐾 趁風雨尚未增強，收妥陽台盆栽與易掉落物品，檢查門窗。\n🐾 備好飲水、手電筒，手機與行動電源先充電，毛孩糧食也別漏掉。\n🐾 風雨期間避免非必要外出；不去海邊觀浪，不到溪邊與山區冒險。必要外出留意路樹、招牌與積水。\n🐾 停班停課以政府公告為準；若接獲疏散通知，請配合撤離。",
+        "safety_en": "🐾 Before winds strengthen, secure loose balcony items and check doors and windows.\n🐾 Prepare drinking water and a torch, charge your phone and power bank, and include pet food.\n🐾 Avoid unnecessary trips during severe weather. Stay away from coasts, rivers and mountains; watch for falling objects and flooding if travel is essential.\n🐾 Follow official work/school and evacuation announcements.",
+        "closing_zh": "我負責喵，你負責平安。曬太陽的約，等風雨過去再赴。💛",
+        "closing_en": "I'll bring the meows. You stay safe. Our sunny-window date can wait. 💛",
+        "opening_zh": "今晚不催喵友出門，先催大家做好防颱。🐾🌀",
+        "opening_en": "Tonight's reminder: typhoon preparations before any plans out. 🐾",
+        "caption_zh": "薔琵颱風接近。依 10/22 午間預報，今晚起北台灣降雨漸趨明顯，10/23 至 24 日清晨須留意風雨，北部與宜蘭山區防豪雨以上降雨。請趁安全時把陽台收好、用品備齊；已經起風下雨，就別冒險出去搬東西。本貓今晚值班顧消息，也顧著叫你平安回家。",
+        "caption_en": "Champi is approaching. The Oct 22 midday outlook indicates increasing rain in northern Taiwan tonight, with wind and rain a concern from Oct 23 to early Oct 24 and heavy rain possible in northern and Yilan mountain areas. Secure belongings while it is safe; don't go outside to retrieve them once conditions become dangerous. This cat is on safety-reminder duty tonight."
+      }
+    },
+    "2026-10-23": {
+      "morning": {
+        "kind": "typhoon",
+        "reference_time": "2026/10/22 午間（Asia/Taipei）",
+        "source_url": "https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_WARN.html",
+        "safety_zh": "🐾 趁風雨尚未增強，收妥陽台盆栽與易掉落物品，檢查門窗。\n🐾 備好飲水、手電筒，手機與行動電源先充電，毛孩糧食也別漏掉。\n🐾 風雨期間避免非必要外出；不去海邊觀浪，不到溪邊與山區冒險。必要外出留意路樹、招牌與積水。\n🐾 停班停課以政府公告為準；若接獲疏散通知，請配合撤離。",
+        "safety_en": "🐾 Before winds strengthen, secure loose balcony items and check doors and windows.\n🐾 Prepare drinking water and a torch, charge your phone and power bank, and include pet food.\n🐾 Avoid unnecessary trips during severe weather. Stay away from coasts, rivers and mountains; watch for falling objects and flooding if travel is essential.\n🐾 Follow official work/school and evacuation announcements.",
+        "closing_zh": "我負責喵，你負責平安。曬太陽的約，等風雨過去再赴。💛",
+        "closing_en": "I'll bring the meows. You stay safe. Our sunny-window date can wait. 💛",
+        "opening_zh": "星期五先不開週末模式，台北貓今天顧大家平安。🐾🌀",
+        "opening_en": "Friday's weekend mode can wait: Taipei Cat is on safety duty. 🐾",
+        "caption_zh": "依 10/22 午間預報，10/23 至 24 日清晨是須特別留意薔琵風雨的時段，北部與宜蘭山區有豪雨以上降雨風險。這是前一日的預報提醒，颱風位置、強度與警戒範圍請務必查看氣象署最新更新。別因眼前暫時風雨不大就鬆懈；今天能少跑一趟，就少跑一趟。貓掌不挑戰風雨，喵友也別逞強。",
+        "caption_en": "The Oct 22 midday outlook highlighted Oct 23 to early Oct 24 for particular attention to Champi's wind and rain, including heavy-rain risk in northern and Yilan mountain areas. This is the previous day's outlook: check CWA for the latest position, intensity and warning areas. A temporary lull does not mean the danger has passed. Avoid unnecessary trips; neither paws nor people need to test the storm."
+      },
+      "evening": {
+        "kind": "typhoon",
+        "reference_time": "2026/10/22 午間（Asia/Taipei）",
+        "source_url": "https://www.cwa.gov.tw/V8/C/P/Typhoon/TY_WARN.html",
+        "safety_zh": "🐾 趁風雨尚未增強，收妥陽台盆栽與易掉落物品，檢查門窗。\n🐾 備好飲水、手電筒，手機與行動電源先充電，毛孩糧食也別漏掉。\n🐾 風雨期間避免非必要外出；不去海邊觀浪，不到溪邊與山區冒險。必要外出留意路樹、招牌與積水。\n🐾 停班停課以政府公告為準；若接獲疏散通知，請配合撤離。",
+        "safety_en": "🐾 Before winds strengthen, secure loose balcony items and check doors and windows.\n🐾 Prepare drinking water and a torch, charge your phone and power bank, and include pet food.\n🐾 Avoid unnecessary trips during severe weather. Stay away from coasts, rivers and mountains; watch for falling objects and flooding if travel is essential.\n🐾 Follow official work/school and evacuation announcements.",
+        "closing_zh": "我負責喵，你負責平安。曬太陽的約，等風雨過去再赴。💛",
+        "closing_en": "I'll bring the meows. You stay safe. Our sunny-window date can wait. 💛",
+        "opening_zh": "週五晚班繼續防颱，今晚的約先留給平安。🐾🌀",
+        "opening_en": "Friday evening's priority is safety, with typhoon updates still on duty. 🐾",
+        "caption_zh": "依 10/22 午間預報，10/23 晚間至 24 日清晨仍在須留意風雨的時段；實際影響請查看氣象署最新警報與風雨預報，不能把這份前一日預報當作目前實況。風雨還沒穩定，就先不安排非必要外出，也別急著去海邊、溪邊或山區。本貓可以等罐罐，大家也可以等天氣穩定再出門。",
+        "caption_en": "The Oct 22 midday outlook still placed the evening of Oct 23 to early Oct 24 within the period needing attention to wind and rain. Check current CWA warnings and forecasts; yesterday's outlook is not a live observation. Postpone unnecessary trips until conditions are safe, and stay away from the coast, rivers and mountains. If this cat can wait for treats, the outing can wait too."
+      }
     }
   }
 }
