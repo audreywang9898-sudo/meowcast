@@ -1,7 +1,12 @@
 name: Taipei Weekly Facebook Page
 on:
+  workflow_run:
+    workflows: ['Weekly Meowcast carousels']
+    types: [completed]
+    branches: [main]
   schedule:
-    - cron: '17,37,57 1 * * 0' # Sunday 09:17/09:37/09:57 Taipei; GitHub UTC cron
+    - cron: '17,37,57 2 * * 0' # Sunday 10:17/10:37/10:57 Taipei; GitHub UTC cron
+    - cron: '17,37,57 3 * * 0' # Sunday 11:17/11:37/11:57 Taipei; GitHub UTC cron
   workflow_dispatch:
     inputs:
       issue_date:
@@ -15,6 +20,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   facebook-weekly:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -39,7 +45,37 @@ jobs:
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               f.write(f"issue_date={issue}\n")
           PY
+      - name: Check Instagram weekly evidence before attempting Facebook
+        id: source
+        env:
+          ISSUE_DATE: ${{ steps.issue.outputs.issue_date }}
+        run: |
+          python - <<'PY'
+          import os
+          from datetime import date, timedelta
+          import requests
+          issue = date.fromisoformat(os.environ["ISSUE_DATE"])
+          week_start = (issue + timedelta(days=1)).isoformat()
+          url = ("https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/"
+                 f"weekly/taipei/{week_start}/state.json")
+          response = requests.get(url, timeout=30)
+          if response.status_code == 404:
+              ready = False
+              print("Instagram weekly issue not available yet; next trigger will retry.")
+          else:
+              response.raise_for_status()
+              source = response.json()
+              ready = (source.get("city") == "taipei"
+                       and source.get("issue_date") == issue.isoformat()
+                       and source.get("status") == "published"
+                       and bool(source.get("media_id"))
+                       and len(source.get("image_urls", [])) == 2)
+              print("Instagram weekly published evidence ready:", ready)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+              out.write(f"ready={str(ready).lower()}\n")
+          PY
       - name: Publish Taipei weekly two-photo Facebook post with dedupe
+        if: steps.source.outputs.ready == 'true'
         env:
           MEDIA_REPO_TOKEN: ${{ secrets.MEDIA_REPO_TOKEN }}
           TAIPEI_FB_PAGE_ID: ${{ secrets.TAIPEI_FB_PAGE_ID }}
