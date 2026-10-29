@@ -117,7 +117,17 @@ jobs:
                   recovery_trigger=open(".github/trigger-meowcast-evening",encoding="utf-8").read()
               except FileNotFoundError:
                   recovery_trigger=""
-              if "force-morning" in recovery_trigger:
+              # A dedicated one-shot morning recovery marker selects 0700
+              # without changing the persistent evening recovery trigger.
+              try:
+                  with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8") as payload_file:
+                      push_payload = json.load(payload_file)
+                  head_commit = push_payload.get("head_commit") or {}
+                  changed_paths = (head_commit.get("added") or []) + (head_commit.get("modified") or [])
+              except (OSError, ValueError, TypeError):
+                  changed_paths = []
+              morning_marker = any(p.startswith(".github/recovery/morning-") for p in changed_paths)
+              if "force-morning" in recovery_trigger or morning_marker:
                   slot="0700"
                   reason="production morning recovery trigger"
               else:
