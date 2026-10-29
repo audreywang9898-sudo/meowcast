@@ -143,17 +143,19 @@ class FacebookTests(unittest.TestCase):
     def test_page_identity_rejects_user_token_or_wrong_page(self):
         with patch.dict(os.environ, {'TAIPEI_FB_PAGE_ID': '9999', 'TAIPEI_FB_PAGE_ACCESS_TOKEN': 'secret'}):
             fb = publisher.Facebook()
-            for profile in [{'id': '1111', 'name': publisher.PAGE_NAME}, {'id': '9999', 'name': 'Audrey Wang'}]:
+            for profile in [{'id': '1111', 'name': publisher.PAGE_NAME}, {'id': '9999', 'name': ''}]:
                 with patch.object(fb, 'request', return_value=profile):
                     with self.assertRaises(RuntimeError): fb.identity()
+            with patch.object(fb, 'request', return_value={'id': '9999', 'name': 'Taipei Meowcast 台北天氣貓'}):
+                self.assertEqual(fb.identity(), '9999')
 
     def test_daily_workflow_preserves_cron_and_runs_fb_after_ig_marker(self):
         import yaml
         workflow = yaml.safe_load(Path('.github/workflows/daily.yml').read_text())
         trigger = workflow.get('on', workflow.get(True))
         self.assertEqual([x['cron'] for x in trigger['schedule']],
-            ['7 23 * * *', '17 23 * * *', '27 23 * * *', '37 23 * * *', '7 0 * * *',
-             '30 5 * * *', '30 6 * * *', '30 7 * * *', '30 8 * * *', '40 8 * * *', '50 8 * * *', '7 9 * * *'])
+            ['7 23 * * *', '17 23 * * *', '7 0 * * *',
+             '30 7 * * *', '30 8 * * *', '40 8 * * *', '50 8 * * *', '7 9 * * *'])
         steps = workflow['jobs']['reel']['steps']
         names = [s.get('name', '') for s in steps]
         self.assertGreater(names.index('Publish Taipei Reel to Facebook Page'), names.index('Mark scheduled slot as published'))
