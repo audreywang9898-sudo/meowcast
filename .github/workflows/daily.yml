@@ -85,6 +85,7 @@ jobs:
         env:
           TRIGGER_SCHEDULE: ${{ github.event.schedule }}
           MANUAL_PERIOD: ${{ inputs.period }}
+          GITHUB_API_TOKEN: ${{ github.token }}
         run: |
           python - <<'PY'
           import json, os
@@ -108,31 +109,38 @@ jobs:
               slot="1630" if period=="evening" else "0700"
               reason=f"manual {period} production publish"
           elif event=="push":
-              # Production recovery: workflow-file pushes default to evening; trigger marker can select morning.
-              # This also gives the guard a second recovery path if a trigger-file push is not dispatched.
-              
-              before=os.environ.get("GITHUB_EVENT_BEFORE","")
-              # Morning recovery pushes use a dedicated marker in the commit message/file.
+              # Resolve the exact pushed files from GitHub's commit API.
+              # Never default an unrecognized morning marker to the evening edition.
+              from urllib.request import Request, urlopen
               try:
-                  recovery_trigger=open(".github/trigger-meowcast-evening",encoding="utf-8").read()
-              except FileNotFoundError:
-                  recovery_trigger=""
-              # A dedicated one-shot morning recovery marker selects 0700
-              # without changing the persistent evening recovery trigger.
-              try:
-                  with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8") as payload_file:
-                      push_payload = json.load(payload_file)
-                  head_commit = push_payload.get("head_commit") or {}
-                  changed_paths = (head_commit.get("added") or []) + (head_commit.get("modified") or [])
-              except (OSError, ValueError, TypeError):
-                  changed_paths = []
-              morning_marker = any(p.startswith(".github/recovery/morning-") for p in changed_paths)
-              if "force-morning" in recovery_trigger or morning_marker:
+                  repo=os.environ["GITHUB_REPOSITORY"]
+                  sha=os.environ["GITHUB_SHA"]
+                  api_url=f"https://api.github.com/repos/{repo}/commits/{sha}"
+                  request=Request(api_url, headers={
+                      "Accept": "application/vnd.github+json",
+                      "Authorization": "Bearer " + os.environ["GITHUB_API_TOKEN"],
+                  })
+                  with urlopen(request, timeout=15) as response:
+                      commit_info=json.load(response)
+                  changed_paths={f.get("filename") for f in commit_info.get("files", [])}
+              except Exception:
+                  changed_paths=set()
+                  print("ERROR: Unable to verify push commit changed paths; fail closed.")
+              if any(p and p.startswith(".github/recovery/morning-") for p in changed_paths):
                   slot="0700"
-                  reason="production morning recovery trigger"
+                  reason="verified one-shot morning recovery push"
+              elif ".github/trigger-meowcast-evening" in changed_paths:
+                  try:
+                      recovery_trigger=open(".github/trigger-meowcast-evening",encoding="utf-8").read()
+                  except OSError:
+                      recovery_trigger=""
+                  slot="0700" if "force-morning" in recovery_trigger else "1630"
+                  reason="verified production recovery trigger"
               else:
-                  slot="1630"
-                  reason="production evening recovery trigger"
+                  run=False
+                  valid=False
+                  reason="unrecognized or unverified recovery push; refusing to publish"
+
           elif event=="schedule":
               if not cfg.get("enabled", True):
                   run=False; reason="schedule disabled"
@@ -446,3 +454,5 @@ jobs:
         run: |
           echo "::warning::Instagram succeeded; Facebook failed or is still pending. Use Taipei Facebook Page for Facebook-only recovery."
           echo "Facebook: failed or pending. Instagram receipt is preserved. Use the Taipei Facebook Page workflow to retry Facebook only." >> "$GITHUB_STEP_SUMMARY"
+          echo "::error::Facebook publication did not succeed; marking run failed while preserving Instagram receipt."
+          exit 1
