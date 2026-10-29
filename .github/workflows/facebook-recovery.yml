@@ -5,6 +5,10 @@ on:
     # Run after the final Instagram recovery windows.
     - cron: '20 0 * * *'   # 08:20 Taipei
     - cron: '20 9 * * *'   # 17:20 Taipei
+  push:
+    branches: [main]
+    paths:
+      - '.github/recovery/facebook-0700-*'
   workflow_dispatch:
     inputs:
       slot:
@@ -58,7 +62,7 @@ jobs:
         run: |
           python - <<'PY'
           import os, re
-          from datetime import datetime
+          from datetime import datetime, timezone, timedelta
           from zoneinfo import ZoneInfo
 
           trigger = (os.environ.get("TRIGGER_SCHEDULE") or "").strip()
@@ -72,6 +76,9 @@ jobs:
               slot = "1630"
           elif os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
               slot = manual_slot
+          elif os.environ.get("GITHUB_EVENT_NAME") == "push":
+              # The only permitted push path is the explicit Facebook-only 0700 marker.
+              slot = "0700"
           else:
               raise SystemExit(f"Unknown Facebook recovery trigger: {trigger!r}")
 
@@ -81,7 +88,15 @@ jobs:
               raise SystemExit("source_run_id must be numeric")
 
           today = datetime.now(ZoneInfo("Asia/Taipei")).date().isoformat()
-          day = manual_date or today
+          if trigger in ("20 0 * * *", "20 9 * * *"):
+              now_utc = datetime.now(timezone.utc)
+              intended_hour = 0 if trigger == "20 0 * * *" else 9
+              intended = now_utc.replace(hour=intended_hour, minute=20, second=0, microsecond=0)
+              if intended > now_utc:
+                  intended -= timedelta(days=1)
+              day = intended.astimezone(ZoneInfo("Asia/Taipei")).date().isoformat()
+          else:
+              day = manual_date or today
           if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", day):
               raise SystemExit("publish_date must be YYYY-MM-DD")
 
