@@ -123,8 +123,12 @@ class Facebook:
 
     def identity(self):
         profile = self.request('GET', 'me', fields='id,name')
-        if str(profile.get('id')) != self.page or profile.get('name') != PAGE_NAME:
-            raise RuntimeError('Page token must belong to 台北喵喵氣象台 and match configured Page ID')
+        if str(profile.get('id')) != self.page:
+            raise RuntimeError('Facebook Page token ID does not match configured Page ID')
+        if not str(profile.get('name') or '').strip():
+            raise RuntimeError('Facebook Page name is missing')
+        if profile.get('name') != PAGE_NAME:
+            print('Facebook Page display name changed; configured Page ID still matches and is authoritative.')
         return self.page
 
     def start(self):
