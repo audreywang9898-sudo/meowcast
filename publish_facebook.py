@@ -164,7 +164,19 @@ class Facebook:
 
     def wait(self, vid, phase):
         for attempt in range(36):
-            status = self.status(vid)
+            try:
+                status = self.status(vid)
+            except RuntimeError as exc:
+                # Meta can briefly return object-not-found (100/33) after a
+                # successful Reel finish. Reconcile the SAME video ID; never
+                # start or publish a second Reel on an ambiguous result.
+                if (phase == 'publishing_phase' and
+                        'Facebook HTTP 400; code=100, subcode=33' in str(exc) and
+                        attempt < 12):
+                    print('Facebook Reel status temporarily unavailable (100/33); checking same video ID again.')
+                    time.sleep(5)
+                    continue
+                raise
             if status.get(phase, {}).get('status') == 'complete':
                 return
             if any(status.get(p, {}).get('status') in ('error', 'failed')
