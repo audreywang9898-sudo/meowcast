@@ -249,15 +249,15 @@ jobs:
           # A plain marker is not enough: a stale or prematurely written marker
           # must never suppress the real morning/evening publication.
           MARKER="${PUBLISH_DATE}-${SLOT}"
-          URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-slot.txt?ts=${GITHUB_RUN_ID}"
-          EVIDENCE_URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-evidence-${SLOT}.json?ts=${GITHUB_RUN_ID}"
+          URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-slot.txt?ts=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-$(date +%s%N)"
+          EVIDENCE_URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-evidence-${SLOT}.json?ts=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-$(date +%s%N)"
           PUBLISHED=$(curl -fsSL "$URL" || true)
           VALID_EVIDENCE=false
           # Compatibility with morning manual runs made before slot normalization.
           # Their evidence must still pass the same date/time checks below.
           if [ "$SLOT" = "0700" ] && [ "$PUBLISHED" = "${PUBLISH_DATE}-manual" ]; then
             MARKER="$PUBLISHED"
-            EVIDENCE_URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-evidence-manual.json?ts=${GITHUB_RUN_ID}"
+            EVIDENCE_URL="https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/latest/published-evidence-manual.json?ts=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-$(date +%s%N)"
           fi
           if [ "$PUBLISHED" = "$MARKER" ] && curl -fsSL "$EVIDENCE_URL" -o /tmp/published-evidence.json; then
             if PUBLISH_DATE="$PUBLISH_DATE" SLOT="$SLOT" python - <<'PY'
