@@ -129,6 +129,9 @@ jobs:
               if any(p and p.startswith(".github/recovery/morning-") for p in changed_paths):
                   slot="0700"
                   reason="verified one-shot morning recovery push"
+              elif any(p and p.startswith(".github/recovery/evening-") for p in changed_paths):
+                  slot="1630"
+                  reason="verified one-shot evening recovery push"
               elif ".github/trigger-meowcast-evening" in changed_paths:
                   try:
                       recovery_trigger=open(".github/trigger-meowcast-evening",encoding="utf-8").read()
