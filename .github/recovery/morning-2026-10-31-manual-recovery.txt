@@ -1,0 +1,2 @@
+Requested morning recovery for Taipei 2026-10-31 0700.
+Trigger is a one-shot verified push, no force republish.
