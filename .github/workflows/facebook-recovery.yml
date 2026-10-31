@@ -9,6 +9,7 @@ on:
     branches: [main]
     paths:
       - '.github/recovery/facebook-0700-*'
+      - '.github/recovery/facebook-1630-*'
   workflow_dispatch:
     inputs:
       slot:
@@ -59,6 +60,7 @@ jobs:
           MANUAL_SLOT: ${{ inputs.slot }}
           MANUAL_DATE: ${{ inputs.publish_date }}
           MANUAL_RUN_ID: ${{ inputs.source_run_id }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           python - <<'PY'
           import os, re
@@ -77,8 +79,23 @@ jobs:
           elif os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
               slot = manual_slot
           elif os.environ.get("GITHUB_EVENT_NAME") == "push":
-              # The only permitted push path is the explicit Facebook-only 0700 marker.
-              slot = "0700"
+              # Recover only the exact Facebook slot named by the verified push.
+              # Never default an unknown marker to another edition.
+              from urllib.request import Request, urlopen
+              repo = os.environ["GITHUB_REPOSITORY"]
+              sha = os.environ["GITHUB_SHA"]
+              token = os.environ.get("GITHUB_TOKEN", "")
+              req = Request(f"https://api.github.com/repos/{repo}/commits/{sha}",
+                            headers={"Accept": "application/vnd.github+json",
+                                     "Authorization": "Bearer " + token})
+              with urlopen(req, timeout=15) as response:
+                  info = __import__("json").load(response)
+              paths = {entry.get("filename", "") for entry in info.get("files", [])}
+              morning = any(p.startswith(".github/recovery/facebook-0700-") for p in paths)
+              evening = any(p.startswith(".github/recovery/facebook-1630-") for p in paths)
+              if morning == evening:
+                  raise SystemExit("Facebook recovery push marker is missing or ambiguous")
+              slot = "0700" if morning else "1630"
           else:
               raise SystemExit(f"Unknown Facebook recovery trigger: {trigger!r}")
 
