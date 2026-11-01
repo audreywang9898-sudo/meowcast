@@ -6,7 +6,7 @@ import os
 import re
 import subprocess
 import tempfile
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 import requests
@@ -48,9 +48,11 @@ def main():
     p.add_argument("--issue-date", required=True)
     a = p.parse_args()
     issue = date.fromisoformat(a.issue_date)
-    today = datetime.now(ZoneInfo("Asia/Taipei")).date()
-    if issue.weekday() != 6 or issue != today:
-        raise RuntimeError("Weekly Facebook production only permits today's Sunday issue")
+    now = datetime.now(ZoneInfo("Asia/Taipei"))
+    today = now.date()
+    monday_recovery = today == issue + timedelta(days=1) and now.hour < 12
+    if issue.weekday() != 6 or (issue != today and not monday_recovery):
+        raise RuntimeError("Weekly Facebook publication is limited to Sunday and Monday morning recovery")
     token = os.environ["TAIPEI_FB_PAGE_ACCESS_TOKEN"]
     page = os.environ["TAIPEI_FB_PAGE_ID"]
     media_token = os.environ["MEDIA_REPO_TOKEN"]
