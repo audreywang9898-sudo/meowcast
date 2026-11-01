@@ -55,6 +55,9 @@ class WeeklyTests(unittest.TestCase):
         due = datetime(2026, 10, 4, 8, 0, tzinfo=ZoneInfo('Asia/Taipei'))
         self.assertFalse(resolve('schedule', now=early)['publish'])
         self.assertTrue(resolve('schedule', now=due)['publish'])
+        self.assertFalse(resolve('workflow_run', now=early)['run'])
+        self.assertTrue(resolve('workflow_run', now=due)['run'])
+        self.assertTrue(resolve('workflow_run', now=due)['publish'])
         self.assertFalse(resolve('push', now=due)['publish'])
         self.assertFalse(resolve('workflow_dispatch', now=due)['publish'])
         with self.assertRaises(RuntimeError): publisher.publication_window(self.issue, early)
@@ -67,6 +70,7 @@ class WeeklyTests(unittest.TestCase):
         publisher.publication_window(self.issue, due)
         monday = datetime(2026, 10, 5, 8, tzinfo=ZoneInfo('Asia/Taipei'))
         self.assertFalse(resolve('schedule', now=monday)['run'])
+        self.assertFalse(resolve('workflow_run', now=monday)['run'])
     def test_oct_18_2026_sunday_issue_resolves_next_week(self):
         """Read-only preview on Thursday must target Sunday 10/18 and forecast 10/19-10/25."""
         thursday = datetime(2026, 10, 15, 12, 0, tzinfo=ZoneInfo('Asia/Taipei'))
