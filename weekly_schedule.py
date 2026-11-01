@@ -7,17 +7,16 @@ from zoneinfo import ZoneInfo
 def resolve(event, manual_date='', manual_publish=False, now=None, recovery=False):
     now = (now or datetime.now(ZoneInfo('Asia/Taipei'))).astimezone(ZoneInfo('Asia/Taipei'))
     today = now.date()
-    if event == 'schedule':
-        if today.weekday() != 6 or now.hour < 8:
+    if event in ('schedule', 'workflow_run'):
+        # GitHub may deliver cron events hours late, including after Taipei midnight.
+        # Recover the just-ended Sunday only through Monday before local noon.
+        if today.weekday() == 6 and now.hour >= 8:
+            issue = today
+        elif today.weekday() == 0 and now.hour < 12:
+            issue = today - timedelta(days=1)
+        else:
             return {'run': False, 'publish': False, 'issue_date': today.isoformat()}
-        issue = today
         publish = True
-    elif event == 'workflow_run':
-        # A completed daily Meowcast run is a second, independent GitHub
-        # event path. Never publish before Sunday 08:00 Taipei or on weekdays.
-        if today.weekday() != 6 or now.hour < 8:
-            return {'run': False, 'publish': False, 'issue_date': today.isoformat()}
-        return {'run': True, 'publish': True, 'issue_date': today.isoformat()}
     elif event in ('workflow_dispatch', 'push'):
         issue = date.fromisoformat(manual_date) if manual_date else today + timedelta(days=(6 - today.weekday()) % 7)
         publish = (event == 'workflow_dispatch' and manual_publish) or (event == 'push' and recovery)
