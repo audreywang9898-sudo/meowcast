@@ -61,6 +61,9 @@ class WeeklyTests(unittest.TestCase):
         publisher.publication_window(self.issue, early, allow_early=True)
         self.assertTrue(resolve('workflow_dispatch', '2026-10-04', True, now=early)['publish'])
         self.assertFalse(resolve('push', '2026-10-04', True, now=early)['publish'])
+        self.assertTrue(resolve('push', '2026-10-04', now=due, recovery=True)['publish'])
+        with self.assertRaises(ValueError):
+            resolve('push', '2026-10-11', now=due, recovery=True)
         publisher.publication_window(self.issue, due)
         monday = datetime(2026, 10, 5, 8, tzinfo=ZoneInfo('Asia/Taipei'))
         self.assertFalse(resolve('schedule', now=monday)['run'])
