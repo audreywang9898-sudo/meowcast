@@ -6,9 +6,16 @@ on:
     paths:
       - '.github/recovery/weekly-*'
   schedule:
-    - cron: '0 8 * * 0'
+    # GitHub schedule events are best-effort and may be delayed or dropped.
+    # Avoid the top-of-hour minute; all triggers use the Sunday Taipei date.
+    # Publication is deduplicated by weekly/{city}/{week_start}/state.json.
+    - cron: '7,23,41 8 * * 0'
       timezone: Asia/Taipei
-    - cron: '15,30,45 8 * * 0'
+    - cron: '11,37 9 * * 0'
+      timezone: Asia/Taipei
+    - cron: '19,47 10 * * 0'
+      timezone: Asia/Taipei
+    - cron: '23 11 * * 0'
       timezone: Asia/Taipei
   workflow_dispatch:
     inputs:
