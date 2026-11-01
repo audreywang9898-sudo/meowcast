@@ -1,6 +1,10 @@
 name: Weekly Meowcast carousels
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/recovery/weekly-*'
   schedule:
     - cron: '0 8 * * 0'
       timezone: Asia/Taipei
@@ -46,6 +50,7 @@ jobs:
         env:
           ISSUE_DATE: ${{ inputs.issue_date }}
           PUBLISH: ${{ inputs.publish }}
+          WEEKLY_RECOVERY_PUSH: ${{ github.event_name == 'push' && 'true' || 'false' }}
         run: python weekly_schedule.py
       - name: Install dependencies
         if: steps.slot.outputs.run == 'true'
