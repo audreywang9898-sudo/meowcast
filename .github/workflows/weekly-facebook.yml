@@ -11,6 +11,7 @@ on:
   schedule:
     - cron: '17,37,57 2 * * 0' # Sunday 10:17/10:37/10:57 Taipei; GitHub UTC cron
     - cron: '17,37,57 3 * * 0' # Sunday 11:17/11:37/11:57 Taipei; GitHub UTC cron
+    - cron: '23 1,2,3 * * 1'  # Monday 09:23/10:23/11:23 Taipei if weekly started late
   workflow_dispatch:
     inputs:
       issue_date:
@@ -40,12 +41,16 @@ jobs:
         run: |
           python - <<'PY'
           import os
-          from datetime import datetime
+          from datetime import date, datetime, timedelta
           from zoneinfo import ZoneInfo
-          today = datetime.now(ZoneInfo("Asia/Taipei")).date()
-          issue = os.environ.get("MANUAL_DATE") or today.isoformat()
-          if issue != today.isoformat() or today.weekday() != 6:
-              raise SystemExit("Only the current Taipei Sunday can be published")
+          now = datetime.now(ZoneInfo("Asia/Taipei"))
+          today = now.date()
+          default_issue = (today - timedelta(days=1)) if today.weekday() == 0 and now.hour < 12 else today
+          issue = os.environ.get("MANUAL_DATE") or default_issue.isoformat()
+          day = date.fromisoformat(issue)
+          valid = day.weekday() == 6 and (day == today or (today == day + timedelta(days=1) and now.hour < 12))
+          if not valid:
+              raise SystemExit("Only current Sunday or previous Sunday before Monday noon can be published")
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               f.write(f"issue_date={issue}\n")
           PY
