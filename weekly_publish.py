@@ -12,7 +12,7 @@ import shutil
 import subprocess
 import tempfile
 import time
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -35,8 +35,10 @@ def now_text():
 def publication_window(issue, now=None, allow_early=False):
     now = now or datetime.now(ZoneInfo('Asia/Taipei'))
     now = now.astimezone(ZoneInfo('Asia/Taipei'))
-    if issue.weekday() != 6 or now.date() != issue or (now.hour < 8 and not allow_early):
-        raise RuntimeError('Production weekly publish is allowed only on its Sunday issue date after 08:00 Asia/Taipei')
+    sunday = now.date() == issue and (now.hour >= 8 or allow_early)
+    monday_recovery = now.date() == issue + timedelta(days=1) and now.hour < 12
+    if issue.weekday() != 6 or not (sunday or monday_recovery):
+        raise RuntimeError('Weekly production is limited to Sunday from 08:00 (explicit manual may run early), or Monday before noon for late recovery')
 
 
 class MediaStore:
