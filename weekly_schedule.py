@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 
-def resolve(event, manual_date='', manual_publish=False, now=None):
+def resolve(event, manual_date='', manual_publish=False, now=None, recovery=False):
     now = (now or datetime.now(ZoneInfo('Asia/Taipei'))).astimezone(ZoneInfo('Asia/Taipei'))
     today = now.date()
     if event == 'schedule':
@@ -14,7 +14,7 @@ def resolve(event, manual_date='', manual_publish=False, now=None):
         publish = True
     elif event in ('workflow_dispatch', 'push'):
         issue = date.fromisoformat(manual_date) if manual_date else today + timedelta(days=(6 - today.weekday()) % 7)
-        publish = event == 'workflow_dispatch' and manual_publish
+        publish = (event == 'workflow_dispatch' and manual_publish) or (event == 'push' and recovery)
         if publish and (issue != today or today.weekday() != 6):
             raise ValueError('Manual production publish must target today, Sunday in Taiwan time')
     else:
@@ -25,7 +25,8 @@ def resolve(event, manual_date='', manual_publish=False, now=None):
 
 if __name__ == '__main__':
     result = resolve(os.environ.get('GITHUB_EVENT_NAME', 'workflow_dispatch'),
-                     os.environ.get('ISSUE_DATE', ''), os.environ.get('PUBLISH', 'false').lower() == 'true')
+                     os.environ.get('ISSUE_DATE', ''), os.environ.get('PUBLISH', 'false').lower() == 'true',
+                     recovery=os.environ.get('WEEKLY_RECOVERY_PUSH', 'false').lower() == 'true')
     with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
         for k, v in result.items(): f.write(f'{k}={str(v).lower() if isinstance(v, bool) else v}\n')
     print(result)
