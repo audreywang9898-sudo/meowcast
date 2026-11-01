@@ -1,6 +1,12 @@
 name: Weekly Meowcast carousels
 
 on:
+  # Separate event path: a completed daily city workflow starts a guarded
+  # Sunday weekly check, even if this weekly workflow's cron is late.
+  workflow_run:
+    workflows: ['Daily Meowcast', 'Melbourne Meowcast']
+    types: [completed]
+    branches: [main]
   push:
     branches: [main]
     paths:
