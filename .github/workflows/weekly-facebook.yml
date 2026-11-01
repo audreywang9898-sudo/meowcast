@@ -1,5 +1,9 @@
 name: Taipei Weekly Facebook Page
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/recovery/weekly-facebook-*'
   workflow_run:
     workflows: ['Weekly Meowcast carousels']
     types: [completed]
