@@ -108,7 +108,7 @@ jobs:
                   now=datetime.now(tz)
                   date=now.date().isoformat()
                   morning={"7 7 * * *","17 7 * * *","27 7 * * *","37 7 * * *","7 8 * * *"}
-                  evening_probe={"30 13 * * *","30 14 * * *","30 15 * * *"}
+                  evening_probe={"30 15 * * *"}
                   evening={"30 16 * * *","40 16 * * *","50 16 * * *","7 17 * * *"}
                   if trigger in morning:
                       period="morning"; slot="0700"; publish=True
