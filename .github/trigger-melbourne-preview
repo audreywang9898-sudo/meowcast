@@ -1,1 +1,1 @@
-morning force-publish 2026-10-22 recovery after public visibility change
+evening force-publish 2026-11-02 manual recovery; slot=1630; do-not-republish; ensure existing published evidence dedupe
