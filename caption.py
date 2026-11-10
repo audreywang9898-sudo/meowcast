@@ -376,6 +376,32 @@ def _voice_lines(w, city):
     if w["rain"] >= 50 and theme(w) != "rainy":
         en += " The rain chance still calls for an umbrella in your bag. The sky has options."
         zh += " 降雨機率仍偏高，包包放把傘。天空也有備案。"
+    if voice == "taipei":
+        # A small, grounded lift after the joke: morning courage, evening recognition.
+        # Rotates by local weekday; never changes weather facts or Melbourne copy.
+        encouragement = {
+            "morning": [
+                ("今天不用一口氣解決所有事，先完成眼前的一小步就很棒。", "You don't have to solve everything today. One small step counts."),
+                ("進度慢一點也沒關係，貓走路不趕，還不是很有氣勢。", "A slower pace still moves you forward. Cats know that."),
+                ("走到星期三已經很不簡單，今天也給自己一點信心。", "You've made it to Wednesday. Give yourself some credit."),
+                ("不用等到萬事俱備才開始，先踏出一步就有新風景。", "You don't need perfect conditions to begin. Take the first step."),
+                ("這週努力到現在值得拍拍手，剩下的照自己的節奏來。", "You've put in the effort this week. Finish at your own pace."),
+                ("今天想探索或休息都可以，選擇適合自己的步調就好。", "Explore or rest today. Your pace is a good pace."),
+                ("把力氣留給真正重要的事，休息也是在替明天充電。", "Save energy for what matters. Rest helps tomorrow too."),
+            ],
+            "evening": [
+                ("今天不管完成多少，都值得好好吃飯、安心休息。", "Whatever you finished today, you deserve dinner and rest."),
+                ("有些努力不會立刻被看見，但它們仍然算數。", "Not every effort is visible right away, but it still counts."),
+                ("走到一週中間了，累了就休息，不用跟誰比速度。", "Halfway through the week. Rest when you need to; it's not a race."),
+                ("今天已經盡力就很好，明天再繼續也來得及。", "Doing your best today is enough. Tomorrow can wait."),
+                ("辛苦一週了，今晚把掌聲留給努力生活的自己。", "You've worked hard this week. Give yourself some credit tonight."),
+                ("平凡的一天也值得珍惜，謝謝自己好好走到現在。", "Even an ordinary day matters. Thanks for making it through."),
+                ("新的一週還沒開始，今晚先把自己照顧好。", "Next week can wait. Take care of yourself tonight."),
+            ],
+        }
+        lift_zh, lift_en = encouragement[period][weekday]
+        zh += "\n" + lift_zh
+        en += "\n" + lift_en
     return en, zh
 
 def _seasonal_copy(event):
@@ -564,7 +590,7 @@ Preserve the time-of-day framing. Keep it concise enough for Instagram/Facebook.
 Preserve the first opening line verbatim, including its weekday and forecast condition. For Taipei also preserve the English opening line verbatim in the English section.
 Taipei voice: Traditional Chinese first, then natural English; an affectionate, mildly grumbling neighbourhood cat. Use Taiwanese everyday phrasing, not forced slang.
 Melbourne voice: natural Australian English, dry wit, brollies, commutes and sofa ownership; no caricature or forced puns.
-Make the cat the butt of the joke. Keep morning and evening distinct. Avoid repetitive motivational platitudes.
+Make the cat the butt of the joke. Keep morning and evening distinct. Avoid repetitive motivational platitudes. For Taipei, balance roughly 60% observational cat humour with 40% natural, specific encouragement: mornings offer a small dose of courage; evenings acknowledge effort and rest. Preserve the existing encouraging lines in both languages, without exaggeration or preachiness.
 Never invent current rain, wind, humidity, UV, transport disruption, or a guaranteed dry period from probabilities.
 Keep the date (including year), city, brand, temperatures, rain chance and its time window. No invented percentages.
 Preserve any named calendar event and its meaning. Treat remembrance days and Qingming respectfully, without jokes.
