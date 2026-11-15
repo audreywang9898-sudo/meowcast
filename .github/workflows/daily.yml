@@ -341,7 +341,21 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add "$MEDIA_PATH"
           git commit -m "Add Meowcast Reel ${PUBLISH_DATE} ${SAFE_SLOT} run ${GITHUB_RUN_ID}"
-          git push origin main
+          # Concurrent city uploads may advance meowcast-media/main between clone and push.
+          # Retry only the Git push; never regenerate or republish the Instagram Reel.
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:main; then
+              break
+            fi
+            if [ "$attempt" -eq 5 ]; then
+              echo "Media upload push failed after 5 attempts."
+              exit 1
+            fi
+            echo "Media repository advanced; rebasing unique Reel commit (attempt $attempt)."
+            sleep "$((attempt * 2))"
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort || true; exit 1; }
+          done
           echo "path=$MEDIA_PATH" >> "$GITHUB_OUTPUT"
           echo "url=https://raw.githubusercontent.com/audreywang9898-sudo/meowcast-media/main/$MEDIA_PATH" >> "$GITHUB_OUTPUT"
 
