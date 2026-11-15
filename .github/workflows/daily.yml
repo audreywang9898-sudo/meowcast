@@ -301,6 +301,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           CWA_API_KEY: ${{ secrets.CWA_API_KEY }}
           MEOWCAST_PERIOD: ${{ steps.schedule.outputs.slot == '1630' && 'evening' || 'morning' }}
+          PUBLISH_DATE: ${{ steps.schedule.outputs.date }}
         if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
         run: python render.py
 
