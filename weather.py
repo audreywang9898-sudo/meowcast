@@ -51,12 +51,23 @@ def _cwa_weather(city, evening=False):
     r.raise_for_status()
     loc=r.json()["records"]["location"][0]
     elements={x["elementName"]:x["time"] for x in loc["weatherElement"]}
-    idx=1 if evening and len(elements["Wx"])>1 else 0
+    # Select the CWA interval covering the local evening (18:00), rather than
+    # blindly selecting index 1, which can already belong to tomorrow.
+    local_now=datetime.now(ZoneInfo(city["timezone"]))
+    idx=0
+    if evening:
+        target=local_now.replace(hour=18, minute=0, second=0, microsecond=0)
+        for i, interval in enumerate(elements["Wx"]):
+            start=datetime.fromisoformat(interval["startTime"]).replace(tzinfo=ZoneInfo(city["timezone"]))
+            end=datetime.fromisoformat(interval["endTime"]).replace(tzinfo=ZoneInfo(city["timezone"]))
+            if start <= target < end:
+                idx=i
+                break
     wx=elements["Wx"][idx]["parameter"]["parameterName"]
     pop=int(elements["PoP"][idx]["parameter"]["parameterName"])
     low=int(elements["MinT"][idx]["parameter"]["parameterName"])
     high=int(elements["MaxT"][idx]["parameter"]["parameterName"])
-    date=elements["Wx"][idx]["startTime"][:10]
+    # The edition date is the local publication day, not the CWA interval start.\n    date=datetime.now(ZoneInfo(city["timezone"])).date().isoformat()
     if evening:
         return {
             "date":date,
