@@ -1,5 +1,6 @@
 import os, subprocess, json, urllib.request, re
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from PIL import Image,ImageDraw,ImageFont
 from weather import get_weather, get_evening_weather
 from caption import make_caption, temperature_label
@@ -260,6 +261,16 @@ def main(period=None):
     if period not in ("morning","evening"):
         raise ValueError(f"Unsupported MEOWCAST_PERIOD: {period}")
     w=get_evening_weather(city) if period=="evening" else get_weather(city)
+    # The caption weekday, date, artwork rotation and video overlay must all
+    # use the edition's local publication date, never a forecast interval date.
+    # GitHub Actions supplies the intended date for delayed scheduled runs.
+    publication_date=os.environ.get("PUBLISH_DATE", "").strip()
+    if not publication_date:
+        publication_date=datetime.now(ZoneInfo(city["timezone"])).date().isoformat()
+    publication_date=datetime.fromisoformat(publication_date).date().isoformat()
+    if w["date"] != publication_date:
+        print(f"Normalizing forecast date {w['date']} to publication date {publication_date}")
+    w["date"]=publication_date
     print("Weather input:", w)
     # A missing scheduled artwork keeps the event caption and weather fallback.
     # Standby events are never selected by the normal morning/evening schedule.
