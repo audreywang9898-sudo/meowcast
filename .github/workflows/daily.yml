@@ -340,7 +340,18 @@ jobs:
           git config user.name "meowcast-bot"
           git config user.email "actions@users.noreply.github.com"
           git add "$MEDIA_PATH"
-          git commit -m "Add Meowcast Reel ${PUBLISH_DATE} ${SAFE_SLOT} run ${GITHUB_RUN_ID}"
+          # A retry keeps GITHUB_RUN_ID, so the uploaded media may already exist.
+          # Reuse only when the stored bytes match the generated Reel exactly.
+          if git diff --cached --quiet; then
+            if cmp -s "$GITHUB_WORKSPACE/output/meowcast.mp4" "$MEDIA_PATH"; then
+              echo "Existing Reel bytes match; reusing the public URL."
+            else
+              echo "ERROR: Existing Reel path differs; refusing overwrite."
+              exit 1
+            fi
+          else
+            git commit -m "Add Meowcast Reel ${PUBLISH_DATE} ${SAFE_SLOT} run ${GITHUB_RUN_ID}"
+          fi
           # Concurrent city uploads may advance meowcast-media/main between clone and push.
           # Retry only the Git push; never regenerate or republish the Instagram Reel.
           for attempt in 1 2 3 4 5; do
