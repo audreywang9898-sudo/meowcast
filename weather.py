@@ -67,7 +67,8 @@ def _cwa_weather(city, evening=False):
     pop=int(elements["PoP"][idx]["parameter"]["parameterName"])
     low=int(elements["MinT"][idx]["parameter"]["parameterName"])
     high=int(elements["MaxT"][idx]["parameter"]["parameterName"])
-    # The edition date is the local publication day, not the CWA interval start.\n    date=datetime.now(ZoneInfo(city["timezone"])).date().isoformat()
+    # The edition date is the local publication day, not the CWA interval start.
+    date=os.environ.get("PUBLISH_DATE") or local_now.date().isoformat()
     if evening:
         return {
             "date":date,
