@@ -1,19 +1,54 @@
-import os,time,requests,json
+import os,time,requests,json,sys
 from pathlib import Path
 
-API="https://graph.instagram.com/v24.0"
+INSTAGRAM_API="https://graph.instagram.com/v24.0"
+FACEBOOK_API="https://graph.facebook.com/v24.0"
+
+def credentials():
+    """Choose the Meta endpoint matching the actual user token, without logging secrets."""
+    ig=(os.environ.get("IG_USER_ID") or "").strip()
+    token=(os.environ.get("IG_ACCESS_TOKEN") or "").strip()
+    if token.startswith("IG_ACCESS_TOKEN="):
+        token=token.split("=",1)[1].strip()
+    token=token.strip('"\'' )
+    if token.lower().startswith("bearer "):
+        token=token[7:].strip()
+    if not ig.isdigit():
+        raise RuntimeError("IG_USER_ID must be a numeric Instagram professional account ID.")
+    if not token or any(c.isspace() for c in token):
+        raise RuntimeError("IG_ACCESS_TOKEN is missing or contains whitespace; enter only the complete Meta access token in GitHub Secrets.")
+    if token.startswith("EAA"):
+        # Facebook Login (including Page tokens) uses graph.facebook.com.
+        api=FACEBOOK_API
+    elif token.startswith("IG"):
+        # Instagram Login uses graph.instagram.com.
+        api=INSTAGRAM_API
+    else:
+        raise RuntimeError("IG_ACCESS_TOKEN has an unrecognized token format; expected an Instagram (IG...) or Facebook (EAA...) user access token.")
+    return ig,token,api
+
+
+def check_credentials():
+    """Read-only token/account validation; never creates or publishes a Reel."""
+    ig,token,api=credentials()
+    r=requests.get(f"{api}/{ig}",params={"fields":"id","access_token":token},timeout=30)
+    fail(r,"Validate Instagram access")
+    if str(r.json().get("id")) != ig:
+        raise RuntimeError("IG_USER_ID does not match the Instagram account accessible through IG_ACCESS_TOKEN.")
+    print("Instagram token and target account verified (read-only; publication permission not tested).")
 
 def fail(r,label):
     if r.ok: return
     try: detail=r.json()
     except Exception: detail=r.text
+    error=detail.get("error",{}) if isinstance(detail,dict) else {}
+    if error.get("code")==190:
+        raise RuntimeError(f"{label} failed: Meta rejected IG_ACCESS_TOKEN (OAuth 190). Check the token value, expiration, and matching Instagram/Facebook Login type.")
     raise RuntimeError(f"{label} failed (HTTP {r.status_code}): {json.dumps(detail,ensure_ascii=False)}")
 
 def publish_reel(video_url,caption):
-    ig=os.environ.get("IG_USER_ID"); token=os.environ.get("IG_ACCESS_TOKEN")
-    if not ig or not token:
-        raise RuntimeError("IG publishing failed: missing GitHub secrets.")
-    base=f"{API}/{ig}"
+    ig,token,api=credentials()
+    base=f"{api}/{ig}"
     r=requests.post(base+"/media",data={"media_type":"REELS","video_url":video_url,"caption":caption,"share_to_feed":"true","access_token":token},timeout=60)
     fail(r,"Create Reel container")
     cid=r.json()["id"]; print("Container created:",cid)
@@ -55,6 +90,11 @@ def publish_reel(video_url,caption):
         fail(r,"Publish Reel")
 
 if __name__=="__main__":
+    if sys.argv[1:]==["--check-config"]:
+        check_credentials()
+        sys.exit(0)
+    if len(sys.argv)>1:
+        raise SystemExit("Usage: publish_instagram.py [--check-config]")
     # Never accept a stale receipt from a prior local invocation.
     Path("output/publish-result.json").unlink(missing_ok=True)
     url=os.environ.get("REEL_PUBLIC_URL")
