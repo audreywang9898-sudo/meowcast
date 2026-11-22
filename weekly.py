@@ -50,15 +50,20 @@ def fetch_forecast(city):
     params = {'latitude': city['latitude'], 'longitude': city['longitude'],
               'timezone': city['timezone'], 'daily': ','.join(DAILY_KEYS), 'forecast_days': 16}
     url = 'https://api.open-meteo.com/v1/forecast?' + urlencode(params)
-    for attempt in range(3):
+    # A single TLS handshake timeout must not cancel the weekly issue.
+    # Retry transient network failures only; never fabricate forecast values.
+    for attempt in range(5):
         try:
-            with urlopen(url, timeout=45) as r:
+            with urlopen(url, timeout=35) as r:
                 data = json.load(r)
             data['_retrieved_at'] = datetime.now(ZoneInfo(city['timezone'])).isoformat(timespec='minutes')
             return data
-        except (URLError, TimeoutError, ValueError):
-            if attempt == 2: raise
-            time.sleep(2 * (attempt + 1))
+        except (URLError, TimeoutError) as exc:
+            if attempt == 4:
+                raise RuntimeError('Open-Meteo unavailable after 5 attempts') from exc
+            delay = min(5 * (2 ** attempt), 30)
+            print(f'Open-Meteo network attempt {attempt + 1}/5 failed: {type(exc).__name__}; retry in {delay}s', flush=True)
+            time.sleep(delay)
 
 
 def select_week(data, dates, city):
