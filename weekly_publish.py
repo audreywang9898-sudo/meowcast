@@ -20,7 +20,8 @@ import requests
 from PIL import Image
 from weekly import week_dates
 
-API = 'https://graph.instagram.com/v24.0'
+INSTAGRAM_API = 'https://graph.instagram.com/v24.0'
+FACEBOOK_API = 'https://graph.facebook.com/v24.0'
 MEDIA_REPO = 'audreywang9898-sudo/meowcast-media'
 
 
@@ -109,16 +110,16 @@ class MediaStore:
 
 class Instagram:
     def __init__(self):
-        self.ig = os.environ.get('IG_USER_ID')
-        self.token = os.environ.get('IG_ACCESS_TOKEN')
-        if not self.ig or not self.token: raise RuntimeError('Instagram credentials missing')
+        # Match the token normalization and Meta endpoint selection used by daily Reels.
+        from publish_instagram import credentials
+        self.ig, self.token, self.api = credentials()
 
     def request(self, method, path, **values):
         values['access_token'] = self.token
         # Do not echo provider payloads or request URLs containing credentials.
         try:
-            if method == 'GET': r = requests.get(API + '/' + path, params=values, timeout=45)
-            else: r = requests.post(API + '/' + path, data=values, timeout=60)
+            if method == 'GET': r = requests.get(self.api + '/' + path, params=values, timeout=45)
+            else: r = requests.post(self.api + '/' + path, data=values, timeout=60)
         except requests.RequestException:
             raise RuntimeError('Instagram network request failed; result may be unconfirmed') from None
         if not r.ok:
