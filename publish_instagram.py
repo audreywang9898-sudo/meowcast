@@ -53,7 +53,7 @@ def publish_reel(video_url,caption):
     fail(r,"Create Reel container")
     cid=r.json()["id"]; print("Container created:",cid)
     for _ in range(30):
-        s=requests.get(f"{API}/{cid}",params={"fields":"status_code,status","access_token":token},timeout=30)
+        s=requests.get(f"{api}/{cid}",params={"fields":"status_code,status","access_token":token},timeout=30)
         fail(s,"Check Reel status")
         data=s.json(); print("Meta status:",data.get("status_code"))
         if data.get("status_code")=="FINISHED": break
