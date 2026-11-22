@@ -296,6 +296,13 @@ jobs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Validate Instagram credentials before rendering
+        if: steps.schedule.outputs.run == 'true' && steps.dedupe.outputs.skip != 'true'
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python publish_instagram.py --check-config
+
       - name: Generate today's Reel
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
